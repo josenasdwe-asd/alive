@@ -5,9 +5,8 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-  type MotionValue,
 } from "framer-motion";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import type {
   AnimationConfig,
   ImageLayer,
@@ -19,9 +18,6 @@ import { DEFAULT_LAYER_ANIM } from "@/lib/types";
 interface AliveCSS3DProps {
   layers: ImageLayer[];
   config: AnimationConfig;
-  backgroundUrl?: string;
-  originalUrl: string;
-  foregroundUrl?: string;
   liquidFilterId?: string;
   editorMode?: boolean;
   selectedLayerId?: string;
@@ -29,7 +25,6 @@ interface AliveCSS3DProps {
   onLayerTransform?: (id: string, transform: Partial<ImageLayer["transform"]>) => void;
 }
 
-// prime-ish durations for organic desync
 const DURATIONS = {
   breath: 6.2,
   sway: 8.3,
@@ -52,17 +47,12 @@ const BLEND_CSS: Record<BlendMode, string> = {
 };
 
 /**
- * Nivel 2 — CSS 3D estereoscópico.
- * Cada capa se posiciona en Z real con translateZ(). El contenedor rota
- * con el mouse (rotateX/rotateY) y el navegador calcula la perspectiva
- * matemáticamente correcta — parallax estereoscópico real, no aproximado.
+ * Nivel 2 — CSS 3D estereoscópico, 1 plane per layer.
+ * Container rotates with mouse; each layer positioned at translateZ(depth).
  */
 export function AliveCSS3D({
   layers,
   config,
-  backgroundUrl,
-  originalUrl,
-  foregroundUrl,
   liquidFilterId,
   editorMode = false,
   selectedLayerId,
@@ -72,19 +62,8 @@ export function AliveCSS3D({
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  // spring for smooth rotation
-  const smx = useSpring(mx, {
-    stiffness: 60,
-    damping: 20,
-    mass: 0.6,
-  });
-  const smy = useSpring(my, {
-    stiffness: 60,
-    damping: 20,
-    mass: 0.6,
-  });
-
-  // container rotation from mouse
+  const smx = useSpring(mx, { stiffness: 60, damping: 20, mass: 0.6 });
+  const smy = useSpring(my, { stiffness: 60, damping: 20, mass: 0.6 });
   const rotateY = useTransform(smx, (v) => v * config.rotate3dStrength);
   const rotateX = useTransform(smy, (v) => -v * config.rotate3dStrength);
 
@@ -92,7 +71,6 @@ export function AliveCSS3D({
     if (config.reducedMotion || !config.parallaxEnabled) return;
     const el = containerRef.current;
     if (!el) return;
-
     const handle = (e: PointerEvent) => {
       const rect = el.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
@@ -112,9 +90,7 @@ export function AliveCSS3D({
     };
   }, [config.reducedMotion, config.parallaxEnabled, mx, my]);
 
-  const planes = buildPlanes(layers, backgroundUrl, originalUrl, foregroundUrl);
-
-  // Z range: far layers at -400px, near at +400px
+  const sorted = [...layers].sort((a, b) => a.depth - b.depth);
   const zRange = 800;
 
   return (
@@ -127,6 +103,7 @@ export function AliveCSS3D({
           transformStyle: "preserve-3d",
           rotateX,
           rotateY,
+          isolation: "isolate",
         } as React.CSSProperties
       }
       onPointerDown={(e) => {
@@ -135,34 +112,25 @@ export function AliveCSS3D({
         }
       }}
     >
-      {planes.map((plane, i) => (
-        <CSS3DPlane
-          key={plane.id}
-          plane={plane}
+      {sorted.map((layer, i) => (
+        <CSS3DLayer
+          key={layer.id}
+          layer={layer}
           index={i}
           zRange={zRange}
           config={config}
           liquidFilterId={liquidFilterId}
           editorMode={editorMode}
-          selected={selectedLayerId === plane.layerId}
-          onSelect={() => onSelectLayer?.(plane.layerId)}
+          selected={selectedLayerId === layer.id}
+          onSelect={() => onSelectLayer?.(layer.id)}
         />
       ))}
     </motion.div>
   );
 }
 
-interface PlaneData {
-  id: string;
-  layerId: string;
-  depth: number;
-  url?: string;
-  alt: string;
-  transform: ImageLayer["transform"];
-}
-
-interface PlaneProps {
-  plane: PlaneData;
+interface CSS3DLayerProps {
+  layer: ImageLayer;
   index: number;
   zRange: number;
   config: AnimationConfig;
@@ -172,8 +140,8 @@ interface PlaneProps {
   onSelect?: () => void;
 }
 
-function CSS3DPlane({
-  plane,
+function CSS3DLayer({
+  layer,
   index,
   zRange,
   config,
@@ -181,18 +149,16 @@ function CSS3DPlane({
   editorMode,
   selected,
   onSelect,
-}: PlaneProps) {
+}: CSS3DLayerProps) {
+  const t = layer.transform;
+
   const layerAnim: LayerAnimationConfig =
-    config.layers[plane.layerId] ??
-    ({ layerId: plane.layerId, ...DEFAULT_LAYER_ANIM } as LayerAnimationConfig);
+    config.layers[layer.id] ??
+    ({ layerId: layer.id, ...DEFAULT_LAYER_ANIM } as LayerAnimationConfig);
 
-  const t = plane.transform;
   const intensity = config.intensity;
+  const translateZ = (layer.depth - 0.5) * zRange;
 
-  // TRUE 3D Z position: depth 0 → -zRange/2, depth 1 → +zRange/2
-  const translateZ = (plane.depth - 0.5) * zRange;
-
-  // durations
   const dm = layerAnim.durationMultiplier;
   const speed = config.speed * dm;
   const phaseDelay = `-${(layerAnim.phaseOffset * 6).toFixed(2)}s`;
@@ -202,6 +168,9 @@ function CSS3DPlane({
   const twistDur = (DURATIONS.twist / Math.max(0.2, speed)).toFixed(2);
   const floatDur = (DURATIONS.float / Math.max(0.2, speed)).toFixed(2);
   const driftDur = (DURATIONS.drift / Math.max(0.2, speed)).toFixed(2);
+
+  // === BUG FIX #1: respect visibility ===
+  if (!t.visible) return null;
 
   const animations: string[] = [];
   const ampVars: Record<string, string | number> = {};
@@ -234,30 +203,23 @@ function CSS3DPlane({
   const layerBlur = t.blur + layerAnim.blur;
   ampVars["--layer-blur"] = `${layerBlur}px`;
 
-  // scale to cover perspective shrink (closer Z = appears larger naturally, but we need to overscale to cover edges during rotation)
-  const overscale = (1.15 + plane.depth * 0.05) * t.scale;
+  const overscale = (1.15 + layer.depth * 0.05) * t.scale;
+  const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
   return (
+    // OUTER: 3D position (translateZ) + blend + opacity
     <div
-      className={`alive-layer absolute inset-0 ${selected ? "selected" : ""}`}
-      data-layer-id={plane.layerId}
-      style={
-        {
-          // TRUE 3D: translateZ positions the layer in 3D space
-          transform: `translateZ(${translateZ}px) translate3d(${t.x}px, ${t.y}px, 0) scale(${overscale}) rotate(${t.rotation}deg)`,
-          transformStyle: "preserve-3d",
-          mixBlendMode: BLEND_CSS[t.blendMode],
-          opacity: t.opacity * layerAnim.opacity,
-          zIndex: t.zOverride ?? 10 + index + Math.round(plane.depth * 100),
-          animationDelay: phaseDelay,
-          filter: useLiquid ? `url(#${liquidFilterId})` : undefined,
-          willChange: "transform, filter",
-          cursor: editorMode ? "move" : "default",
-          pointerEvents: editorMode ? "auto" : "none",
-          ...ampVars,
-          animation: animations.join(", ") || undefined,
-        } as React.CSSProperties
-      }
+      className="absolute inset-0"
+      style={{
+        transform: `translateZ(${translateZ}px)`,
+        transformStyle: "preserve-3d",
+        mixBlendMode: BLEND_CSS[t.blendMode],
+        opacity: t.opacity * layerAnim.opacity,
+        zIndex,
+        isolation: t.blendMode !== "normal" ? "isolate" : undefined,
+        pointerEvents: editorMode ? "auto" : "none",
+        cursor: editorMode ? (selected ? "move" : "pointer") : "default",
+      }}
       onPointerDown={(e) => {
         if (editorMode) {
           e.stopPropagation();
@@ -265,69 +227,29 @@ function CSS3DPlane({
         }
       }}
     >
-      {plane.url ? (
-        <img
-          src={plane.url}
-          alt={plane.alt}
-          className="h-full w-full object-cover select-none"
-          draggable={false}
-        />
-      ) : (
-        plane.fallback
-      )}
+      {/* INNER: user transform + organic animations */}
+      <div
+        className={`alive-layer absolute inset-0 ${selected ? "selected" : ""}`}
+        data-layer-id={layer.id}
+        style={
+          {
+            transform: `translate3d(${t.x}px, ${t.y}px, 0) scale(${overscale}) rotate(${t.rotation}deg)`,
+            animationDelay: phaseDelay,
+            animation: animations.join(", ") || undefined,
+            filter: useLiquid ? `url(#${liquidFilterId})` : undefined,
+            ...ampVars,
+          } as React.CSSProperties
+        }
+      >
+        {layer.url ? (
+          <img
+            src={layer.url}
+            alt={layer.name}
+            className="h-full w-full object-cover select-none"
+            draggable={false}
+          />
+        ) : null}
+      </div>
     </div>
   );
-}
-
-function buildPlanes(
-  layers: ImageLayer[],
-  backgroundUrl: string | undefined,
-  originalUrl: string,
-  foregroundUrl: string | undefined
-): PlaneData[] {
-  const planes: PlaneData[] = [];
-
-  const bgLayer = layers.find((l) => l.role === "background");
-  if (backgroundUrl) {
-    planes.push({
-      id: "plane-bg",
-      layerId: bgLayer?.id ?? layers[0]?.id ?? "bg",
-      depth: bgLayer?.depth ?? 0.1,
-      url: backgroundUrl,
-      alt: "Background layer",
-      transform: bgLayer?.transform ?? ({} as ImageLayer["transform"]),
-    });
-  }
-
-  const subjectLayer = layers.find((l) => l.role === "subject");
-  const midLayer = layers.find((l) => l.role === "midground");
-  planes.push({
-    id: "plane-original",
-    layerId:
-      subjectLayer?.id ??
-      midLayer?.id ??
-      layers[layers.length - 1]?.id ??
-      "subject",
-    depth: subjectLayer?.depth ?? midLayer?.depth ?? 0.6,
-    url: originalUrl,
-    alt: "Main image",
-    transform:
-      subjectLayer?.transform ??
-      midLayer?.transform ??
-      ({} as ImageLayer["transform"]),
-  });
-
-  if (foregroundUrl) {
-    const fgLayer = layers.find((l) => l.role === "foreground");
-    planes.push({
-      id: "plane-fg",
-      layerId: fgLayer?.id ?? "foreground",
-      depth: fgLayer?.depth ?? 0.95,
-      url: foregroundUrl,
-      alt: "Foreground layer",
-      transform: fgLayer?.transform ?? ({} as ImageLayer["transform"]),
-    });
-  }
-
-  return planes;
 }

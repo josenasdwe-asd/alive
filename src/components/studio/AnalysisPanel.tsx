@@ -203,10 +203,12 @@ export function AnalysisPanel() {
 
       const updatedLayers = currentLayers.map((l) => {
         if (l.role === "background" && res.background)
-          return { ...l, url: res.background.url };
+          return { ...l, url: res.background.url, transform: { ...l.transform, visible: true } };
         const exUrl = extractedMap.get(l.name);
-        if (exUrl) return { ...l, url: exUrl };
-        return { ...l, url: originalUrl };
+        if (exUrl)
+          return { ...l, url: exUrl, transform: { ...l.transform, visible: true } };
+        // no extraction for this layer — hide it (we don't have its real image)
+        return { ...l, url: "", transform: { ...l.transform, visible: false } };
       });
       setLayers(updatedLayers);
 

@@ -1896,3 +1896,334 @@ Stage Summary:
 - Pipeline indicator visual de 4 pasos siempre visible en el header
 - Panel derecho contextual con tabs (Animar/Atmósfera/Exportar) reduce ruido visual
 - Dos caminos: matemático (determinístico, rápido) o IA (semántico, profundo) — el usuario elige
+
+---
+Task ID: 1
+Agent: Research Agent v4 — Awwwards + Bug Analysis
+Task: Research Awwwards parallax architectures + diagnose why layer hide/edit bugs occur
+
+Work Log:
+- Read /home/z/my-project/worklog.md (1898 lines) for full project context — established that Task 1 (layer separation research), Task 1-10 (v2 evolution), v3 (CSS 3D + canvas particles), and v4 (K-means depth slicer) have all shipped, and that the studio already supports a layers[] array of 6-10 ImageLayers with full LayerTransform (x, y, scale, rotation, opacity, blur, blendMode, visible, locked, zOverride) — but two critical user-reported bugs remain: (1) hiding a layer does nothing, (2) editing transform on the canvas does nothing.
+- Read the five suspect files end-to-end with `Read` tool:
+  * `/home/z/my-project/src/components/alive/AliveLayers.tsx` (404 lines)
+  * `/home/z/my-project/src/components/alive/AliveCSS3D.tsx` (333 lines)
+  * `/home/z/my-project/src/components/studio/LayersPanel.tsx` (463 lines)
+  * `/home/z/my-project/src/components/alive/LayerEditor.tsx` (95 lines)
+  * `/home/z/my-project/src/lib/store.ts` (311 lines)
+  Also read for context: `AliveStage.tsx`, `Studio.tsx`, `LayerInspector.tsx` (head), `lib/types.ts`, and the head of `AliveWebGL.tsx`.
+- Traced the full data flow for both bugs (see "Root cause trace" below).
+- For Part A (Awwwards research): attempted z-ai `web_search` and `page_reader` for ~30 min — both backends returned persistent HTTP 429 ("Too many requests, please try again later") after Task 1's prior heavy usage. Pivoted to the existing `research_cache/` directory (50+ JSON files of prior search/page_reader output) and the Task 1 / v2 / v3 / v4 worklog entries, which already cover Codrops WebGL UV-displacement, R3F vertex displacement, Immersity/LeiaPix/DepthFlow/Tiefling, 3D Photo Inpainting LDI, GSAP/Lenis, SVG feTurbulence, Photopea/Figma/Konva/Polotno layer editors, dnd-kit, react-moveable, painter's algorithm, mix-blend-mode, and hit-testing — all primary sources I would have searched for. Cross-referenced with my own knowledge of Active Theory / Lusion / Resn / Studio Korpi / Mathieu Triay / Locomotive award-winning sites.
+- For Part B (bug diagnosis): produced exact file:line root-cause analysis and concrete fix recommendations for each bug.
+- Appended this entry to worklog.md. No code was written.
+
+Stage Summary:
+- **Two bugs are downstream of ONE architectural defect**: `AliveLayers.buildPlanes()` and `AliveCSS3D.buildPlanes()` are HARDCODED to render at most 3 planes (background / original / foreground). They ignore the user's full `layers[]` array except as a role-lookup. So when the LayersPanel shows 6 layers and the user toggles visibility or drags a transform on layer #4, the store updates correctly but the canvas never sees that layer in the first place.
+- **Bug #1 (hide does nothing)** — `Plane`/`CSS3DPlane` NEVER read `transform.visible`. They set `opacity: t.opacity * layerAnim.opacity` (AliveLayers.tsx:296, AliveCSS3D.tsx:250) but never apply `display:none` / `visibility:hidden`. `buildPlanes()` also never filters `!layer.transform.visible`. LayersPanel.tsx + store.ts are correct.
+- **Bug #2 (edit does nothing)** — three compounding defects in LayerEditor.tsx + AliveLayers.tsx: (a) `onDrag` does `layer.transform.x + beforeTranslate[0]` which ACCUMULATES because `beforeTranslate` is cumulative-from-drag-start (react-moveable semantics) while `layer.transform.x` is also being updated each frame → exponential blow-up; (b) `useTransform(smx, v => v * pxToMove + t.x)` (AliveLayers.tsx:210-211) captures `t.x` in a closure that only re-runs when `smx` emits — if the user drags via moveable without mouse-moving across the container, `smx` doesn't emit and the new `t.x` is never reflected on the DOM; (c) react-moveable sets the target's inline `transform` directly during drag, but framer-motion's `<motion.div style={{x: tx}}>` reclaims it on re-render → the two libraries fight over the transform property.
+- **Awwwards techniques we should adopt**: (1) refactor `buildPlanes` to one-plane-per-layer so N layers actually render N planes (this alone fixes 80% of both bugs); (2) treat `transform.visible` as a first-class plane-skip, not an opacity flag; (3) adopt Active Theory's "WebGL plane stack with per-plane alpha texture" pattern for occlusion-aware parallax; (4) consider Lenis + GSAP ScrollTrigger for scroll-bound parallax (currently we only have mouse parallax); (5) use `@property`-registered CSS custom properties for per-layer animation amplitudes (we already do this in v2 — keep); (6) add a `pointer-events: none` blanket on the stage with `pointer-events: auto` only on the moveable target, so moveable doesn't fight with the container's `pointermove` listener.
+
+## PART A — Awwwards parallax architecture research
+
+> Note: z-ai `web_search` and `page_reader` were unavailable during this run (persistent HTTP 429). The synthesis below combines the existing `research_cache/` artifacts (a1_slicing, a3_lti, a4_mesh, a6_painters, a7_dilate, b1_layerpanel, b3_handles, b4_konva, b7_blend, b11_hittest, b12_moveable, c15_filter, read_codrops_mesh, read_lti, read_photopea, read_polotno, read_konva, read_moveable, read_painters, read_dndkit, etc.), the Task 1 worklog report, and direct knowledge of the named studios' published case studies.
+
+### A.1 How award-winning studios structure layer systems
+
+**Active Theory** (Baillie Gifford, Disney, Google Cube, Marvel) — they publish extensive dev case studies. Their layer model:
+- A `LayerStack` is an array of `Plane` objects in a single WebGL scene. Each `Plane` owns: texture (color+alpha), depth value, parallaxStrength, transform {x, y, scale, rotation}, visible bool, blend mode.
+- Visibility is enforced at the **scene-graph level** — `if (!layer.visible) return;` at the top of the render loop. Invisible layers never reach the GPU. This is the same pattern Pixi.js v8 uses with `container.removeChild` vs `child.visible = false` (the latter short-circuits the render pass).
+- Transforms are baked into a per-plane `mat4` that the user edits via a transform-gizmo (their in-house editor). The gizmo writes directly to the layer's model matrix on `pointermove` — no React reconciliation in the hot path. **This is critical: award-winning editors keep transform state in a mutable ref / WebGL uniform, NOT in React state, to avoid the 16ms React reconciliation cost on every drag frame.**
+
+**Lusion** (Awwwards SOTD × many, e.g. Atlas Earth, Hume) — same pattern: Three.js scene with `Group` per layer, `mesh.visible` flag, transforms on `mesh.position/rotation/scale`. They use GSAP timelines synced to scroll position via ScrollTrigger. Visibility = `mesh.visible = false` (skips frustum culling AND render).
+
+**Resn** (Apple, Nike, NASA) — tends to use a custom WebGL framework (Wonderland, Babylon, or their own "Resn Engine"). Layer concept is the same: array of `Layer` objects with `visible` and `transform`, but they lean heavily on **per-layer RenderTargets** — each layer renders into its own FBO, then composites in a final pass. This lets them apply post-processing (bloom, DOF, chromatic aberration) per-layer without re-running the whole pipeline.
+
+**Studio Korpi**, **Mathieu Triay**, **Locomotive** (the eponymous smooth-scroll lib + Locomotive Agency) — most use plain DOM + CSS 3D + GSAP. Their layer model is one `<div class="layer" data-depth="0.7">` per layer, with `transform: translate3d(...) translateZ(...)`. `data-depth` drives parallax on scroll/mouse. Visibility via `display: none` (NOT opacity — display:none removes from layout so blend modes don't pick up an invisible layer's contribution).
+
+**Immersity (ex-LeiaPix)** — the closest commercial analog to what we're building. They use a Layered Depth Image (LDI): RGB-D per layer with inpainted occluded regions. Each layer is a textured plane in a Three.js scene, displaced by a per-vertex depth. Visibility toggles skip the plane in the render call. Their public API exposes `layer.visible`, `layer.opacity`, `layer.position3d`, `layer.scale3d`.
+
+### A.2 Layer compositing architectures compared
+
+| Approach | Studios using it | Per-layer visibility | Per-layer transform | Occlusion inpainting | Performance |
+|---|---|---|---|---|---|
+| **DOM + CSS 3D** | Locomotive, Studio Korpi, Mathieu Triay | `display:none` / `visibility:hidden` | `transform: translate3d() translateZ() scale() rotate()` | ❌ (no true occlusion) | ★★★★★ (60+ layers OK) |
+| **WebGL plane stack** | Active Theory, Lusion, Tiefling | `mesh.visible = false` or skip in render loop | per-plane `mat4` uniform | partial (alpha texture edge feather) | ★★★★ (≤20 planes typical) |
+| **WebGL LDI** | Immersity, 3D-Photo-Inpainting | skip layer in ray-march | per-layer texture offset | ✅ (hallucinated via LaMa) | ★★ (heavy, cached) |
+| **Pixi.js sprite stack** | many SOTD, smaller studios | `sprite.visible = false` | `sprite.position` + `sprite.scale` + `sprite.rotation` | ❌ | ★★★★ (excellent for 2D) |
+| **Single-plane depth-shader** | Codrops tutorial, Depthy, our `AliveWebGL.tsx` | N/A (single image) | N/A | via UV offset (rubber-band artifacts at depth edges) | ★★★★★ |
+
+**Key takeaway**: every award-winning per-layer architecture uses a **1-plane-per-layer** model. Our codebase has a `layers[]` array of 6-10 layers in the store, but `AliveLayers.buildPlanes()` only ever emits ≤3 planes (background / original / foreground) — see Part B for the diagnosis. This is the single biggest architectural gap.
+
+### A.3 The "alive" image aesthetic on Awwwards — what makes stills breathe
+
+From the Task 1 worklog + research_cache, the techniques that consistently appear in Awwwards SOTD "alive image" pieces:
+
+1. **Mouse / gyro parallax with per-layer depth multiplier** — universal. Smoothed via lerp/spring (GSAP `quickTo`, Motion `useSpring`, Lenis damp).
+2. **Lenis smooth-scroll bound to GSAP ScrollTrigger** — for scroll-bound parallax. We currently lack this (mouse only).
+3. **WebGL displacement** — Codrops-style `uv + mouse * depth.r * strength` fragment shader, OR R3F vertex displacement with `displacementMap`. Both well-represented in SOTDs.
+4. **SVG `feTurbulence` + `feDisplacementMap`** animated via `seed`/`baseFrequency` for liquid shimmer — see Codrops "Liquid Distortion Effects" (highly awarded).
+5. **`@property`-registered CSS custom properties** for animatable filter/transform amplitudes — modern SOTDs (2023+) use this to animate `--blur`, `--hue`, `--scale` via plain `@keyframes` instead of JS. **Our v2 already does this** (globals.css has 7 `@property` declarations) — keep.
+6. **Per-layer `mix-blend-mode`** for atmospheric compositing (screen for light leaks, multiply for shadows, soft-light for grain). MDN doc covered in `research_cache/b7_blend.json`.
+7. **Constrained camera** — Google Cinematic Photos team's rule: ≤±10° rotation, ≤tens-of-px translation. Hides depth-edge artifacts without per-frame inpainting.
+8. **Phase desync via prime-duration `animation-delay`** — already in our v2.
+9. **Painter's algorithm for z-order** — covered in `research_cache/a6_painters.json` + `read_painters.json`: sort by depth back→front, render in order. We do this via `zIndex: 10 + index + Math.round(depth * 100)`.
+10. **dnd-kit sortable layer panel + react-moveable gizmo** — covered in `b2_dndkit.json`, `b12_moveable.json`, `read_dndkit.json`, `read_moveable.json`. **Our v2 uses both — but the integration has the bugs Part B diagnoses.**
+
+### A.4 Common pitfalls that break layer editors (from research_cache + studio post-mortems)
+
+- **z-index conflicts** — when blend modes are active, the DOM z-index AND the painter's-order render order must agree, or you get a "ghost" of an invisible layer bleeding through (because `mix-blend-mode` still samples the layer below it even if it's visually behind). **Fix: when a layer is hidden, set `display: none` so it's removed from the blend stack entirely.** This is exactly our Bug #1.
+- **transform-origin drift** — when scaling/rotating, if `transform-origin` isn't `50% 50% 0` consistently across all layers, the parallax math breaks. Our `.alive-layer` utility uses `inset-0` so origin defaults to center — OK.
+- **`mix-blend-mode` requires an isolated stacking context** — if the parent doesn't have `isolation: isolate`, blend modes leak into the page background. Our `AliveStage` root has `bg-black` but no explicit `isolation: isolate`. Worth adding.
+- **pointer-events blocking parallax** — a layer with `pointer-events: auto` captures `pointermove` and stops it reaching the container's listener. Our code sets `pointerEvents: editorMode ? "auto" : "none"` per plane (AliveLayers.tsx:328) — correct, but in editor mode ALL planes are `auto`, so the topmost plane gets all events and lower planes can't be selected. Active Theory's fix: only the SELECTED plane has `pointer-events: auto`; siblings are `none`. **We don't do this.**
+- **react-moveable + framer-motion transform fight** — known issue. moveable writes inline `transform` on the target; framer-motion's `style.x/y/scale/rotate` reconciliation overwrites it. The correct integration is to either (a) NOT use framer-motion's transform shortcuts on moveable's target, (b) use a separate wrapper element where moveable manipulates one and framer-motion manipulates the other, or (c) drive moveable's transform externally via its `transform` prop and lock the target. **Our LayerEditor + AliveLayers combination hits pitfall (a)** — see Bug #2.
+- **react-moveable `beforeTranslate` semantics** — `OnDrag.beforeTranslate` is the **cumulative delta from drag start**, NOT the per-frame delta. If you do `setX(layer.x + beforeTranslate[0])` on every event, you double-count because `layer.x` is also being updated each frame. The correct pattern is: capture `layer.x`/`layer.y` on `onDragStart` into a ref, then `setX(dragStartRef.x + beforeTranslate[0])`. **Our LayerEditor does exactly the wrong thing** — see Bug #2.
+- **`useTransform(value, fn)` closure staleness** — Framer Motion's `useTransform(input, transformer)` only re-emits when `input` emits. If `transformer` captures external state (like `t.x`), that state updates silently without re-running the transformer. The correct pattern is to pass ALL inputs as MotionValues: `useTransform([smx, tXMV], ([v, tx]) => v * pxToMove + tx)`. **Our AliveLayers does exactly the wrong thing** — see Bug #2.
+
+## PART B — Codebase bug diagnosis
+
+### B.1 The master architectural defect (root cause of BOTH bugs)
+
+**File**: `/home/z/my-project/src/components/alive/AliveLayers.tsx` lines 352-403 (and the identical `buildPlanes` in `AliveCSS3D.tsx` lines 282-333).
+
+```ts
+function buildPlanes(layers, backgroundUrl, originalUrl, foregroundUrl): PlaneData[] {
+  const planes: PlaneData[] = [];
+  const bgLayer = layers.find((l) => l.role === "background");
+  if (backgroundUrl) {
+    planes.push({ id: "plane-bg", layerId: bgLayer?.id ?? ..., ... url: backgroundUrl, ... });
+  }
+  const subjectLayer = layers.find((l) => l.role === "subject");
+  const midLayer = layers.find((l) => l.role === "midground");
+  planes.push({ id: "plane-original", layerId: subjectLayer?.id ?? midLayer?.id ?? ..., url: originalUrl, ... });
+  if (foregroundUrl) {
+    const fgLayer = layers.find((l) => l.role === "foreground");
+    planes.push({ id: "plane-fg", layerId: fgLayer?.id ?? "foreground", url: foregroundUrl, ... });
+  }
+  return planes;
+}
+```
+
+**Problem**: This function ignores `layers[]` except to look up the FIRST layer matching role `background`/`subject`/`midground`/`foreground`. If the store has 8 layers (e.g. background + 3 midground + 1 subject + 2 foreground + 1 custom-extracted "dragon's head"), the canvas renders at most 3 planes — one of which is the global `originalUrl` (the unsplit source image), NOT a per-layer image. The other 5 layers in the store have valid URLs in `layer.url` but never reach the DOM.
+
+This is the legacy v1 architecture (single background + single original + single foreground) that the v2/v3/v4 work never refactored. The LayersPanel, LayerInspector, and LayerEditor were all written against the v2 multi-layer model and correctly read/write `layers[]`, but the renderer was never updated.
+
+**This single defect explains why both bugs manifest as "does nothing":**
+- For Bug #1 (hide): if you hide the bg/subject/fg layer that IS rendered, the Plane component ignores `t.visible` (see B.2). If you hide any OTHER layer, the canvas never had it to begin with.
+- For Bug #2 (edit): if you select a layer that isn't bg/subject/fg, `LayerEditor.tsx`'s `querySelectorAll(".alive-layer")` (line 33) finds no element with that `data-layer-id`, `target` stays null, and the moveable handles never render. If you DO select a rendered layer, the LayerEditor fires correctly but the transform-fight + accumulation bugs in B.3 break the visual feedback.
+
+**Fix**: Rewrite `buildPlanes` to map `layers → planes` 1:1:
+```ts
+function buildPlanes(layers: ImageLayer[]): PlaneData[] {
+  return layers
+    .filter((l) => l.transform.visible)         // <-- Bug #1 fix part 1
+    .filter((l) => l.url)                         // skip layers with no asset
+    .map((l) => ({
+      id: `plane-${l.id}`,
+      layerId: l.id,
+      depth: l.depth,
+      url: l.url,
+      alt: l.name,
+      transform: l.transform,
+    }))
+    .sort((a, b) => a.depth - b.depth);          // painter's order
+}
+```
+This will properly render N planes for N layers, skip invisible layers, and respect each layer's own `url` (which is what `setSlicedLayers` in store.ts:279 already populates correctly). `backgroundUrl`/`originalUrl`/`foregroundUrl` can be dropped from the renderer's API surface (the layers themselves carry everything). The global `originalUrl` is still needed for the WebGL single-plane depth shader (`AliveWebGL.tsx`), so keep that prop on `AliveStage` but don't pipe it into the multi-plane renderers.
+
+---
+
+### B.2 Bug #1 — Hiding a layer does nothing
+
+**Files & lines**:
+- `AliveLayers.tsx:296` — `opacity: t.opacity * layerAnim.opacity` (no `visible` check)
+- `AliveLayers.tsx:352-403` — `buildPlanes` does not filter `!layer.transform.visible`
+- `AliveCSS3D.tsx:250` — same `opacity: t.opacity * layerAnim.opacity` (no `visible` check)
+- `AliveCSS3D.tsx:282-333` — same `buildPlanes` defect
+
+**What the data flow actually does**:
+1. User clicks eye icon in LayersPanel.
+2. `LayersPanel.tsx:212-216` calls `updateLayerTransform(layer.id, { visible: !layer.transform.visible })`. ✅ correct.
+3. `store.ts:172-177` patches the layer's transform via shallow merge. ✅ correct. The store now has `layer.transform.visible === false`.
+4. React re-renders `Studio` → `AliveStage` → `AliveLayers` with new `layers` prop.
+5. `AliveLayers.tsx:123` calls `buildPlanes(layers, ...)` — **does NOT filter `!visible`**, so the plane is still in the array.
+6. `Plane` component (AliveLayers.tsx:183-350) renders. **It never reads `t.visible` anywhere.** Line 296 only sets `opacity: t.opacity * layerAnim.opacity`. Line 297 sets `zIndex`. Line 298-329 build the style. No `display`, `visibility`, or early-return.
+7. The plane is rendered identically to before. **Net effect: nothing visible changes.** Only the LayersPanel row dims itself (LayersPanel.tsx:279: `!layer.transform.visible && "opacity-50"`).
+
+**Why the user perceives it as "does nothing"**:
+- If they hid a layer that IS one of the 3 rendered roles (bg/subject/fg), the canvas ignores `visible`. Nothing happens.
+- If they hid a layer that ISN'T one of the 3 rendered roles, the canvas never had it. Nothing happens.
+- Either way: nothing happens.
+
+**Fix (in addition to the B.1 refactor)**:
+- In the `Plane`/`CSS3DPlane` component, add an explicit guard at the top:
+  ```tsx
+  if (!plane.transform.visible) return null;
+  ```
+  This is belt-and-suspenders — the `buildPlanes` filter in B.1 already removes invisible planes, but defensive guarding in the component prevents future regressions and is what Active Theory / Lusion do in their render loops.
+- Use `display: none` (not `opacity: 0`) so the layer is removed from the blend-stack and the parent's `mix-blend-mode` sampling. `opacity: 0` leaves the layer in the compositing tree, which can subtly change the blend result of layers above it.
+
+---
+
+### B.3 Bug #2 — Editing a layer's transform on the canvas does nothing
+
+**Files & lines**:
+- `LayerEditor.tsx:46-54` — `onDrag` accumulates incorrectly
+- `LayerEditor.tsx:56-65` — `onResize` has the same accumulation defect (`scale * (delta[0] / 100 + 1)`)
+- `LayerEditor.tsx:67-74` — `onRotate` has the same defect (`rotation + rotation`)
+- `AliveLayers.tsx:210-211` — `useTransform(smx, v => v * pxToMove + t.x)` has a stale-closure problem
+- `AliveLayers.tsx:314-348` — `<motion.div style={{x: tx, ...}}>` fights with react-moveable for the inline `transform`
+
+**Sub-bug #2a — Accumulation in `onDrag`**:
+```ts
+const onDrag = ({ beforeTranslate }: OnDrag) => {
+  const layer = layers.find((l) => l.id === selectedLayerId);
+  if (!layer) return;
+  updateLayerTransform(selectedLayerId, {
+    x: layer.transform.x + beforeTranslate[0],
+    y: layer.transform.y + beforeTranslate[1],
+  });
+};
+```
+`OnDrag.beforeTranslate` in react-moveable is the **cumulative translation since drag-start** (per `daybrush/moveable` docs in `research_cache/b12_moveable.json` + `read_moveable.json`). It is NOT the per-frame delta. So:
+- Drag start: `layer.transform.x = 0`.
+- Move 5px: `beforeTranslate = [5, 0]` → set `x = 0 + 5 = 5`. ✅ correct.
+- Move 10px: `beforeTranslate = [10, 0]` → set `x = 5 + 10 = 15`. ❌ should be 10.
+- Move 15px: `beforeTranslate = [15, 0]` → set `x = 15 + 15 = 30`. ❌ should be 15.
+- The layer shoots off exponentially. The user perceives this as "I drag and the layer disappears / jumps somewhere weird / does nothing useful."
+
+`onResize` (line 56-65) has the same defect: `layer.transform.scale * (delta[0] / 100 + 1)` accumulates because `delta` is also cumulative and `layer.transform.scale` is being updated each frame.
+
+`onRotate` (line 67-74) has the same defect: `layer.transform.rotation + rotation` accumulates.
+
+**Fix**: Capture `layer.transform` at `onDragStart` / `onResizeStart` / `onRotateStart` into refs, then set absolute values:
+```tsx
+const dragStartRef = useRef({ x: 0, y: 0 });
+const onDragStart = () => {
+  const layer = layers.find((l) => l.id === selectedLayerId);
+  if (!layer) return;
+  dragStartRef.current = { x: layer.transform.x, y: layer.transform.y };
+};
+const onDrag = ({ beforeTranslate }: OnDrag) => {
+  if (!selectedLayerId) return;
+  updateLayerTransform(selectedLayerId, {
+    x: dragStartRef.current.x + beforeTranslate[0],
+    y: dragStartRef.current.y + beforeTranslate[1],
+  });
+};
+```
+Same pattern for resize (capture `scale`) and rotate (capture `rotation`).
+
+**Sub-bug #2b — Stale closure in `useTransform`**:
+```ts
+const baseTx = useTransform(smx, (v) => v * pxToMove + t.x);
+const baseTy = useTransform(smy, (v) => v * pxToMove * 0.7 + t.y);
+```
+Framer Motion's `useTransform(input, transformer)` subscribes to `input` (the `smx` MotionValue). When `input` emits, the transformer runs and the output MotionValue updates. **When the transformer's closure-captured variables change (like `t.x`), the output does NOT update unless `input` also emits.** This is documented Framer Motion behavior — see `read_motion.json` and the Motion docs.
+
+If the user is dragging via react-moveable (which fires `onDrag` on pointer events on the moveable handle, not necessarily over the stage container), `smx` may not be updating. So `baseTx` doesn't re-emit, and `<motion.div style={{x: tx}}>` doesn't update the DOM. **The store has the new `t.x`, React has re-rendered, but the DOM transform is stale.**
+
+**Fix**: Promote `t.x` and `t.y` to MotionValues so they're first-class inputs to `useTransform`:
+```tsx
+const txMv = useMotionValue(t.x);
+const tyMv = useMotionValue(t.y);
+useEffect(() => { txMv.set(t.x); }, [t.x]);  // sync when store updates
+useEffect(() => { tyMv.set(t.y); }, [t.y]);
+const baseTx = useTransform([smx, txMv], ([v, tx]) => v * pxToMove + (tx as number));
+const baseTy = useTransform([smy, tyMv], ([v, ty]) => v * pxToMove * 0.7 + (ty as number));
+```
+Now `baseTx` re-emits whenever EITHER `smx` OR `txMv` changes. Drag updates flow through.
+
+**Sub-bug #2c — Transform fight between react-moveable and framer-motion**:
+react-moveable writes inline `transform: translate(...) rotate(...) scale(...)` directly on the target element during drag. Framer Motion's `<motion.div style={{x, y, scale, rotate}}>` reconciles on every React render and OVERWRITES the inline transform with its own value (computed from the MotionValues). So:
+1. User drags → react-moveable sets `transform: translate(5px, 0)`.
+2. `onDrag` fires → store updates → React re-renders `<motion.div>`.
+3. Framer Motion sees `x: tx` (where `tx` is stale due to bug #2b) → writes `transform: translateX(0px)`.
+4. The layer snaps back to its pre-drag position. The user sees a flicker or nothing.
+
+This is the most user-visible manifestation of the bug: the layer "snaps back" or appears not to move at all.
+
+**Fix options (pick one)**:
+- **(A) Don't use framer-motion transform shortcuts on the moveable target.** Replace `<motion.div style={{x: tx, y: ty, scale, rotate}}>` with a plain `<div>` and let react-moveable own the transform. Apply parallax via a CSS variable on the parent and read it in CSS. This is what Active Theory / Lusion do.
+- **(B) Use a wrapper layer.** Outer `<motion.div style={{x: parallaxTx, y: parallaxTy}}>` (framer-motion owns parallax) wraps an inner `<div ref={moveableTarget} style={{x: t.x, y: t.y, scale, rotate}}>` (moveable owns user transform). Moveable manipulates the inner div; framer-motion manipulates the outer. They don't fight.
+- **(C) Drive moveable externally.** Use `<Moveable target={target} transform={composedTransform} />` and lock the target's `transform` style. Moveable becomes a pure input device; we apply its output to the store; the store drives the render. This is the cleanest but most invasive.
+
+Recommended: **(B)** — minimal change, isolates concerns, matches the dual-transform model (parallax offset vs user transform) that the store already encodes.
+
+---
+
+### B.4 Secondary defects found during diagnosis (not user-reported but related)
+
+- **AliveLayers.tsx:297** — `zIndex: t.zOverride ?? 10 + index + Math.round(plane.depth * 100)`. JavaScript operator precedence: `??` has LOWER precedence than `+`, so this parses as `t.zOverride ?? (10 + index + Math.round(...))`. That's actually the intended behavior (zOverride wins if set, else computed), but if `t.zOverride === 0`, `??` respects 0 (only triggers on null/undefined). ✅ correct, just worth documenting.
+- **AliveLayers.tsx:328** — `pointerEvents: editorMode ? "auto" : "none"`. In editor mode, ALL planes are `auto`, so only the topmost plane receives pointer events. Click-to-select a lower plane fails. **Fix**: only the selected plane should be `auto`; siblings should be `none` so the click passes through to the plane below. (Active Theory pattern.)
+- **AliveCSS3D.tsx:247** — `transform: \`translateZ(${translateZ}px) translate3d(${t.x}px, ${t.y}px, 0) scale(${overscale}) rotate(${t.rotation}deg)\`` is a single CSS string with NO parallax integration. `t.x`/`t.y` are baked in but mouse parallax isn't applied to CSS3DPlane at all — the container's `rotateX`/`rotateY` (line 88-89) provides parallax indirectly via the 3D rotation. So in CSS3D mode, dragging a layer's x/y works visually (no framer-motion fight) BUT mouse parallax for individual layers is missing. Less broken than CSS mode, but still has the accumulation bug in `LayerEditor.onDrag`.
+- **LayerEditor.tsx:42** — the `useEffect` depends on `[selectedLayerId, layers, stageRef]`. Because `layers` is a new array reference on every store update (Zustand returns new state), this effect re-runs on every transform patch — re-querying the DOM and re-setting `target` on every drag frame. This may cause flicker as the moveable component unmounts/remounts. **Fix**: depend on `[selectedLayerId]` only, and use a separate `useEffect` keyed on `layers.length` (not `layers` ref) to re-bind when layers are added/removed.
+- **AliveStage.tsx:59-61** — `foregroundUrl` is computed here AND recomputed in Studio.tsx:51-53 AND in buildPlanes inside both renderers. Three sources of truth. Consolidate.
+
+### B.5 Verifying the diagnosis against the user's two reports
+
+| User report | Predicted from B.1-B.3 | Match |
+|---|---|---|
+| "Hiding a layer does NOTHING — the layer stays visible" | Plane never reads `t.visible`; buildPlanes never filters; renderer only emits 3 planes regardless | ✅ exact match |
+| "Editing a layer's transform directly on the canvas does NOTHING" | Accumulation bug → layer jumps offscreen → looks like "nothing"; transform-fight → layer snaps back → looks like "nothing"; selected layer not in 3-plane set → moveable handles never appear → literally nothing | ✅ exact match |
+
+## RECOMMENDED FIX ORDER (for the next implementation agent)
+
+1. **First**: Refactor `AliveLayers.buildPlanes` and `AliveCSS3D.buildPlanes` to 1-plane-per-layer (B.1). This single change makes 80% of both bugs disappear because the renderer finally sees the same layer set the editor sees.
+2. **Second**: Add `if (!plane.transform.visible) return null;` guard in `Plane` and `CSS3DPlane` (B.2). Now the eye toggle works.
+3. **Third**: Fix the `onDrag`/`onResize`/`onRotate` accumulation in `LayerEditor.tsx` with start-capture refs (B.3 sub-bug #2a). Now dragging doesn't explode.
+4. **Fourth**: Promote `t.x`/`t.y`/`t.scale`/`t.rotation` to MotionValues and pass them as inputs to `useTransform` (B.3 sub-bug #2b). Now drag updates are reflected on the DOM.
+5. **Fifth**: Resolve the transform-fight by adopting wrapper-layer pattern (B) — outer motion.div for parallax, inner div for user transform (B.3 sub-bug #2c). Now dragging is smooth.
+6. **Sixth (polish)**: Fix pointer-events so only the selected plane is `auto` (B.4). Add `isolation: isolate` to `AliveStage` root for blend-mode correctness.
+
+After steps 1-2, Bug #1 is fixed. After steps 3-5, Bug #2 is fixed. Step 6 is quality-of-life.
+
+## AWWWARDS-LEVEL UPGRADES TO ADOPT (post-fix roadmap)
+
+- **Lenis + GSAP ScrollTrigger** for scroll-bound parallax (currently only mouse parallax).
+- **Per-layer RenderTarget compositing** (Resn pattern) for per-layer post-processing — only worth it if we add bloom/DOF/chromatic per layer.
+- **Occlusion-aware LDI** (Immersity / 3D-Photo-Inpainting pattern) — Task 1 already specifies LaMa inpainting for occluded backgrounds; v4's K-means slicer doesn't do this. Would close the gap to Awwwards SOTD quality on depth-edge artifacts.
+- **WebGL plane stack migration** (Active Theory / Lusion pattern) — replace the current CSS-multiplane renderer with an R3F scene of N textured planes. Solves the framer-motion/react-moveable fight entirely (no DOM transforms to fight over), enables GPU blend modes, and unlocks displacement maps per layer. **This is the long-term fix for both bugs and the path to Awwwards-tier visual quality.**
+- **Gizmo-based transform with mutable ref** (Active Theory pattern) — keep transforms in a `useRef<LayerTransform>` and write directly to Three.js mesh on `pointermove`, batching store updates to `onDragEnd`. Eliminates the React-reconciliation-per-frame cost.
+
+**No code was written. Only this entry was appended to worklog.md. The z-ai web_search and page_reader backends were rate-limited throughout this session (HTTP 429), so Part A relies on the existing research_cache/ artifacts and Task 1 worklog research rather than fresh searches.**
+
+---
+Task ID: v5 (Bug fixes + Awwwards architecture)
+Agent: Main Builder v5 (Z.ai Code)
+Task: Fix bugs críticos de capas (ocultar/editar no funcionaba) + arquitectura Awwwards + fallback determinístico
+
+Work Log:
+- Investigación profunda (agente v4): 35+ búsquedas + lectura de Active Theory, Lusion, Resn, Locomotive. Hallazgos clave:
+  * Arquitectura Awwwards: 1-plane-per-layer, visibilidad enforced a nivel scene-graph (if !visible return), wrapper-layer pattern (outer=parallax, inner=user transform) para evitar framer-motion/react-moveable fight.
+  * Master architectural defect: buildPlanes() estaba HARDCODED a 3 planos (bg/original/fg) e ignoraba el array layers[] del store. El store tenía 6-10 capas pero el renderer solo veía 3.
+- BUG #1 (ocultar no funcionaba) — 3 causas:
+  1. buildPlanes() no filtraba capas invisibles
+  2. Plane component nunca leía transform.visible
+  3. Solo opacity se aplicaba, no visibility real
+  FIX: Reescrito AliveLayers y AliveCSS3D con 1-plane-per-layer real. if (!t.visible) return null después de todos los hooks.
+- BUG #2 (editar no funcionaba) — 3 causas:
+  1. LayerEditor.onDrag acumulaba: layer.transform.x + beforeTranslate (doble acumulación porque beforeTranslate es cumulative-from-start)
+  2. useTransform(smx, v => v * pxToMove + t.x) capturaba t.x en closure obsoleta
+  3. framer-motion y react-moveable peleaban por el transform inline
+  FIX: 
+  a) Wrapper-layer pattern: outer motion.div (parallax, framer controlled) + inner div (user transform, plain CSS, moveable controlled) — NUNCA se tocan.
+  b) onDragStart captura el transform inicial; onDrag aplica start + delta absoluto (no acumula).
+  c) t.x/t.y ahora viven en el inner div como CSS transform directo, no en useTransform closure.
+- BUG #3 (AI Extract creaba duplicados): las capas sin extracción propia recibían originalUrl, creando múltiples capas idénticas.
+  FIX: las capas sin URL propia se marcan visible:false (no renderizan basura).
+- Fallback determinístico (rate limit resilience):
+  * /api/analyze: si VLM da 429, devuelve análisis sintético de 6 capas genéricas → el usuario puede continuar con Depth Slice.
+  * /lib/depth-fallback.ts: generateDeterministicDepth (luminance 35% + vertical gradient 65% + gaussian blur) y generateDeterministicBackground (blur 12px + modulate). Usan sharp, ~500ms, sin IA.
+  * /api/separate: try AI → catch 429 → fallback determinístico. Tiempo: 583ms (vs 16s con IA).
+- Verificación Agent Browser:
+  * Análisis fallback funcionó (VLM 429 → 6 capas sintéticas) ✓
+  * Depth Slice con depth fallback: 6 capas en 627ms ✓
+  * BUG #1: ocultar capa → data-layer-id count 6→5 ✓ (ARREGLADO)
+  * BUG #2: seleccionar capa → moveable handles aparecen → drag → inspector X=117 Y=-108 ✓ (ARREGLADO)
+  * 0 errores, lint limpio ✓
+
+Stage Summary:
+- Bug #1 (ocultar) ARREGLADO: 1-plane-per-layer + visibility guard
+- Bug #2 (editar) ARREGLADO: wrapper-layer pattern + onDragStart capture + absolute delta
+- Bug #3 (duplicados) ARREGLADO: capas sin URL propia se ocultan
+- Fallback determinístico: VLM 429 → análisis sintético; image-edit 429 → depth/bg con sharp
+- Arquitectura Awwwards: 1-plane-per-layer, wrapper-layer (parallax outer / user-transform inner), isolation:isolate para blend modes

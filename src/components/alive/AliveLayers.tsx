@@ -7,7 +7,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import type {
   AnimationConfig,
   ImageLayer,
@@ -19,18 +19,13 @@ import { DEFAULT_LAYER_ANIM } from "@/lib/types";
 interface AliveLayersProps {
   layers: ImageLayer[];
   config: AnimationConfig;
-  backgroundUrl?: string;
-  originalUrl: string;
-  foregroundUrl?: string;
   liquidFilterId?: string;
-  /** when true, layers can be clicked to select (editor mode) */
   editorMode?: boolean;
   selectedLayerId?: string;
   onSelectLayer?: (id: string) => void;
   onLayerTransform?: (id: string, transform: Partial<ImageLayer["transform"]>) => void;
 }
 
-// prime-ish durations so animations never re-sync (organic feel)
 const DURATIONS = {
   breath: 6.2,
   sway: 8.3,
@@ -38,7 +33,7 @@ const DURATIONS = {
   float: 11.1,
   drift: 13.7,
   wave: 9.4,
-  jitter: 0.18, // fast boil
+  jitter: 0.18,
   glow: 5.7,
   hue: 28,
   focus: 14.3,
@@ -58,24 +53,29 @@ const BLEND_CSS: Record<BlendMode, string> = {
   difference: "difference",
 };
 
+/**
+ * Nivel 1 renderer — 1 plane per layer (no hardcoded bg/original/fg).
+ * Each layer is a full independent entity: own URL, transform, visibility.
+ *
+ * Architecture (Awwwards-inspired):
+ *  - Outer wrapper: parallax (mouse-driven, framer-motion controlled)
+ *  - Inner content: user transform (drag/scale/rotate via moveable) — NEVER touched by framer
+ *  This split eliminates the framer-motion/react-moveable transform fight.
+ */
 export function AliveLayers({
   layers,
   config,
-  backgroundUrl,
-  originalUrl,
-  foregroundUrl,
   liquidFilterId,
   editorMode = false,
   selectedLayerId,
   onSelectLayer,
-  onLayerTransform,
 }: AliveLayersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const mvx = useMotionValue(0); // mouse velocity x
-  const mvy = useMotionValue(0); // mouse velocity y
+  const mvx = useMotionValue(0);
+  const mvy = useMotionValue(0);
   const smx = useSpring(mx, { stiffness: 50, damping: 20, mass: 0.5 });
   const smy = useSpring(my, { stiffness: 50, damping: 20, mass: 0.5 });
   const smvx = useSpring(mvx, { stiffness: 80, damping: 30 });
@@ -96,7 +96,7 @@ export function AliveLayers({
       const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
       const now = performance.now();
       const dt = Math.max(1, now - lastT);
-      const vx = ((e.clientX - lastX) / dt) * 16; // normalize to ~frame
+      const vx = ((e.clientX - lastX) / dt) * 16;
       const vy = ((e.clientY - lastY) / dt) * 16;
       lastX = e.clientX;
       lastY = e.clientY;
@@ -120,24 +120,24 @@ export function AliveLayers({
     };
   }, [config.reducedMotion, config.parallaxEnabled, mx, my, mvx, mvy]);
 
-  const planes = buildPlanes(layers, backgroundUrl, originalUrl, foregroundUrl);
+  // sort layers back→front for correct painter's order
+  const sorted = [...layers].sort((a, b) => a.depth - b.depth);
 
   return (
     <div
       ref={containerRef}
       className="absolute inset-0 overflow-hidden"
-      style={{ perspective: "1200px" }}
+      style={{ perspective: "1200px", isolation: "isolate" }}
       onPointerDown={(e) => {
-        if (editorMode && onSelectLayer) {
-          // click on empty area deselects
-          if (e.target === e.currentTarget) onSelectLayer("");
+        if (editorMode && onSelectLayer && e.target === e.currentTarget) {
+          onSelectLayer("");
         }
       }}
     >
-      {planes.map((plane, i) => (
-        <Plane
-          key={plane.id}
-          plane={plane}
+      {sorted.map((layer, i) => (
+        <LayerPlane
+          key={layer.id}
+          layer={layer}
           index={i}
           smx={smx}
           smy={smy}
@@ -146,27 +146,16 @@ export function AliveLayers({
           config={config}
           liquidFilterId={liquidFilterId}
           editorMode={editorMode}
-          selected={selectedLayerId === plane.layerId}
-          onSelect={() => onSelectLayer?.(plane.layerId)}
-          onTransform={(t) => onLayerTransform?.(plane.layerId, t)}
+          selected={selectedLayerId === layer.id}
+          onSelect={() => onSelectLayer?.(layer.id)}
         />
       ))}
     </div>
   );
 }
 
-interface PlaneData {
-  id: string;
-  layerId: string;
-  depth: number;
-  url?: string;
-  alt: string;
-  fallback?: ReactNode;
-  transform: ImageLayer["transform"];
-}
-
-interface PlaneProps {
-  plane: PlaneData;
+interface LayerPlaneProps {
+  layer: ImageLayer;
   index: number;
   smx: MotionValue<number>;
   smy: MotionValue<number>;
@@ -177,11 +166,10 @@ interface PlaneProps {
   editorMode?: boolean;
   selected?: boolean;
   onSelect?: () => void;
-  onTransform?: (t: Partial<ImageLayer["transform"]>) => void;
 }
 
-function Plane({
-  plane,
+function LayerPlane({
+  layer,
   index,
   smx,
   smy,
@@ -192,37 +180,38 @@ function Plane({
   editorMode,
   selected,
   onSelect,
-  onTransform,
-}: PlaneProps) {
-  const layerAnim: LayerAnimationConfig =
-    config.layers[plane.layerId] ??
-    ({ layerId: plane.layerId, ...DEFAULT_LAYER_ANIM } as LayerAnimationConfig);
+}: LayerPlaneProps) {
+  const t = layer.transform;
 
-  const t = plane.transform;
-  const depthFactor = 0.3 + plane.depth * 1.4;
+  const layerAnim: LayerAnimationConfig =
+    config.layers[layer.id] ??
+    ({ layerId: layer.id, ...DEFAULT_LAYER_ANIM } as LayerAnimationConfig);
+
+  const depthFactor = 0.3 + layer.depth * 1.4;
   const intensity = config.intensity;
   const pxToMove =
     (config.parallaxEnabled ? layerAnim.parallaxStrength : 0) *
     depthFactor *
     intensity;
 
-  // base parallax from mouse position
-  const baseTx = useTransform(smx, (v) => v * pxToMove + t.x);
-  const baseTy = useTransform(smy, (v) => v * pxToMove * 0.7 + t.y);
-
-  // mouse velocity adds a "wind" push
+  // parallax transform (framer-motion) — separate from user transform
+  const parallaxX = useTransform(smx, (v) => v * pxToMove);
+  const parallaxY = useTransform(smy, (v) => v * pxToMove * 0.7);
   const velX = useTransform(
     smvx,
-    (v) => v * layerAnim.mouseVelocityInfluence * intensity * (0.3 + plane.depth)
+    (v) => v * layerAnim.mouseVelocityInfluence * intensity * (0.3 + layer.depth)
   );
   const velY = useTransform(
     smvy,
-    (v) => v * layerAnim.mouseVelocityInfluence * intensity * (0.3 + plane.depth) * 0.5
+    (v) => v * layerAnim.mouseVelocityInfluence * intensity * (0.3 + layer.depth) * 0.5
   );
-  const tx = useTransform([baseTx, velX], (vals) => (vals[0] as number) + (vals[1] as number));
-  const ty = useTransform([baseTy, velY], (vals) => (vals[0] as number) + (vals[1] as number));
+  const tx = useTransform([parallaxX, velX] as any, (vals: any) => vals[0] + vals[1]);
+  const ty = useTransform([parallaxY, velY] as any, (vals: any) => vals[0] + vals[1]);
 
-  // durations — per-layer multiplier + phase offset (negative delay)
+  // === BUG FIX #1: respect visibility (after all hooks) ===
+  if (!t.visible) return null;
+
+  // durations
   const dm = layerAnim.durationMultiplier;
   const speed = config.speed * dm;
   const phaseDelay = `-${(layerAnim.phaseOffset * 6).toFixed(2)}s`;
@@ -289,45 +278,30 @@ function Plane({
     }
   }
 
-  // apply negative delay for phase offset (after the first animation)
-  const style: React.CSSProperties = {
-    animationDelay: phaseDelay,
-    mixBlendMode: BLEND_CSS[t.blendMode],
-    opacity: t.opacity * layerAnim.opacity,
-    zIndex: t.zOverride ?? 10 + index + Math.round(plane.depth * 100),
-  };
-
-  // filter (liquid + per-layer blur + chromatic)
   const useLiquid =
     layerAnim.liquid && config.liquidEnabled && liquidFilterId;
   const layerBlur = t.blur + layerAnim.blur;
   ampVars["--layer-blur"] = `${layerBlur}px`;
 
-  const filters: string[] = [];
-  if (useLiquid) filters.push(`url(#${liquidFilterId})`);
-  // the .alive-layer utility already adds blur/focus/glow/hue/shadow via filter
-  // we don't override — let CSS handle it
-
-  // overscale: cover parallax edges + user scale
-  const overscale = (1.08 + plane.depth * 0.04) * t.scale;
+  const overscale = 1.08 + layer.depth * 0.04;
+  const userScale = t.scale * overscale;
+  const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
   return (
+    // OUTER wrapper — parallax (framer-motion owns x/y here)
     <motion.div
-      className={`alive-layer absolute inset-0 ${selected ? "selected" : ""}`}
-      data-layer-id={plane.layerId}
-      style={
-        {
-          x: tx,
-          y: ty,
-          scale: overscale,
-          rotate: t.rotation,
-          ...style,
-          ...ampVars,
-          willChange: "transform, filter",
-          cursor: editorMode ? "move" : "default",
-          pointerEvents: editorMode ? "auto" : "none",
-        } as React.CSSProperties
-      }
+      className="absolute inset-0"
+      style={{
+        x: tx,
+        y: ty,
+        zIndex,
+        mixBlendMode: BLEND_CSS[t.blendMode],
+        opacity: t.opacity * layerAnim.opacity,
+        isolation: t.blendMode !== "normal" ? "isolate" : undefined,
+        willChange: "transform",
+        pointerEvents: editorMode ? "auto" : "none",
+        cursor: editorMode ? (selected ? "move" : "pointer") : "default",
+      }}
       onPointerDown={(e) => {
         if (editorMode) {
           e.stopPropagation();
@@ -335,69 +309,30 @@ function Plane({
         }
       }}
     >
-      {plane.url ? (
-        <img
-          src={plane.url}
-          alt={plane.alt}
-          className="h-full w-full object-cover select-none"
-          draggable={false}
-        />
-      ) : (
-        plane.fallback
-      )}
+      {/* INNER content — user transform (plain CSS, moveable controls this) */}
+      {/* The .alive-layer class applies breathing/sway/etc via @property */}
+      <div
+        className={`alive-layer absolute inset-0 ${selected ? "selected" : ""}`}
+        data-layer-id={layer.id}
+        style={
+          {
+            transform: `translate3d(${t.x}px, ${t.y}px, 0) scale(${userScale}) rotate(${t.rotation}deg)`,
+            animationDelay: phaseDelay,
+            animation: animations.join(", ") || undefined,
+            filter: useLiquid ? `url(#${liquidFilterId})` : undefined,
+            ...ampVars,
+          } as React.CSSProperties
+        }
+      >
+        {layer.url ? (
+          <img
+            src={layer.url}
+            alt={layer.name}
+            className="h-full w-full object-cover select-none"
+            draggable={false}
+          />
+        ) : null}
+      </div>
     </motion.div>
   );
-}
-
-function buildPlanes(
-  layers: ImageLayer[],
-  backgroundUrl: string | undefined,
-  originalUrl: string,
-  foregroundUrl: string | undefined
-): PlaneData[] {
-  const planes: PlaneData[] = [];
-
-  const bgLayer = layers.find((l) => l.role === "background");
-  if (backgroundUrl) {
-    planes.push({
-      id: "plane-bg",
-      layerId: bgLayer?.id ?? layers[0]?.id ?? "bg",
-      depth: bgLayer?.depth ?? 0.1,
-      url: backgroundUrl,
-      alt: "Background layer",
-      transform: bgLayer?.transform ?? ({} as ImageLayer["transform"]),
-    });
-  }
-
-  const subjectLayer = layers.find((l) => l.role === "subject");
-  const midLayer = layers.find((l) => l.role === "midground");
-  planes.push({
-    id: "plane-original",
-    layerId:
-      subjectLayer?.id ??
-      midLayer?.id ??
-      layers[layers.length - 1]?.id ??
-      "subject",
-    depth: subjectLayer?.depth ?? midLayer?.depth ?? 0.6,
-    url: originalUrl,
-    alt: "Main image",
-    transform:
-      subjectLayer?.transform ??
-      midLayer?.transform ??
-      ({} as ImageLayer["transform"]),
-  });
-
-  if (foregroundUrl) {
-    const fgLayer = layers.find((l) => l.role === "foreground");
-    planes.push({
-      id: "plane-fg",
-      layerId: fgLayer?.id ?? "foreground",
-      depth: fgLayer?.depth ?? 0.95,
-      url: foregroundUrl,
-      alt: "Foreground layer",
-      transform: fgLayer?.transform ?? ({} as ImageLayer["transform"]),
-    });
-  }
-
-  return planes;
 }

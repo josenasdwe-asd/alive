@@ -4,6 +4,10 @@ import {
   generateDepthMap,
   extractElement,
 } from "@/lib/ai";
+import {
+  generateDeterministicDepth,
+  generateDeterministicBackground,
+} from "@/lib/depth-fallback";
 import { readImageAsDataUrl, saveGeneratedImage } from "@/lib/image-utils";
 import path from "path";
 
@@ -38,31 +42,29 @@ export async function POST(req: NextRequest) {
 
     const safeUrl = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
     const dataUrl = await readImageAsDataUrl(safeUrl);
+    const originalPath = path.join(process.cwd(), "public", safeUrl);
 
-    // Phase 1: essential assets in parallel (bg + depth)
-    const essential: Promise<unknown>[] = [
-      generateBackgroundPlate(dataUrl, subject)
-        .then((buf) => saveGeneratedImage(buf, "bg"))
-        .then((r) => ({ key: "background", ...r }))
-        .catch((e) => {
-          console.warn("[separate] background failed", e);
-          return null;
-        }),
-      generateDepthMap(dataUrl, subject)
-        .then((buf) => saveGeneratedImage(buf, "depth"))
-        .then((r) => ({ key: "depth", ...r }))
-        .catch((e) => {
-          console.warn("[separate] depth failed", e);
-          return null;
-        }),
-    ];
-
-    const essentialResults = (await Promise.allSettled(essential)) as any[];
+    // Phase 1: try AI for bg + depth, fallback to deterministic on 429
     const out: Record<string, { url: string; filename: string } | null> = {};
-    for (const r of essentialResults) {
-      if (r.status === "fulfilled" && r.value) {
-        out[r.value.key] = { url: r.value.url, filename: r.value.filename };
-      }
+
+    // depth map
+    try {
+      const buf = await generateDepthMap(dataUrl, subject);
+      const r = await saveGeneratedImage(buf, "depth");
+      out.depth = { url: r.url, filename: r.filename };
+    } catch (e: any) {
+      console.warn("[separate] AI depth failed, using deterministic fallback", e?.message);
+      out.depth = await generateDeterministicDepth(originalPath);
+    }
+
+    // background plate
+    try {
+      const buf = await generateBackgroundPlate(dataUrl, subject);
+      const r = await saveGeneratedImage(buf, "bg");
+      out.background = { url: r.url, filename: r.filename };
+    } catch (e: any) {
+      console.warn("[separate] AI bg failed, using deterministic fallback", e?.message);
+      out.background = await generateDeterministicBackground(originalPath);
     }
 
     // If baseOnly, skip per-element extraction
@@ -91,7 +93,6 @@ export async function POST(req: NextRequest) {
       filename: string;
     }> = [];
 
-    // run extracts in batches of 2 to respect rate limits
     for (let i = 0; i < extractTargets.length; i += 2) {
       const batch = extractTargets.slice(i, i + 2);
       const results = await Promise.allSettled(
@@ -105,13 +106,6 @@ export async function POST(req: NextRequest) {
         if (r.status === "fulfilled") extractResults.push(r.value);
         else console.warn("[separate] extract failed", r.reason);
       }
-    }
-
-    if (!out.background && !out.depth) {
-      return NextResponse.json(
-        { error: "Layer generation failed for all essential assets" },
-        { status: 500 }
-      );
     }
 
     return NextResponse.json({

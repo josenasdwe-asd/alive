@@ -16,7 +16,6 @@ interface AliveStageProps {
   layers: ImageLayer[];
   config: AnimationConfig;
   originalUrl: string;
-  backgroundUrl?: string;
   depthUrl?: string;
   framed?: boolean;
   aspectClass?: string;
@@ -33,7 +32,6 @@ export function AliveStage({
   layers,
   config,
   originalUrl,
-  backgroundUrl,
   depthUrl,
   framed = false,
   aspectClass = "aspect-[16/10]",
@@ -56,11 +54,7 @@ export function AliveStage({
   );
 
   const canWebGL = config.renderMode === "webgl" && !!depthUrl;
-  const foregroundUrl = layers.find(
-    (l) => l.role === "foreground" && l.url
-  )?.url;
 
-  // Determine if any canvas-particle effects are active
   const hasCanvasParticles =
     config.effects.smoke || config.effects.fire || config.effects.embers;
 
@@ -100,9 +94,6 @@ export function AliveStage({
           <AliveCSS3D
             layers={layers}
             config={config}
-            backgroundUrl={backgroundUrl}
-            originalUrl={originalUrl}
-            foregroundUrl={foregroundUrl}
             liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
             editorMode={editorMode}
             selectedLayerId={selectedLayerId}
@@ -113,9 +104,6 @@ export function AliveStage({
           <AliveLayers
             layers={layers}
             config={config}
-            backgroundUrl={backgroundUrl}
-            originalUrl={originalUrl}
-            foregroundUrl={foregroundUrl}
             liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
             editorMode={editorMode}
             selectedLayerId={selectedLayerId}
@@ -133,7 +121,6 @@ export function AliveStage({
         />
       )}
 
-      {/* CSS-based particles (dust motes) */}
       {config.particlesEnabled && !config.reducedMotion && !hasCanvasParticles && (
         <Particles
           count={config.preset === "dream" ? 20 : 14}
@@ -141,7 +128,6 @@ export function AliveStage({
         />
       )}
 
-      {/* Canvas 2D particle systems (Nivel 4) */}
       {hasCanvasParticles && !config.reducedMotion && (
         <ParticleCanvas
           systems={{
@@ -164,7 +150,6 @@ export function AliveStage({
         intensity={config.intensity}
       />
 
-      {/* CSS-based effect overlays (fog, godrays, bokeh, etc) */}
       <EffectOverlays effects={config.effects} speed={config.speed} />
 
       <div
@@ -173,7 +158,6 @@ export function AliveStage({
         style={vignetteStyle}
       />
 
-      {/* chromatic aberration overlay */}
       {config.chromaticAberration > 0 && !canWebGL && (
         <div
           aria-hidden

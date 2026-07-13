@@ -2,27 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 import Moveable from "react-moveable";
-import type { OnDrag, OnResize, OnRotate } from "react-moveable";
+import type { OnDrag, OnResize, OnRotate, OnDragStart } from "react-moveable";
 import { useAliveStore } from "@/lib/store";
+import type { LayerTransform } from "@/lib/types";
 
 interface LayerEditorProps {
-  /** the stage container that the editor overlays on top of */
   stageRef: React.RefObject<HTMLDivElement>;
   selectedLayerId?: string;
 }
 
 /**
  * Visual transform handles for the selected layer.
- * Renders on top of the AliveStage and lets the user drag/resize/rotate
- * the layer directly on the canvas.
+ * Uses react-moveable for drag/resize/rotate.
+ *
+ * BUG FIX: react-moveable's `beforeTranslate` is cumulative from drag start,
+ * NOT per-frame. So we capture the transform at onDragStart and set absolute
+ * values (start + delta) instead of accumulating.
  */
 export function LayerEditor({ stageRef, selectedLayerId }: LayerEditorProps) {
   const [target, setTarget] = useState<HTMLElement | null>(null);
   const layers = useAliveStore((s) => s.layers);
   const updateLayerTransform = useAliveStore((s) => s.updateLayerTransform);
   const rafRef = useRef<number>(0);
+  const startTransformRef = useRef<LayerTransform | null>(null);
 
-  // find the DOM element for the selected layer via rAF (deferred setState)
   useEffect(() => {
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -30,7 +33,7 @@ export function LayerEditor({ stageRef, selectedLayerId }: LayerEditorProps) {
         setTarget(null);
         return;
       }
-      const planes = stageRef.current.querySelectorAll(".alive-layer");
+      const planes = stageRef.current.querySelectorAll("[data-layer-id]");
       let found: HTMLElement | null = null;
       planes.forEach((p) => {
         const el = p as HTMLElement;
@@ -41,35 +44,43 @@ export function LayerEditor({ stageRef, selectedLayerId }: LayerEditorProps) {
     return () => cancelAnimationFrame(rafRef.current);
   }, [selectedLayerId, layers, stageRef]);
 
-  if (!target) return null;
+  if (!target || !selectedLayerId) return null;
+
+  const layer = layers.find((l) => l.id === selectedLayerId);
+  if (!layer) return null;
+
+  const onDragStart: OnDragStart = () => {
+    // capture the starting transform so we can compute absolute positions
+    startTransformRef.current = { ...layer.transform };
+  };
 
   const onDrag = ({ beforeTranslate }: OnDrag) => {
-    if (!selectedLayerId) return;
-    const layer = layers.find((l) => l.id === selectedLayerId);
-    if (!layer) return;
+    if (!selectedLayerId || !startTransformRef.current) return;
+    // absolute: start + cumulative delta (NOT accumulating on top of current)
     updateLayerTransform(selectedLayerId, {
-      x: layer.transform.x + beforeTranslate[0],
-      y: layer.transform.y + beforeTranslate[1],
+      x: startTransformRef.current.x + beforeTranslate[0],
+      y: startTransformRef.current.y + beforeTranslate[1],
     });
   };
 
-  const onResize = ({ delta }: OnResize) => {
-    if (!selectedLayerId) return;
-    const layer = layers.find((l) => l.id === selectedLayerId);
-    if (!layer) return;
+  const onResize = ({ delta, drag }: OnResize) => {
+    if (!selectedLayerId || !startTransformRef.current) return;
+    // delta[0] is the total width change ratio from drag start
     const newScale = Math.max(
       0.1,
-      layer.transform.scale * (delta[0] / 100 + 1)
+      startTransformRef.current.scale * (1 + delta[0] / 200)
     );
-    updateLayerTransform(selectedLayerId, { scale: newScale });
+    updateLayerTransform(selectedLayerId, {
+      scale: newScale,
+      x: startTransformRef.current.x + (drag.beforeTranslate?.[0] ?? 0),
+      y: startTransformRef.current.y + (drag.beforeTranslate?.[1] ?? 0),
+    });
   };
 
   const onRotate = ({ rotation }: OnRotate) => {
-    if (!selectedLayerId) return;
-    const layer = layers.find((l) => l.id === selectedLayerId);
-    if (!layer) return;
+    if (!selectedLayerId || !startTransformRef.current) return;
     updateLayerTransform(selectedLayerId, {
-      rotation: layer.transform.rotation + rotation,
+      rotation: startTransformRef.current.rotation + rotation,
     });
   };
 
@@ -84,6 +95,7 @@ export function LayerEditor({ stageRef, selectedLayerId }: LayerEditorProps) {
       throttleRotate={0}
       keepRatio={false}
       origin={false}
+      onDragStart={onDragStart}
       onDrag={onDrag}
       onResize={onResize}
       onRotate={onRotate}

@@ -32,7 +32,6 @@ export function Studio() {
     animation,
     originalUrl,
     originalDataUrl,
-    backgroundUrl,
     depthMapUrl,
     error,
     selectedLayerId,
@@ -47,10 +46,6 @@ export function Studio() {
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";
   const showStage = !!previewUrl;
-
-  const foregroundUrl = layers.find(
-    (l) => l.role === "foreground" && l.url
-  )?.url;
 
   return (
     <div className="mx-auto max-w-[1600px] px-3 py-4 sm:px-6 sm:py-6">
@@ -72,9 +67,7 @@ export function Studio() {
                     layers={layers}
                     config={animation}
                     originalUrl={originalUrl}
-                    backgroundUrl={backgroundUrl}
                     depthUrl={depthMapUrl}
-                    foregroundUrl={foregroundUrl}
                     framed
                     aspectClass="aspect-[16/10]"
                     editorMode={editorMode}

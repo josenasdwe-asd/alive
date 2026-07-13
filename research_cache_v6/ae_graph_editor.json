@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=Hg2mIvyCUHY",
+    "name": "How to get Bezier Handles in Graph Editor in After Effects, Tutorial for",
+    "snippet": "After Effects Tutorial show how to get Bezier handles in Graph Editor. It may looks different graph editor in After Effects, ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://mtmograph.com/blogs/tools/how-to-use-the-graph-editor-in-after-effects?srsltid=AfmBOooaqtKNi-WBzkZbcz_B2n3LLizl7rYdCEABKerpNp4CKL0v3LD_",
+    "name": "How to Use the Graph Editor in After Effects | Mt. Mograph",
+    "snippet": "Drag the bezier handles to influence the easing curve shape. TIP: the direction handles control the keyframe's easing curve shape. The Graph ...",
+    "host_name": "mtmograph.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/AfterEffects/comments/1jjkmoo/why_must_you_separate_position_dimensions_to_get",
+    "name": "WHY must you separate position dimensions to get bezier handles in",
+    "snippet": "I very regularly need to change the curve of a position and/or scale animation. I usually go from the auto bezier s curve to an exponential ...",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.adobe.com/questions-529/bezier-handles-in-graph-editor-25455",
+    "name": "Bezier handles in graph editor - Adobe Community",
+    "snippet": "You have to right-click on the keyframe and select \"Keyframe interpolation...\" and change the keyframe interpolation to rove across time and use ...",
+    "host_name": "community.adobe.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=6zrEKEuJGKs",
+    "name": "Beautiful easing curves in After Effects | Ae Genius - YouTube",
+    "snippet": "Get the most comprehensive intro to After Effects ever: https://jkinmo.com/xl9e37 Creating beautiful animation easing curves in After ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/AfterEffects/comments/1ld0as8/easing_plugin_just_released_a_plugin_for_custom",
+    "name": "Just released a plugin for custom Bezier ease control called Easer.",
+    "snippet": "Hello again, guys. It's a plugin to draw, save, and share your ease curves with Bezier handles. You can also preview the ease before ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/taranimator/posts/7883084545103311",
+    "name": "A handy visual reference for the graph editor in After Effects. - Facebook",
+    "snippet": "I'm flailing in the graph editor simply trying to get a bezier handle to flatten the end of the curve. Any understandable tutorials out there?",
+    "host_name": "www.facebook.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://graphicdesign.stackexchange.com/questions/113853/use-css-cubic-bezier-for-keyframes-in-after-effects",
+    "name": "Use CSS cubic-bezier for keyframes in After Effects?",
+    "snippet": "The first approach is to just use the graph editor, set the mode to value handles, then drag your handles. Only this does not really work well ...",
+    "host_name": "graphicdesign.stackexchange.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

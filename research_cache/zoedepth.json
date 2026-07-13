@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://arxiv.org/html/2407.18443v2",
+    "name": "HybridDepth: Robust Metric Depth Fusion by Leveraging Depth  - arXiv",
+    "snippet": "HybridDepth, a robust depth estimation pipeline. Zoedepth: Zero-shot transfer by combining relative and metric depth.",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/isl-org/ZoeDepth",
+    "name": "GitHub - isl-org/ZoeDepth: Metric depth estimation from a single image",
+    "snippet": "Metric depth estimation from a single image. This project will no longer be maintained by Intel. ZoeDepth: Combining relative and metric depth ...",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content/WACV2025/papers/Ganj_HybridDepth_Robust_Metric_Depth_Fusion_by_Leveraging_Depth_from_Focus_WACV_2025_paper.pdf",
+    "name": "[PDF] HybridDepth: Robust Metric Depth Fusion by Leveraging Depth from",
+    "snippet": "HYBRIDDEPTH leverages focal stack, data conveniently accessible in common mobile de- vices, to produce accurate metric depth maps.",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.semanticscholar.org/paper/ZoeDepth%3A-Zero-shot-Transfer-by-Combining-Relative-Bhat-Birkl/ebe2a5a186fa08e4e1b5d225d7a253d444d2c396",
+    "name": "ZoeDepth: Zero-shot Transfer by Combining Relative and Metric Depth",
+    "snippet": "ZeroDepth is introduced, a novel monocular depth estimation framework capable of predicting metric scale for arbitrary test images from different domains",
+    "host_name": "www.semanticscholar.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@bhaskarbose1998/monocular-depth-estimation-using-zoedepth-our-experience-42fa5974cb59",
+    "name": "Monocular Depth Estimation using ZoeDepth : Our Experience - Medium",
+    "snippet": "ZoeDepth: Zero-shot Transfer by Combining Relative and Metric Depth This paper tackles the problem of depth estimation from a single image.",
+    "host_name": "medium.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ui.adsabs.harvard.edu/abs/2023arXiv230212288F/abstract",
+    "name": "ZoeDepth: Zero-shot Transfer by Combining Relative and Metric Depth",
+    "snippet": "This paper tackles the problem of depth estimation from a single image. Existing work either focuses on generalization performance disregarding metric scale.",
+    "host_name": "ui.adsabs.harvard.edu",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://huggingface.co/docs/transformers/v4.49.0/model_doc/zoedepth",
+    "name": "ZoeDepth - Hugging Face",
+    "snippet": "ZoeDepth extends the DPT framework for metric (also called absolute) depth estimation. ZoeDepth is pre-trained on 12 datasets using relative depth and fine ...",
+    "host_name": "huggingface.co",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dl.acm.org/doi/full/10.1145/3749859.3749861",
+    "name": "Edge Enhanced Scene Understanding and Depth Estimation",
+    "snippet": "ZoeDepth, which combines relative and metric depth estimation to enhance depth prediction accuracy on various datasets.",
+    "host_name": "dl.acm.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

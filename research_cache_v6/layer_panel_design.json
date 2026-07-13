@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://discourse.mcneel.com/t/controlling-per-detail-layer-visibility-in-layouts/173656",
+    "name": "Controlling per-Detail layer visibility in Layouts - Rhino - McNeel Forum",
+    "snippet": "The lightbulb in the Layout On column controls layer visibility on the layout. When a detail is active, that column changes to Detail On. All this is the same ...",
+    "host_name": "discourse.mcneel.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=AuliKyI0DSY",
+    "name": "Illustrator Layers Panel | Understanding How it Works",
+    "snippet": "Illustrator Layers Panel tutorial. An Illustrator tutorial on understanding the layers panel in Illustrator, what each column represents ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.affinity.studio/help/panels-layers-panel",
+    "name": "Layers panel - Affinity Help Center",
+    "snippet": "Toggle Visibility—disable to hide the item; enable to make it visible again. thumbnail displays a preview of all the group's contents.",
+    "host_name": "www.affinity.studio",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://jkost.com/blog/2017/06/the_layers_panel.html",
+    "name": "Fundamental Layers Panel Tips and Techniques - Julieanne Kost's Blog",
+    "snippet": "Command + “,” (comma) (Mac) | Control + “,” (comma) (Win) toggles the visibility of the currently selected layer(s). Command + Option + “,” ( ...",
+    "host_name": "jkost.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.trimble.com/blogs/guillaume-clin/2025/04/21/toggle-layer-visibility-in-design-preview",
+    "name": "Toggle Layer visibility in Design Preview - Trimble Community",
+    "snippet": "Visibility Toggling: Simply click the eye icon next to any layer name to instantly turn its visibility on or off in the preview window.",
+    "host_name": "community.trimble.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sketch.com/docs/prototyping/customizing-layer-visibility",
+    "name": "Customizing layer visibility - Sketch",
+    "snippet": "In the Visibility section, click the circle.plus. Choose an Action (Show, Hide, or Toggle) The Toggle option changes the layer's visibility ...",
+    "host_name": "www.sketch.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.figma.com/ask-the-community-7/hide-preview-box-in-layers-ui-tab-52573",
+    "name": "hide preview box in layers ui tab - Figma Forum",
+    "snippet": "In Figma Draw, the Layers section in the left sidebar displays an enlarged visual preview of the layer's contents. You can toggle back into ...",
+    "host_name": "forum.figma.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=J8ZOGLsXlyQ",
+    "name": "How to Display Only Layer Content in Thumbnails (Video Tutorial)",
+    "snippet": "In this Photoshop how-to video, Khara Plicanic lets us in on a very helpful Photoshop Layers panel hack. By default, thumbnails in the ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://scikit-image.org/docs/0.25.x/auto_examples/segmentation/plot_multiotsu.html",
+    "name": "Multi-Otsu Thresholding — skimage 0.25.2 documentation",
+    "snippet": "Multi-Otsu calculates several thresholds, determined by the number of desired classes. The default number of classes is 3: for obtaining three classes, the ...",
+    "host_name": "scikit-image.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nature.com/articles/s41598-023-36066-8",
+    "name": "An efficient multilevel image thresholding method based on",
+    "snippet": "The Otsu method selects the best thresholds by the maximization of the variance among groups. In the Kapur method, the threshold value is ...",
+    "host_name": "www.nature.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@vignesh.g1609/image-segmentation-using-otsu-threshold-selection-method-856ccdacf22",
+    "name": "Image segmentation using otsu threshold selection method - Medium",
+    "snippet": "Otsu's method aims to find the threshold value that minimizes the variance within each class (intra-class variance) or, equivalently, maximizes ...",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sciencedirect.com/science/article/am/pii/S1051200416301191",
+    "name": "[PDF] A multi-scale 3D Otsu thresholding algorithm for medical image",
+    "snippet": "In this paper, a novel thresholding algorithm based on 3D Otsu and multi-scale image representation is proposed for medical image segmentation.",
+    "host_name": "www.sciencedirect.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mathworks.com/help/images/ref/multithresh.html",
+    "name": "multithresh - Multilevel image thresholds using Otsu's method",
+    "snippet": "thresh = multithresh( A , N ) returns thresh a 1-by- N vector containing N threshold values using Otsu's method. You can use thresh as an input argument to ...",
+    "host_name": "www.mathworks.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

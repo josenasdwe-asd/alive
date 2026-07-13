@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://help.figma.com/hc/en-us/articles/360039818874-Smart-animate-layers-between-frames",
+    "name": "Smart animate layers between frames – Figma Learn - Help Center",
+    "snippet": "Smart animate looks for matching layers, recognizes differences, and animates layers between frames in a prototype. UX design Prototyping Graphic",
+    "host_name": "help.figma.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=HCD8-JqCtH0&vl=en",
+    "name": "Figma for Edu: Smart animate with Figma Design - YouTube",
+    "snippet": "... Figma's prototyping features. You'll learn how to animate transitions between frames, use Smart Animate to create seamless motion, and ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.figma.com/blog/announcing-smart-animate-and-advanced-transitions",
+    "name": "Designing for top feature requests, like Smart Animate | Figma Blog",
+    "snippet": "Smart Animate, a new transition type that automatically animates similar objects and improves existing transitions; Drag, a new interaction type ...",
+    "host_name": "www.figma.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://thecodeaccelerator.com/blog/figma-smart-animate-transitions",
+    "name": "Figma Smart Animate & Transitions: Create Smooth UI Motion",
+    "snippet": "Smart Animate automatically animates differences between two frames or component states like position, size, color, or opacity changes.",
+    "host_name": "thecodeaccelerator.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.figma.com/suggest-a-feature-11/instant-transition-support-for-smart-animate-33257",
+    "name": "Instant Transition support for Smart Animate - Figma Forum",
+    "snippet": "I've been learning how to prototype using Figma and I couldn't find a proper way to use Smart Animation with an Instant Transition for unmatched layers.",
+    "host_name": "forum.figma.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/FigmaDesign/comments/17hr3bs/smart_animate_autolayout",
+    "name": "SMART ANIMATE & AUTOLAYOUT : r/FigmaDesign - Reddit",
+    "snippet": "Note: Components & AL don't always play nicely with smart animate transitions, sometimes you will have to break apart components & AL frames to ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=QSifeTQyG1E",
+    "name": "Why Your Prototype Animations Are BROKEN (Easy Fix) - YouTube",
+    "snippet": "Figma smart animate is the most powerful animation tool within figma ... Figma Auto Animate: Why Your Prototype Animations Are BROKEN (Easy Fix).",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.logrocket.com/ux-design/using-figma-smart-animate-prototype-animations",
+    "name": "Using Figma smart animate to prototype animations",
+    "snippet": "This article provides a step-by-step guide on using Figma's smart animate feature to prototype animations.",
+    "host_name": "blog.logrocket.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

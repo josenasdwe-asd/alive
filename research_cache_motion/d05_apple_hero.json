@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://css-tricks.com/lets-make-one-of-those-fancy-scrolling-animations-used-on-apple-product-pages",
+    "name": "Let's Make One of Those Fancy Scrolling Animations Used on",
+    "snippet": "By synchronizing each frame to the user's scroll position, we can play the animation as the user scrolls down (or back up) the page.",
+    "host_name": "css-tricks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/25188-airpods-image-sequence-animation-using-scrolltrigger",
+    "name": "AirPods image sequence animation using ScrollTrigger - GSAP",
+    "snippet": "My idea is to use an array which holds all the images and then make use of ScrollTrigger.update() to update the img src based on the scrolling position. Page 3 - GSAP Page 2 - GSAP More results from gsap.com",
+    "host_name": "gsap.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=PKLnHvpNabc",
+    "name": "Create Scrolling Animations Used On Apple Product Pages - YouTube",
+    "snippet": "... sequences and Component features. Dora will help you easily create complex scroll animation at ease and boost your efficiency in creating ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DVrBoEqDHxe",
+    "name": "FFmpeg -> Image Sequence (WebP) -> Canvas + Scroll Logic - Instagram",
+    "snippet": "A guide to building Apple-style scroll-driven product animations using an image sequence on a canvas. This is the same core technique used ...",
+    "host_name": "www.instagram.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=JO-g2vz7BYE",
+    "name": "Apple-Style Image Sequence Animation On Scroll with GSAP In",
+    "snippet": "Learn how to recreate the iconic scroll-triggered animation from Apple's AirPods Pro page — directly inside Webflow, using GSAP and ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ankittrehan2000.medium.com/creating-scroll-animations-similar-to-apples-airpods-pro-page-bc5c1c0814df",
+    "name": "Creating scroll animations similar to Apple's AirPods Pro page |",
+    "snippet": "Learn how to create the awesome scroll effects that Apple has on its website for some of its products.",
+    "host_name": "ankittrehan2000.medium.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://graydonpleasants.com/posts/flow-apples-secret-weapon",
+    "name": "Flow: Apple's Animation Secret Weapon | Graydon Pleasants",
+    "snippet": "Apple's high-quality, scroll-tied animations on their product promo pages are powered by a technology they call Flow. Flow uses a custom, ...",
+    "host_name": "graydonpleasants.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=tRkN8tgya8E",
+    "name": "Framer Tutorial: Making The AirPods Pro Scroll Animation - YouTube",
+    "snippet": "... sequence scroll animation on your Framer website. I'll show you ... How to Recreate Apple iPhone 16 Pro Scroll Animation in Framer No Code!",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

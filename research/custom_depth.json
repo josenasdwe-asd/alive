@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.facebook.com/groups/870470487040994/posts/1327054394715932",
+    "name": "Creating 3D image depth with Marigold for cyborgs - Facebook",
+    "snippet": "Introducing DMC Depth Map Creator, a user-friendly website that simplifies the Depth Map creation process! Upload your raw depth map generated ... This is simply a comparison exercise between Midas, Marigold, and ... How are depth maps created (software, techniques, and or ... More results from www.facebook.com",
+    "host_name": "www.facebook.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=egBNsSCajDg",
+    "name": "Best Depth Estimation Models (MiDaS, Depth Pro  - YouTube",
+    "snippet": "Best Depth Estimation Models (MiDaS, Depth Pro, Depth Anything v2, DepthCrafter, Marigold, Metric3D) · Comments.",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/comfyui/comments/18i5o7w/marigold_depth_calculation_node",
+    "name": "marigold depth calculation node : r/comfyui - Reddit",
+    "snippet": "Three quick comparisons. Top is Marigold default, middle is Marigold with some settings changed, and the bottom is Midas default. [Test] Zoe Depth vs MiDaS Depth. Spoiler alert: Use MiDaS. - Reddit Use Marigold, an SD based depth map generator, to add cgi elements ... More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.runcomfy.com/comfyui-nodes/comfyui_controlnet_aux/MiDaS-DepthMapPreprocessor",
+    "name": "MiDaS Depth Map - RunComfy",
+    "snippet": "Generate depth maps from images using MiDaS model for AI artists to enhance visual depth and realism in creative applications.",
+    "host_name": "www.runcomfy.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://huggingface.co/spaces/prs-eth/marigold",
+    "name": "Marigold Depth Estimation - a Hugging Face Space by prs-eth",
+    "snippet": "Upload a photo or select an example below to compute depth maps in real time. Use the slider to reveal areas of interest. Use the radio-buttons to switch ...",
+    "host_name": "huggingface.co",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Cx_x9va-YOg",
+    "name": "Nomad Sculpt & Midas for depth maps - Bas reliefs - Hight Map - YouTube",
+    "snippet": "Nomad Sculpt tutorial. How to use MIDAS to create depth / hight maps and use it with nomad sculpt tools.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/isl-org/MIDAS",
+    "name": "GitHub - isl-org/MiDaS: Code for robust monocular depth estimation",
+    "snippet": "MiDaS computes the relative depth map given an image. diffusion designed to generate joint image and depth data from a text prompt.",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=k8gTE5qPi-M",
+    "name": "MiDaS: Create depth maps with machine learning in Nuke w",
+    "snippet": "Master ML depth maps with Julian Kreusser using MiDas in Nuke. Learn to relight, add fog, create mattes, and more. In this first part, ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://library.phygital.plus/details/midas/r/rechZIfR46OKehXwV",
+    "name": "MiDaS + 3 tools for Depth map creation - AI Library",
+    "snippet": "MiDaS is an AI tool that accurately estimates depth from an image using powerful algorithms. It can analyse images and create a depth map to enhance your ...",
+    "host_name": "library.phygital.plus",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.aimodels.fyi/models/compare/image-preprocessors-midas-fal-ai-vs-imageutils-marigold-depth-fal-ai",
+    "name": "image-preprocessors/midas vs imageutils/marigold-depth",
+    "snippet": "It processes photographs and creates detailed depth maps that preserve fine details while capturing the overall spatial structure. The model ...",
+    "host_name": "www.aimodels.fyi",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

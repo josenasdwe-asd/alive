@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://carbondesignsystem.com/components/tree-view/usage",
+    "name": "Tree view - Carbon Design System",
+    "snippet": "A tree view consists of nested heading levels that create a content hierarchy for users and assist with navigating large amounts of information.",
+    "host_name": "carbondesignsystem.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=RMNd5i5Qk10",
+    "name": "Tree View | Side Navbar | UI Design | HTML, CSS & JavaScript - YouTube",
+    "snippet": "We'll build animated nested accordion (tree view, side navbar) using vanilla JavaScript. And at the end of video I'll show you how to use ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/carbon-design-system/carbon/issues/1613",
+    "name": "new variation for nested tree structure & left-positioned chevron · Issue",
+    "snippet": "By providing a left-aligned chevron with the ability to nest Accordions, we are providing a familiar hierarchy and interaction pattern for ...",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://spectrum.adobe.com/page/tree-view",
+    "name": "Tree view - Spectrum, Adobe's design system",
+    "snippet": "A tree view provides users with a way to navigate nested hierarchical information. Example of a tree view used for side navigation.",
+    "host_name": "spectrum.adobe.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@hagan.rivers/interaction-design-for-trees-5e915b408ed2",
+    "name": "Interaction Design for Trees - by Hagan Rivers - Medium",
+    "snippet": "Interaction Design for Trees Let's talk about how to use trees in interaction design, and we'll start with the fundamentals.",
+    "host_name": "medium.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dribbble.com/search/nested-groups",
+    "name": "nested groups - Dribbble",
+    "snippet": "Explore thousands of high-quality nested groups images on Dribbble. Your resource to get inspired, discover and connect with designers worldwide.",
+    "host_name": "dribbble.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.ux-components.com/components/tree-view",
+    "name": "Tree View - UX Components",
+    "snippet": "A hierarchical display of nested data. Accordion or grouped list. Create a Tree View component that renders nested hierarchical data. Use design tokens for ...",
+    "host_name": "www.ux-components.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://design.gitlab.com/components/tree",
+    "name": "Tree - Pajamas Design System - GitLab",
+    "snippet": "A tree follows a top-down pattern and each consecutive nested node (level) is indented to communicate the hierarchy. Collapsed and expanded ...",
+    "host_name": "design.gitlab.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

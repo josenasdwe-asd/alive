@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=ywBHtTSiluQ&vl=en",
+    "name": "Creating Parallax with Scroll Speed in Framer (Animation Lesson 9) - YouTube",
+    "snippet": "Parallax scrolling adds instant depth to any website by making elements move at different speeds. In this tutorial, you'll discover how ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sketch.com/blog/what-is-a-parallax-effect",
+    "name": "What is a parallax effect? The definitive guide · Sketch Blog",
+    "snippet": "Everything you need to know about parallax scrolling for websites and apps — including parallax effect examples.",
+    "host_name": "www.sketch.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=khu72P-R2fo",
+    "name": "This 3D Parallax Effect Made a Static Fullscreen Overlay Menu Feel IMMERSIVE - YouTube",
+    "snippet": "Learn how to create a fullscreen overlay navigation menu with an immersive 3D parallax effect — built with HTML, CSS, JavaScript, ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nngroup.com/articles/parallax-usability",
+    "name": "What Parallax Lacks - NN/G",
+    "snippet": "Parallax-scrolling effects add visual interest, but they often create usability issues, such as content that is slow to load or hard to read.",
+    "host_name": "www.nngroup.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=WqZmdi7kk2U",
+    "name": "The Parallax Effect in Web [Learn With Magnific] - YouTube",
+    "snippet": "... parallax effect – known as animation – is used in web design to break the limits of the 2D, creating an illusion of depth and movement on ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tilda.education/en/courses/webanimation/animation-theory",
+    "name": "Basic Theory of Web Animation - Tilda Education",
+    "snippet": "In this article, we'll go through what goes into the design of web animation: Speed in Animation, Easing, Bezier Curves, How Animation Works on Tilda, ...",
+    "host_name": "tilda.education",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DRhXqWfClk0",
+    "name": "Built to move minds. For Froyoo, we created a bold and dynamic user experience  - Instagram",
+    "snippet": "Most websites feel invisible because your scroll interactions lack spatial intent. ​Designers often treat scroll-triggered animations as mere ...",
+    "host_name": "www.instagram.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.taccgl.org/blog/parallax-scrolling.html",
+    "name": "Creating Parallax Scrolling Web Sites with 3D Hardware Acceleration and WebGL - taccGL",
+    "snippet": "Parallax scrolling adds a 3D effect to websites by scrolling objects that are further away slower than objects in front. This mimics a well-known optical effect ...",
+    "host_name": "www.taccgl.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

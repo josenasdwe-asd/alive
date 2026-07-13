@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://motion.dev/docs/react-transitions",
+    "name": "React transitions | Configure Motion animations",
+    "snippet": "Physics-based spring animations are set via stiffness , damping and mass , and these incorporate the velocity of any existing gestures or animations for ...",
+    "host_name": "motion.dev",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.maximeheckel.com/posts/the-physics-behind-spring-animations",
+    "name": "The physics behind spring animations - The Blog of Maxime Heckel",
+    "snippet": "By default, Framer Motion sets the stiffness of the spring animation to 100, the damping to 10, and the mass to 1 according to the docs.",
+    "host_name": "blog.maximeheckel.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=pgCwGAhvUg4",
+    "name": "Fine-Tune Your Motion Animations with the Spring Visualizer - YouTube",
+    "snippet": "The Spring Visualizer is an essential tool that helps you fine-tune stiffness, damping, and mass to create the perfect motion dynamics. In ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.framer.com/dictionary/spring-animation",
+    "name": "Spring Animation: Definition, Examples, and Framer Context",
+    "snippet": "Physics-based animation that simulates natural spring-like motion with properties like stiffness, damping, and mass. Spring animations feel more natural ...",
+    "host_name": "www.framer.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/framer/comments/1md2ixn/built_a_tool_to_make_configuring_spring",
+    "name": "Built a tool to make configuring spring animations easier : r/framer - Reddit",
+    "snippet": "Just choose a preset you like and then type in the numbers (Mass, Stiffness, Damping) in Framer. a few ideas on starting points to iterate from!",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.ishandeveloper.com/animating-with-physics",
+    "name": "Animating with Physics - Blog | ishandeveloper",
+    "snippet": "The default values in Framer Motion (stiffness: 100, damping: 10, mass: 1) work well for most cases, but now that you understand what each ...",
+    "host_name": "blog.ishandeveloper.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/origami.community/posts/3376873045744887",
+    "name": "hi everyone! how to convert spring or pop animation to iOS parameters",
+    "snippet": "animation parameters are usually defined as stiffness, damping, and mass. However, in Origami, the Spring Animation uses tension, friction, and ...",
+    "host_name": "www.facebook.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://rapidtoolset.com/en/tool/framer-motion-spring-generator",
+    "name": "Framer Motion Spring Generator - RapidToolSet",
+    "snippet": "You can adjust the spring physics parameters (stiffness, damping, mass) and animation duration, then preview the animation behavior in real-time ...",
+    "host_name": "rapidtoolset.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

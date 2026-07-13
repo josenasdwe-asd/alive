@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=7pOCtlrrE3Y",
+    "name": "The LAST graph editor tutorial you'll ever need. \\\\ After Effects Tutorial",
+    "snippet": "ANIMATION PRINCIPLES FOR MOTION DESIGNERS - $100 OFF (ends Nov 21) Learn the 8 core principles that separate good motion design from great ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://helpx.adobe.com/after-effects/desktop/animate-in-after-effects/speed-between-keyframes/speed.html",
+    "name": "Apply and control speed changes in After Effects - Adobe Help Center",
+    "snippet": "In the Timeline panel, expand the outline for the keyframe you want to adjust. Select the Graph Editor button and display the speed graph for ...",
+    "host_name": "helpx.adobe.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.bloopanimation.com/mastering-the-basics-of-keyframes-and-graph-editors-in-after-effects",
+    "name": "Mastering the Basics of Keyframes and Graph Editors in After Effects",
+    "snippet": "The After Effects Graph Editor visualizes the interpolation between keyframes and offers a way to maintain precise control over the timing and movement between ...",
+    "host_name": "www.bloopanimation.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://mtmograph.com/blogs/tools/how-to-use-the-graph-editor-in-after-effects?srsltid=AfmBOoofrxKondEsSB_9V44UOEl08T1OmZyfTCuA8u_nHeG2PWwM4ZU6",
+    "name": "How to Use the Graph Editor in After Effects | Mt. Mograph",
+    "snippet": "1. Select a keyframe in the Timeline · 2. Toggle to the Graph Editor · 3. The selected keyframes will be visible in the Graph Editor · 4. Hover the ...",
+    "host_name": "mtmograph.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/AfterEffects/comments/1kjfgg3/changing_the_keyframe_interpolation_on_the",
+    "name": "Changing the keyframe interpolation on the timeline from Linear to",
+    "snippet": "In the Graph Editor, you should be able to click and drag from the keyframe (I can't remember if it needs a modifier key) to switch from Linear ...",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=bJmfL4U8VgI",
+    "name": "Mastering Keyframe Animation | After Effects Crash Course - YouTube",
+    "snippet": "... key frames and you will gain these skills under your belt ... Graph Editor for Beginners – After Effects Tutorial That Actually Makes Sense.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motiondesign.school/blog/keyframe-velocity",
+    "name": "Keyframe Velocity in After Effects - Motion Design School",
+    "snippet": "With the keyframes selected, go to the “Window” menu and choose “Graph Editor.” The Graph Editor provides a visual representation of keyframe ...",
+    "host_name": "motiondesign.school",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DVtHwnoAk6-",
+    "name": "Motion Designer | Adobe After Effects Instructor - Instagram",
+    "snippet": "Click random effects, add 17 keyframes, and pray the render works. Then the timeline crashes… and we all pretend it's fine. I do things a little ...",
+    "host_name": "www.instagram.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tomfosterctp.wordpress.com/2015/12/11/after-effects-keyframes-and-the-graph-editor",
+    "name": "After Effects: Keyframes and The Graph Editor - tomfosterctp",
+    "snippet": "The graph editor allows the animator to see the movement and also adjust the movement, value or speed of the keyframes. The graph editor allows ...",
+    "host_name": "tomfosterctp.wordpress.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.schoolofmotion.com/blog/after-effects-keyframe-types",
+    "name": "After Effects 101: Basic Keyframe Types - School of Motion",
+    "snippet": "We'll take a look at the ins-and-outs of keyframes in After Effects. We'll cover all sorts of nerdy terms like spacial and temporal interpolation.",
+    "host_name": "www.schoolofmotion.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

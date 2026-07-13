@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://arxiv.org/html/2406.09414v2",
+    "name": "Depth Anything V2 - arXiv",
+    "snippet": "Thus, we choose to build our teacher and student models on the original DINOv2 encoders. ... Structure-guided ranking loss for single image depth prediction.",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/data-science/monocular-depth-estimation-with-depth-anything-v2-54b6775abc9f",
+    "name": "Monocular Depth Estimation with Depth Anything V2 - Medium",
+    "snippet": "Depth Anything V2 improved performance by ignoring real-world sensor datasets and only using synthetic images generated with graphics engines ...",
+    "host_name": "medium.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.emergentmind.com/topics/depth-anything-v2",
+    "name": "Depth Anything V2: Advanced Depth Estimation - Emergent Mind",
+    "snippet": "The framework integrates a DINOv2 Vision Transformer with a Dense Prediction Transformer decoder and employs specialized losses for scale ...",
+    "host_name": "www.emergentmind.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/DepthAnything/Depth-Anything-V2",
+    "name": "DepthAnything/Depth-Anything-V2: [NeurIPS 2024] Depth  - GitHub",
+    "snippet": "This work presents Depth Anything V2. It significantly outperforms V1 in fine-grained details and robustness. Compared with SD-based models, it enjoys faster ...",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.lightly.ai/blog/dinov2",
+    "name": "Understanding DINOv2: Engineer's Deep Dive - Lightly AI",
+    "snippet": "DINOv2 is a self-supervised Vision Transformer by Meta AI that learns general-purpose visual features from unlabeled images.",
+    "host_name": "www.lightly.ai",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://claru.ai/glossary/depth-anything-v2",
+    "name": "Depth Anything V2 — Definition & Training Data | Claru",
+    "snippet": "The model is trained with a combination of supervised loss on labeled depth data and self-training loss on pseudo-labeled unlabeled data, using a scale-and- ...",
+    "host_name": "claru.ai",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/26cfdcd8fe6fd75cc53e92963a656c58-Paper-Conference.pdf",
+    "name": "[PDF] Depth Anything V2 - NIPS",
+    "snippet": "It consists of three steps: • train a reliable teacher model based on DINOv2-G purely on high-quality synthetic images. • produce precise pseudo depth on large ...",
+    "host_name": "proceedings.neurips.cc",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://encord.com/blog/dinov2-self-supervised-learning-explained",
+    "name": "DINOv2: Self-supervised Learning Model Explained - Encord",
+    "snippet": "Discover how Meta AI's DINOv2 works without labeled data, outperforming other models in tasks like segmentation, depth estimation, and instance retrieval.",
+    "host_name": "encord.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

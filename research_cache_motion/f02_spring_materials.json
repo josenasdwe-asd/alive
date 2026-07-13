@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://blog.maximeheckel.com/posts/the-physics-behind-spring-animations",
+    "name": "The physics behind spring animations - The Blog of Maxime Heckel",
+    "snippet": "Framer Motion sets the stiffness of the spring animation to 100, the damping to 10, and the mass to 1 according to the docs.",
+    "host_name": "blog.maximeheckel.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=pgCwGAhvUg4",
+    "name": "Fine-Tune Your Motion Animations with the Spring Visualizer - YouTube",
+    "snippet": "The Spring Visualizer is an essential tool that helps you fine-tune stiffness, damping, and mass to create the perfect motion dynamics. In ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/examples/js-spring",
+    "name": "Spring example & tutorial for JavaScript - Motion.dev",
+    "snippet": "stiffness - Controls how rigid the spring feels. Higher values create faster, snappier motion. damping - Controls how quickly the spring ...",
+    "host_name": "motion.dev",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.remotion.dev/docs/spring",
+    "name": "spring() | Remotion | Make videos programmatically",
+    "snippet": "A physics-based animation primitive. damping 10 mass 1 stiffness 100. An optional object that allows you to customize the physical properties ...",
+    "host_name": "www.remotion.dev",
+    "rank": 3,
+    "date": "Jul 11, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.android.com/develop/ui/views/animations/spring-animation",
+    "name": "Animate movement using spring physics | Views - Android Developers",
+    "snippet": "In a spring-based animation, the SpringForce class lets you customize spring's stiffness, its damping ratio, and its final position.",
+    "host_name": "developer.android.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=-3X6zDaJ8r4",
+    "name": "Stiffness and damping | Simulation | Computer Animation | Khan Academy",
+    "snippet": "Now we'll add spring stiffness and damping to our system.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kvin.me/posts/effortless-ui-spring-animations",
+    "name": "Effortless UI Spring Animations: A Two-Parameter Approach",
+    "snippet": "When configuring spring animations, there's what I'll call \"The Physics Approach\". This involves defining mass, stiffness, and damping (names ...",
+    "host_name": "www.kvin.me",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.joshwcomeau.com/animation/a-friendly-introduction-to-spring-physics",
+    "name": "A Friendly Introduction to Spring Physics Animation in JavaScript",
+    "snippet": "We've seen how mass, tension, and friction affect a spring's motion. Now you can control each of these parameters, and discover pleasant or ...",
+    "host_name": "www.joshwcomeau.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

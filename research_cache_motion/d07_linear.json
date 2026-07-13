@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://prismic.io/blog/css-text-animations",
+    "name": "CSS Text Animations: 40 Creative Examples to Try - Prismic",
+    "snippet": "In this article, we'll explore 40 creative CSS text animations featuring ten custom animations I've personally created, plus 30 additional hand ...",
+    "host_name": "prismic.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/57339684/text-reveal-using-css-animation-and-background-color",
+    "name": "Text reveal using CSS animation and background color - Stack Overflow",
+    "snippet": "The only way to create a reveal using background is to consider multiple background layer where one of them is using background-clip:text Raise ( Reveal ) text from bottom css animation Is there a way to animate appearing text in html/css? More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=mikht2lEnI0",
+    "name": "Create Text Animation For Website Using CSS - YouTube",
+    "snippet": "Learn Text Reveal Animation CSS And Text Background Animation For Website Using HTML And CSS for beginners #cssanimation #csstutorial ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sliderrevolution.com/resources/css-text-animation",
+    "name": "Awesome CSS Text Animation Examples You Can Use",
+    "snippet": "Explore CSS text animation examples to make your web content pop! Discover a variety of animated effects to enhance readability and engagement.",
+    "host_name": "www.sliderrevolution.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://alvarotrigo.com/blog/css-text-animations",
+    "name": "33 Gorgeous CSS Text Animation Effects [Examples] - Alvaro Trigo",
+    "snippet": "You can introduce cool CSS text effects. Things such as scrolling text, shadows, text glow, style, colour, 3D effect and many more.",
+    "host_name": "alvarotrigo.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/27278-text-reveal-word-by-word-instead-line-by-line",
+    "name": "Text reveal word by word instead line by line - GSAP",
+    "snippet": "Hello all,. I'm using the Codepen below to reveal text on scroll, but I'm hoping to reveal word by word instead of line by line.",
+    "host_name": "gsap.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=V18Rvcxj1iA",
+    "name": "CSS Text Animations - 6 tricks you should know in 2022 - YouTube",
+    "snippet": "In this tutorial, you will learn some fancy text animations and learn many CSS tricks and effects that you can then use in many different ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://verpex.com/blog/a-text-reveal-animation-using-css",
+    "name": "A Text Reveal Animation using CSS - Verpex",
+    "snippet": "In this article, we are going to build a simple but cool reveal animation that you can apply to your text. It will also work with multi-line ...",
+    "host_name": "verpex.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

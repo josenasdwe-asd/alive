@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://depthy.stamina.pl",
+    "name": "DEPTHY",
+    "snippet": "Depthy shows Google Camera Lens Blur photos with 3D parallax effect and creates animated GIFs from them. Plus extracts the depth map and enables you to create ...",
+    "host_name": "depthy.stamina.pl",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/Android/comments/23o60r/depthy_create_3d_parallax_images_out_of_photos",
+    "name": "DEPTHY - Create 3d parallax images out of photos created with Google Camera's Lens Blur feature! (uses extracted depth map) : r/Android - Reddit",
+    "snippet": "Create 3d parallax images out of photos created with Google Camera's Lens Blur feature! This website takes this info to split the photo in ... Make your images come alive in 3D with Depthmap script and Depthy webapp! Does anybody know what app/software can achieve this subtle movement? More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://news.ycombinator.com/item?id=7627410",
+    "name": "Parallax effect from Google Lens Blur photos - Hacker News",
+    "snippet": "Parallax effect from Google Lens Blur photos (depthy.stamina.pl) a depth map calculated from a series of shots made upwards. If you just want a ...",
+    "host_name": "news.ycombinator.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.defold.com/t/depth-map/76908",
+    "name": "Depth Map - Questions - Defold game engine forum",
+    "snippet": "I'm currently exploring ways to integrate depth maps with images to create 2.5D effects similar to what you can see on depthy.stamina.pl.",
+    "host_name": "forum.defold.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://apps.shopify.com/depthy",
+    "name": "Depthy – iPhone‑style 3D image - Shopify App Store",
+    "snippet": "Depthy gives your Shopify store an immersive edge by turning static images into depth-enabled visuals. create iPhone-style 3D images",
+    "host_name": "apps.shopify.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/panrafal/depthy",
+    "name": "panrafal/depthy: Extract depth map and original from photos made with Google Camera's Lens Blur. - GitHub",
+    "snippet": "Depthy shows Google Camera Lens Blur photos with 3D parallax effect and creates animated GIFs from them. Plus extracts the depth map and enables you to create ...",
+    "host_name": "github.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://lemmasoft.renai.us/forums/viewtopic.php?t=30462",
+    "name": "Software that makes 2D images look 3D by using depth maps? - Lemma Soft Forums",
+    "snippet": "I've heard of a website called Depthy which lets you upload a 2D image and a special black and white image called a depth map, which defines the ...",
+    "host_name": "lemmasoft.renai.us",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://adventurecreator.org/forum/discussion/6785/depthy-me-wiggle-js-2d-sudo-3d-backgrounds",
+    "name": "Depthy.me / Wiggle.js - 2D/sudo 3D Backgrounds — Adventure Creator forum",
+    "snippet": "Depthy.me ! basically you upload your background image, and paint whether image pixels should be far away or closer to view.",
+    "host_name": "adventurecreator.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://app.artificialstudio.ai/tools/image-depth-map-generator",
+    "name": "Free Depth Map Generator | Artificial Studio",
+    "snippet": "Generate depth maps from any 2D image with AI. Transform your photos into depth data for 3D effects, AR/VR projects, and visual enhancements. Try it now!",
+    "host_name": "app.artificialstudio.ai",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.droid-life.com/2014/04/22/depthy-adds-3d-parallax-to-your-google-camera-lens-blur-photos",
+    "name": "Depthy Adds 3D Parallax to Your Google Camera Lens Blur Photos - Droid Life",
+    "snippet": "A crafty developer has created Depthy, an open source program that adds a parallax effect to photos taken with Google Camera's Lens Blur mode.",
+    "host_name": "www.droid-life.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

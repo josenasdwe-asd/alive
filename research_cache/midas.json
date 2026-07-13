@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://arxiv.org/html/2406.09374v1",
+    "name": "Scale-Invariant Monocular Depth Estimation via SSI Depth - arXiv",
+    "snippet": "We propose a framework to generate high resolution scale-invariant (SI) depth from a single image that can be projected to geometrically accurate point clouds ...",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dl.acm.org/doi/fullHtml/10.1145/3641519.3657523",
+    "name": "Scale-Invariant Monocular Depth Estimation via SSI Depth",
+    "snippet": "The scale-invariant (SI) depth estimation networks require geometrically consistent depth maps that are a scale away from the true depth.",
+    "host_name": "dl.acm.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://huggingface.co/blog/Isayoften/monocular-depth-estimation-guide",
+    "name": "Metric and Relative Monocular Depth Estimation - Hugging Face",
+    "snippet": "Scale and Shift Invariant Loss. Often the relative depth is inverted, y of relative depth estimation. MDE models usually overfit. Scale and ...",
+    "host_name": "huggingface.co",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "http://vladlen.info/papers/midas.pdf",
+    "name": "[PDF] Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero",
+    "snippet": "We propose to perform pre- diction in disparity space (inverse depth up to scale and shift) together with a family of scale- and shift-invariant dense losses",
+    "host_name": "vladlen.info",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://yaksoy.github.io/sidepth",
+    "name": "Scale-Invariant Monocular Depth Estimation via SSI Depth",
+    "snippet": "We propose a framework to generate high resolution scale-invariant (SI) depth from a single image that can be projected to geometrically accurate point clouds ...",
+    "host_name": "yaksoy.github.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=324UGvwUkQg",
+    "name": "Scale-Invariant Monocular Depth Estimation via SSI Depth - YouTube",
+    "snippet": "... loss that substantially improves detail generation in SSI MDE, addressing critical limitations in existing approaches. Through in-the-wild ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/isl-org/MiDaS/issues/261",
+    "name": "DEPTH VALUE OF THE EACH PIXEL · Issue #261 · isl-org/MiDaS - GitHub",
+    "snippet": "The midas models output inverse depth maps (or images). So each pixel of the output corresponds to a value like: 1/depth. However, the mapping is also only ...",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content/ICCV2025/papers/Zhang_StableDepth_Scene-Consistent_and_Scale-Invariant_Monocular_Depth_ICCV_2025_paper.pdf",
+    "name": "[PDF] StableDepth: Scene-Consistent and Scale-Invariant Monocular Depth",
+    "snippet": "StableDepth achieves efficient online monocular depth estimation that produces scene-consistent and scale-invariant predictions frame by frame.",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

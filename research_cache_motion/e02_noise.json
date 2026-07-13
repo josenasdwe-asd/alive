@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=oo9HFnDdviw",
+    "name": "PERLIN NOISE Demystified: All You Need To Know - YouTube",
+    "snippet": "Perlin Noise is a procedural generation algorithm that can be used to create natural looking landscapes and textures.",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://thirafi.com/en/blog/perlin-noise",
+    "name": "Manipulating Perlin Noise for Organic Procedural Animations - Thirafi Dide",
+    "snippet": "One example is easing function on CSS transition, which you want to start the animation slower but get faster over time (for ease-in function).",
+    "host_name": "thirafi.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://garagefarm.net/blog/perlin-noise-implementation-procedural-generation-and-simplex-noise",
+    "name": "Perlin Noise: Implementation, Procedural Generation, and",
+    "snippet": "Perlin Noise, developed by Ken Perlin in 1983, is a type of gradient noise widely used for simulating natural-looking textures and phenomena.",
+    "host_name": "garagefarm.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://thebookofshaders.com/11",
+    "name": "Noise - The Book of Shaders",
+    "snippet": "Perlin's Noise Algorithm. Use your noise function to animate a shape by moving it, rotating it or scaling it. Construct \"organic-looking\" shapes using the ...",
+    "host_name": "thebookofshaders.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/andresclua/let-it-flow-effortless-noise-animation-for-the-dom-4aca",
+    "name": "Let It Flow – Effortless Noise Animation for the DOM",
+    "snippet": "Perlin noise or. Simplex noise, for bringing that organic, almost-natural motion to life. Map the noise values to CSS transforms. Handle play/ ...",
+    "host_name": "dev.to",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=C0S0RiBepsY",
+    "name": "Perlin noise (2D) | Patterns | Computer animation | Khan Academy",
+    "snippet": "Explore how 3D curves can be added together to create 2D noise. Click here to play with the interactive used in this video.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Perlin_noise",
+    "name": "Perlin noise - Wikipedia",
+    "snippet": "Simplex noise has the same purpose of Perlin noise, but uses a simpler space-filling grid and produces less grid-shaped artifacts.",
+    "host_name": "en.wikipedia.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/58769147/simplex-3d-noise-animation-halts-on-mobile",
+    "name": "Simplex 3D noise animation halts on mobile - webgl - Stack Overflow",
+    "snippet": "Simplex noise and animating it using WebGL. the animation always halts after a fixed period. Same thing happens with the classic Perlin noise ... Why does simplex noise seem to have *more* artifacts than classic Perlin ... What is the intent of using 4D OpenSimplex Noise instead of 2D ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

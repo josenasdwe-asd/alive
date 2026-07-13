@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=TJm2cvVOY3Q",
+    "name": "Animation Principles 5 | Arcs - YouTube",
+    "snippet": "All Lessons and Project Files: https://www.sidefx.com/tutorials/12-principles-of-animation/ Learn how to apply the principle of Arcs to ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/dylantarre/animation-principles/blob/main/docs/01-by-domain/web-motion-design.md",
+    "name": "web-motion-design.md - dylantarre/animation-principles",
+    "snippet": "Arc motion-path or bezier translate transforms Secondary Action Shadows, glows responding to primary motion Timing Duration: micro 100-200ms, standard 200-400ms",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@rocchokcoco/motion-path-magical-path-animation-6f9f36c621b3",
+    "name": "Motion Path — Magical Path Animation | by ChokCoco - Medium",
+    "snippet": "Use CSS motion path to make complex path animations. CSS can also implement some simple curve path animations. For some simple arc curve paths, ...",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tobiasahlin.com/blog/curved-path-animations-in-css",
+    "name": "Moving along a curved path in CSS with layered animation | Tobias Ahlin",
+    "snippet": "No matter how much you bend your bezier curves, you can't make something move along a curved path by applying an animation or a transition to an object.",
+    "host_name": "tobiasahlin.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Motion_path",
+    "name": "CSS motion path - MDN Web Docs",
+    "snippet": "The CSS motion path module allows authors to animate any graphical object along a custom path. The CSS transforms module provides features that ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DSaFvQWAN-_/?hl=en",
+    "name": "Animation Principle - Instagram",
+    "snippet": "... Principle: Arcs Arcs mean using curved motion paths instead of straight lines. When a character moves from point A to B, the motion should ...",
+    "host_name": "www.instagram.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/docs/arc",
+    "name": "arc() | Animate along a curved path - Motion.dev",
+    "snippet": "Use Motion's arc() factory to animate elements along a curved path. arc arc can change the path between two points from a straight line to a curved one.",
+    "host_name": "motion.dev",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.smashingmagazine.com/2016/08/css-animations-motion-curves",
+    "name": "Upgrading CSS Animation With Motion Curves - Smashing Magazine",
+    "snippet": "Motion curves are primarily used by animators to create advanced, realistic animations. In this article, Nash Vail will show you how motion curves work.",
+    "host_name": "www.smashingmagazine.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

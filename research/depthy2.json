@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://depthy.stamina.pl",
+    "name": "DEPTHY",
+    "snippet": "Depthy shows Google Camera Lens Blur photos with 3D parallax effect and creates animated GIFs from them. Plus extracts the depth map and enables you to create ...",
+    "host_name": "depthy.stamina.pl",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/StableDiffusion/comments/yo87qz/make_your_images_come_alive_in_3d_with_depthmap",
+    "name": "Make your images come alive in 3D with Depthmap script and Depthy",
+    "snippet": "Once you have an image and its depth map, you can hop on over to Depthy in your web browser, upload the image and its depth map, and then create ...",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://news.ycombinator.com/item?id=7627410",
+    "name": "Parallax effect from Google Lens Blur photos - Hacker News",
+    "snippet": "Parallax effect from Google Lens Blur photos (depthy.stamina.pl) be used to generate the depthmap using what algorithms Lens Blur used, and ...",
+    "host_name": "news.ycombinator.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.defold.com/t/depth-map/76908",
+    "name": "Depth Map - Questions - Defold game engine forum",
+    "snippet": "I'm currently exploring ways to integrate depth maps with images to create 2.5D effects similar to what you can see on depthy.stamina.pl.",
+    "host_name": "forum.defold.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/clcarwin/depthy_2D_image_add_depthmap",
+    "name": "Extract depth map and original from photos made with Google  - GitHub",
+    "snippet": "Depthy shows Google Camera Lens Blur photos with 3D parallax effect and creates animated GIFs from them. Plus extracts the depth map and enables you to create ...",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://lemmasoft.renai.us/forums/viewtopic.php?t=30462",
+    "name": "Software that makes 2D images look 3D by using depth maps?",
+    "snippet": "Depthy which lets you upload a 2D image and a special black and white image called a depth map, which defines the depth of your first image,",
+    "host_name": "lemmasoft.renai.us",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://apps.shopify.com/depthy",
+    "name": "Depthy – iPhone‑style 3D image - Shopify App Store",
+    "snippet": "Depthy gives your Shopify store an immersive edge by turning static images into depth-enabled visuals. . Activate interactive depth effect on your storefront.",
+    "host_name": "apps.shopify.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://adventurecreator.org/forum/discussion/6785/depthy-me-wiggle-js-2d-sudo-3d-backgrounds",
+    "name": "Depthy.me / Wiggle.js - 2D/sudo 3D Backgrounds - Adventure Creator",
+    "snippet": "First I had to make a \"depth map\", and googled \"Depth Map Generator\", and quickly enough found the most amazing tool, Depthy.me !",
+    "host_name": "adventurecreator.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=FDds98WuFnM",
+    "name": "Four Ways to Create and Use Depth Maps - YouTube",
+    "snippet": "... image as well as the color. I use them all the time to help guide my viewer's eye through the frame. Don Smith Photography specializes in ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://app.artificialstudio.ai/tools/image-depth-map-generator",
+    "name": "Free Depth Map Generator | Artificial Studio",
+    "snippet": "Generate depth maps from any 2D image with AI. Transform your photos into depth data for 3D effects, AR/VR projects, and visual enhancements. Try it now!",
+    "host_name": "app.artificialstudio.ai",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

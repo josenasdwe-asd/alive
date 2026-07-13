@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://joshcollinsworth.com/blog/easing-curves",
+    "name": "Understanding easing and cubic-bezier curves in CSS",
+    "snippet": "The easing curve can make or break any animation on the web. Let's look at the science of CSS cubic-bezier curves, and the art of using them ...",
+    "host_name": "joshcollinsworth.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://css-tricks.com/almanac/functions/c/cubic-bezier",
+    "name": "cubic-bezier() - CSS-Tricks",
+    "snippet": "The cubic-bezier() function lets you define custom timing curves for CSS animations and transitions. It gives you precise control over how elements move.",
+    "host_name": "css-tricks.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=pxUCPbaZRQY",
+    "name": "Using CSS Cubic-Bezier Animations for Page Transitions - YouTube",
+    "snippet": "... transition animations within Vue. First, we fix a minor issue with mode=\"out-in\" and I also show you how to use CSS's Cubic-Bezier function ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ics.media/en/entry/18730",
+    "name": "Choosing ease in CSS - ICS MEDIA",
+    "snippet": "The cubic-bezier() function specifies the coordinates of the control points of a cubic Bézier curve. Example /* For CSS transitions */ .example ...",
+    "host_name": "ics.media",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://railsdesigner.com/transitions-with-cubic-bezier",
+    "name": "Level up CSS transitions with cubic-bezier - Rails Designer",
+    "snippet": "If you learn about CSS' cubic-bezier timing functions, your transitions and animations will instantly feel more professional and polished.",
+    "host_name": "railsdesigner.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.uwarp.design/easings",
+    "name": "Easing Functions Cheat Sheet - Uwarp",
+    "snippet": "Use keyframes for bounce and elastic: When a single bezier cannot capture overshoot, copy the generated @keyframes blocks for scale, translate, or opacity.",
+    "host_name": "www.uwarp.design",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/7921-translating-css-cubic-bezier-easing-to-gsap",
+    "name": "translating CSS cubic-bezier easing to GSAP",
+    "snippet": "In a project I'm doing, I need to match easing feel of elements animated using CSS cubic-Bezier timing function (example:cubic-bezier(0.1, ...",
+    "host_name": "gsap.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://easings.net",
+    "name": "Easing Functions Cheat Sheet",
+    "snippet": "In CSS, the transition and animation properties allow you to specify an easing function. .block { transition: transform 0.6s ; }. Edit on cubic-bezier.com.",
+    "host_name": "easings.net",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

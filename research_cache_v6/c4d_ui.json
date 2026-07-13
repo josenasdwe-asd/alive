@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=jVHJa-K0jU8",
+    "name": "Cinema 4d 2023: Beginners Guide Pt3 (Object Manager  - YouTube",
+    "snippet": "This video continues the beginners guide while discussing the object manager, attribute manager along with basic object creation.",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.maxon.net/c4d/r25/en-us/Content/html/5743.html",
+    "name": "Object Manager",
+    "snippet": "The Object Manager is the control center for all objects in the scene including their tags. You are free to choose which items are shown in the Object Manager.",
+    "host_name": "help.maxon.net",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/learning/learning-cinema-4d-s22/change-object-attributes",
+    "name": "Change object attributes - CINEMA 4D Video Tutorial - LinkedIn",
+    "snippet": "The objects we create in Cinema 4D are stored in the object manager. But in order to change an object's appearance, we use the attributes manager.",
+    "host_name": "www.linkedin.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=7mYXWQB6ujg",
+    "name": "How to Link Animation Timeline to Object Manager | Cinema 4D Tutorial",
+    "snippet": "HERE SOME TRICK I WOULD LIKE TO SHARE WITH YOU ON HOW TO LINK ANIMATION TIMELINE TO OBJECT MANAGER OR VIEWPORT By default setting, ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/Cinema4D/comments/qozfyr/in_r25_how_do_i_link_view_to_object_manager_so",
+    "name": "In r25 how do I link view to object manager, so that only my  - Reddit",
+    "snippet": "You can also drag and drop the objects you want from the object manager into the time line. You can also set only objects that are animating and ...",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=JQdx-_qZNMA",
+    "name": "How to select an object in the timeline and viewport in CINEMA 4D",
+    "snippet": "In this video we're going to look at a question from one of our users, Sazarret, on how to select an object in the viewport and have it ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.maxon.net/c4d/en-us/Content/html/5821.html",
+    "name": "Attribute Manager",
+    "snippet": "Cinema 4D and Related Apps. How to use the Attribute Manager. HUD Configuration The User Interface Windows Tabs. Timeline/Function Graph Extensions",
+    "host_name": "help.maxon.net",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://creativecow.net/forums/thread/how-to-restore-c4d-object-manager",
+    "name": "How to restore c4d Object Manager - Maxon Cinema 4D - Creative COW",
+    "snippet": "Hello,. In the course of working, i mistakenly clicked on something and my object manager has lost the standard C4D listing of objects.",
+    "host_name": "creativecow.net",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/learning/learning-cinema-4d-s22/touring-the-cinema-4d-interface",
+    "name": "Touring the Cinema 4D interface - CINEMA 4D Video Tutorial - LinkedIn",
+    "snippet": "All objects in a 3D scene are stored in the object manager to the right of the object manager are tabs, allowing you to switch between different ...",
+    "host_name": "www.linkedin.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=goE3bNbLgLA",
+    "name": "Quick Tip 43: Link Timeline to Object Manager - YouTube",
+    "snippet": "In this Cinema 4D Quick Tip video we take a look at how we can link our Timeline / Dopesheet to our Viewport and Object Manager, ...",
+    "host_name": "www.youtube.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

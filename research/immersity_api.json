@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://immersity.ai/pricing",
+    "name": "Immersity for Web Pricing",
+    "snippet": "$ 4.99 per month billed monthly 500 conversions ・ $ 14.99 per month billed monthly 1,700 conversion credits ・ 24.99 per month billed monthly 3,300 ・ $ 49.99 ...",
+    "host_name": "immersity.ai",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs-api.immersity.ai/docs/getting-started",
+    "name": "Getting Started with Immersity AI API",
+    "snippet": "As a promotional offer, each new account will initially receive 100 free credits and each API will require a flat rate of 10 credits per call.",
+    "host_name": "docs-api.immersity.ai",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/perplexity_ai/comments/1r4cztm/confirmed_5_monthly_api_credits_for_pro_users",
+    "name": "Confirmed: $5 Monthly API Credits for Pro users discontinued - Reddit",
+    "snippet": "The monthly API credit grant for Pro users was a time-limited benefit that has been discontinued as of 2/12. Your Pro subscription benefits ... Did You Know? You Get $5 Free API Usage with Your Perplexity ... Ridiculous API cost of Perplexity AI : r/perplexity_ai More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.perplexity.ai/docs/getting-started/pricing",
+    "name": "Pricing - Perplexity API",
+    "snippet": "$5 per 1,000 requests. Agent API pricing varies by provider and model, $5 per 1,000 tool invocations. API credits through AWS Marketplace with consolidated ...",
+    "host_name": "docs.perplexity.ai",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openai.com/api/pricing",
+    "name": "API Pricing - OpenAI",
+    "snippet": "Explore OpenAI API pricing. Price Audio:$32.00 / 1M tokens for inputs$0.40 / 1M tokens for cached inputs$64.00 / sText:$4.00 / s$0.50 Price $10.00",
+    "host_name": "openai.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cloudzero.com/blog/perplexity-api-pricing",
+    "name": "Perplexity API Pricing In 2026: Models, Costs & Optimization Tips",
+    "snippet": "Perplexity Pro subscribers ($20/month) have historically received $5/month in API credits, Perplexity AI pricing spans free, Pro ($20/month), ...",
+    "host_name": "www.cloudzero.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ai.google.dev/gemini-api/docs/pricing",
+    "name": "Gemini Developer API pricing",
+    "snippet": "Free of charge $1.50 Output price (including thinking tokens) 5,000 prompts per month (free, $2.70 Output price (including thinking tokens) ...",
+    "host_name": "ai.google.dev",
+    "rank": 6,
+    "date": "Jul 8, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.glbgpt.com/hub/perplexity-api-cost-2025",
+    "name": "Perplexity API Cost 2025: Full Pricing & Credit Guide - Global GPT",
+    "snippet": "Pro subscribers receive a recurring monthly credit of only $5 to be used for API calls. For context, heavy testing or a production app can burn ...",
+    "host_name": "www.glbgpt.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://platform.stability.ai/pricing",
+    "name": "Pricing - Stability AI - Developer Platform",
+    "snippet": "How does pricing work? API usage is based on credits. 1 credit = $0.01. Pricing is subject to change as we improve our models and infrastructure.",
+    "host_name": "platform.stability.ai",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://platform.imaginepro.ai/pricing",
+    "name": "API Pricing Plans | ImaginePro Platform",
+    "snippet": "1,600 credits per month∗ · Best AI-generated image quality · API Access · No extra accounts or plans needed · Unlimited API calls.",
+    "host_name": "platform.imaginepro.ai",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://github.com/vt-vl-lab/3d-photo-inpainting",
+    "name": "vt-vl-lab/3d-photo-inpainting: [CVPR 2020] 3D Photography using",
+    "snippet": "We propose a method for converting a single RGB-D input image into a 3D photo, ie, a multi-layer representation for novel view synthesis.",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://shihmengli.github.io/3D-Photo-Inpainting",
+    "name": "3D Photography using Context-aware Layered Depth Inpainting",
+    "snippet": "We propose a method for converting a single RGB-D input image into a 3D photo, ie, a multi-layer representation for novel view synthesis.",
+    "host_name": "shihmengli.github.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/ShihMengLi/3D-Photo-Inpainting",
+    "name": "ShihMengLi/3D-Photo-Inpainting - GitHub",
+    "snippet": "ShihMengLi/3D-Photo-Inpainting development by creating an account on GitHub. IssuesPlan and track work Code ReviewManage. CVPR2020 CVPR2020 … 3D Photography ...",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/DeepNetGroup/posts/1130859933973554",
+    "name": "Context-aware layered depth inpainting for 3D photography",
+    "snippet": "Public From CVPR 2020: Turn any picture to a 3D photo! Paper and code here: https://shihmengli.github.io/3D- Photo-Inpainting/ produces high- ...",
+    "host_name": "www.facebook.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/thygate/stable-diffusion-webui-depthmap-script/discussions/50",
+    "name": "3D Photography using Context-aware Layered Depth Inpainting #50",
+    "snippet": "the 3d photo inpainting process is indeed slow, particularly the \"now writing PLY and doing basically everything\" part",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content_CVPR_2020/papers/Shih_3D_Photography_Using_Context-Aware_Layered_Depth_Inpainting_CVPR_2020_paper.pdf",
+    "name": "[PDF] 3D Photography using Context-aware Layered Depth Inpainting - Meng-Li",
+    "snippet": "The quality of the depth input to our method does not need to be perfect, our proposed model yields better perceptual quality. In CVPR, 2020. Fully automatic 2 ...",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/topics/3d-photo?l=python",
+    "name": "3d-photo · GitHub Topics",
+    "snippet": "[CVPR 2020] 3D Photography using Context-aware Layered Depth Inpainting … a tool that attempts to improve the accuracy of YOLOv4 in images image-processing",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/alibjn/My-3D-Photo-Inpainting",
+    "name": "alibjn/My-3D-Photo-Inpainting - GitHub",
+    "snippet": "Shih, Shih-Yang. Pattern Recognition (CVPR), 2020. We propose a method for converting a single RGB-D input image into a 3D photo,",
+    "host_name": "github.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://colab.research.google.com/github/fzantalis/colab_collection/blob/master/3D_Photo_Inpainting.ipynb",
+    "name": "3D-Photo-Inpainting.ipynb - Colab - Google",
+    "snippet": "[CVPR 2020] 3D Photography using Context-aware Layered Depth Inpainting ... git clone https://github.com/vt-vl-lab/3d-photo-inpainting.git %cd 3d-photo ...",
+    "host_name": "colab.research.google.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/ShihMengLi/3D-Photo-Inpainting/blob/master/index.html",
+    "name": "3D-Photo-Inpainting/index.html at master - GitHub",
+    "snippet": "Contribute to ShihMengLi/3D-Photo-Inpainting development by creating an account on GitHub.",
+    "host_name": "github.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

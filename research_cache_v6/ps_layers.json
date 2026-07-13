@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://helpx.adobe.com/after-effects/desktop/work-with-layers/work-with-layer-blending-modes/blending-modes-layer-styles.html",
+    "name": "Use blending modes and layer styles in After Effects - Adobe Help Center",
+    "snippet": "Blending modes for multiple masks on a single layer are called mask modes. To cycle through blending modes for selected layers, hold down the ...",
+    "host_name": "helpx.adobe.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=doI1eH_nCxs",
+    "name": "Blending Modes - Photoshop for Beginners | Lesson 5 - YouTube",
+    "snippet": "Join PiXimperfect Pro - The Ultimate Photoshop Training Course: https://pix.live/pro Discover what Blend Modes are and learn how to use them ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sketch.com/blog/blend-modes",
+    "name": "Every blend mode explained · Sketch Blog",
+    "snippet": "We categorize blending modes into five sections based on their main outcome: Darker, Lighter, Contrast, Color, and Comparative.",
+    "host_name": "www.sketch.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/craftstars/posts/1101447527588174",
+    "name": "Mastering layers in Photoshop for graphic design - Facebook",
+    "snippet": "Layer Masks: Use masks to hide parts of a layer without deleting them. Adjustment Layers: Apply adjustments non- destructively. Blend Modes: ...",
+    "host_name": "www.facebook.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.figma.com/hc/en-us/articles/360040667874-Apply-blend-modes-to-layers-fills-and-effects",
+    "name": "Apply blend modes to layers, fills, and effects - Figma Learn",
+    "snippet": "Blend modes let you define how a layer's colors interact with overlapping objects like other layers, strokes, or effects. Blend modes use mathematical ...",
+    "host_name": "help.figma.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://graphicdesign.stackexchange.com/questions/146983/how-to-get-a-mask-from-blending-modes",
+    "name": "How to get a mask from blending modes",
+    "snippet": "I made a design using blending modes with a background texture of cardboard. The idea is that the design will get printed directly on the cardboard.",
+    "host_name": "graphicdesign.stackexchange.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/photoshop/comments/18pe6lw/what_is_the_best_way_to_blend_this_layer_with",
+    "name": "What is the best way to blend this layer with layer mask? : r/photoshop",
+    "snippet": "Option(alt)-click the mask layer button on the Normal layer, and paint with white brush on to the mask to reveal the areas of highlight you want to keep.",
+    "host_name": "www.reddit.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/photoshop/comments/11kfa6m/how_do_i_turn_the_result_of_a_blend_mode_into_a",
+    "name": "How do I turn the result of a blend mode into a mask shape ? I'd like to",
+    "snippet": "Now, once you have your 2 stamp visible layers (make sure they're both visible) you need to set the top layers blend mode to Difference (doesn't ...",
+    "host_name": "www.reddit.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=3PWmgRfikFw",
+    "name": "Advanced Blending Options in Layer Style Panel - YouTube",
+    "snippet": "Photoshop tutorial for beginners, Beginner's guide to Photoshop, Easy Photoshop tutorials for beginners, Photoshop basics for beginners, ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://photoshoptrainingchannel.com/blending-modes-explained",
+    "name": "Blending Modes Explained - The Complete Guide to Photoshop",
+    "snippet": "Blending Modes are mathematical equations that blend layers based on their hue, saturation, luminosity, or a combination of these components.",
+    "host_name": "photoshoptrainingchannel.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

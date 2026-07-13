@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.researchgate.net/publication/383082331_Employment_of_conditional_random_fields_for_monocular_depth_estimation",
+    "name": "Employment of conditional random fields for monocular depth estimation",
+    "snippet": "Conventional methods for monocular depth estimation often employ Markov Random Fields (MRFs) or Conditional Random Fields (CRFs) to compile ...",
+    "host_name": "www.researchgate.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://durr.jhu.edu/pubs/deep-learning-and-conditional-random-fields-based-depth-estimation-and-topographical-reconstruction-from-conventional-endoscopy",
+    "name": "Deep Learning and Conditional Random Fields-based Depth",
+    "snippet": "The CNN-CRF approach estimates depths with a relative error of 0.152 for synthetic endoscopy images and 0.242 for real endoscopy images.",
+    "host_name": "durr.jhu.edu",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sciencedirect.com/science/article/abs/pii/S0262885620300548",
+    "name": "A contextual conditional random field network for monocular depth",
+    "snippet": "In this paper, we propose a contextual CRF network (CCN) to tackle these issues. The new CCN adopts the popular encoder-decoder architecture with a new ...",
+    "host_name": "www.sciencedirect.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ieeexplore.ieee.org/document/10647895",
+    "name": "MSD-CRFS: Multi-Scale Dual Aggregation Conditional Random",
+    "snippet": "Abstract: We address the problem of estimating a high-quality dense depth map from a single RGB input image. We first analyze Conditional Random Field (CRF) ...",
+    "host_name": "ieeexplore.ieee.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content/CVPR2022/papers/Yuan_Neural_Window_Fully-Connected_CRFs_for_Monocular_Depth_Estimation_CVPR_2022_paper.pdf",
+    "name": "[PDF] Neural Window Fully-Connected CRFs for Monocular Depth Estimation",
+    "snippet": "In traditional monocular depth estimation, some meth- ods build the energy function from Markov Random Fields (MRFs) or Conditional Random Fields (CRFs) [30, ...",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/alexkonrad/monocular-depth-estimation",
+    "name": "GitHub - alexkonrad/monocular-depth",
+    "snippet": "A monocular depth estimation system using graphical model techniques. The depths are modeled as a Gaussian Markov Random Field, simulate depth relationships ...",
+    "host_name": "github.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

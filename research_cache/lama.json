@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://arxiv.org/abs/2109.07161",
+    "name": "[2109.07161] Resolution-robust Large Mask Inpainting with Fourier Convolutions - arXiv",
+    "snippet": "LaMa is based on i) a new inpainting network architecture that uses fast Fourier convolutions (FFCs), which have the image-wide receptive field;",
+    "host_name": "arxiv.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Lg97gWXsiQ4",
+    "name": "Resolution-robust Large Mask Inpainting with Fourier Convolutions (w/ Author Interview)",
+    "snippet": "lama #inpainting #deeplearning At the end of the video is an interview with the paper authors! LaMa is a system that is amazing at removing ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content/WACV2022/papers/Suvorov_Resolution-Robust_Large_Mask_Inpainting_With_Fourier_Convolutions_WACV_2022_paper.pdf",
+    "name": "[PDF] Resolution-robust Large Mask Inpainting with Fourier Convolutions - CVF Open Access",
+    "snippet": "The procedure produces wide and large masks, which force the network to fully exploit the high receptive field of the model and the loss function. large mask ...",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/MachineLearning/comments/q97fpv/r_resolutionrobust_large_mask_inpainting_with",
+    "name": "[R] Resolution-robust Large Mask Inpainting with Fourier Convolutions - Reddit",
+    "snippet": "LaMa is based on i) a new inpainting network architecture that uses fast Fourier convolutions, which have the image-wide receptive field; ii) a ...",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pub.towardsai.net/exploring-lama-resolution-robust-large-mask-inpainting-with-fourier-convolutions-a-brief-overview-593f29a3f8da",
+    "name": "Exploring LaMa: Resolution-robust Large Mask Inpainting with Fourier Convolutions: A Brief Overview | by Vincent Liu | Towards AI",
+    "snippet": "LaMa is a lightweight Resnet-like network integrated with Fast Fourier Convolution (FFC) and guided by the High Receptive Field Perceptual Loss ...",
+    "host_name": "pub.towardsai.net",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://advimman.github.io/lama-project",
+    "name": "Resolution-robust Large Mask Inpainting with Fourier Convolutions",
+    "snippet": "LaM ais based on: a new inpainting network architecture that uses fast Fourier convolutions, which have the image-widereceptive field a high receptive field ...",
+    "host_name": "advimman.github.io",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://github.com/combatwombat/tiefling",
+    "name": "combatwombat/tiefling: 2D-to-3D image generator and viewer - GitHub",
+    "snippet": "Generates a depth map with DepthAnythingV2, then renders a 3D parallax view of the image to simulate depth. Runs locally and privately in your browser.",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/StableDiffusion/comments/1idxsp9/i_made_a_2dto3d_parallax_image_converter_and",
+    "name": "I made a 2D-to-3D parallax image converter and (VR-)viewer that",
+    "snippet": "It looks really good, with actual inpainting. Tieflings main thing is that it runs completely in the browser and doesn't take minutes to ...",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Mm6LUQZt3Ik",
+    "name": "AutoDepth Image Viewer VR - Gamepaly & Early Impressions",
+    "snippet": "Auto Depth Image Viewer PCVR is an app that convers 2D images into 3D with automatic depth map generation. Tested on the Meta Quest 2 using ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tiefling.app",
+    "name": "Tiefling · 3D Image Converter & Viewer",
+    "snippet": "Offline 3D image converter and viewer + depth map generator. This website processes all images locally in your browser.",
+    "host_name": "tiefling.app",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stereoscopy.blog/2022/03/11/learning-to-free-view-see-stereoscopic-images-with-the-naked-eye",
+    "name": "Learning to Free-View: See Stereoscopic Images with the Naked Eye",
+    "snippet": "They produce an illusion of depth, Free-viewing offers an instant, easy way to view stereo pairs. the best way to view 3D images on a phone or ...",
+    "host_name": "stereoscopy.blog",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/1508789132952429/posts/2314185045746163",
+    "name": "Is there a tutorial for using the 3DEP viewer? - Facebook",
+    "snippet": "Hi, is there a \"depth map viewer\"? Something I can load a depth map in and see what it will look like in 3D. I'm trying to learn how to create ... Creating 3D stereo photos with AI and Owl3D Viewing Stereogram 3D Images with Depth Perception More results from www.facebook.com",
+    "host_name": "www.facebook.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.stereopi.com/viewtopic.php?t=71",
+    "name": "viewing stereo images on the web site - StereoPi Forum",
+    "snippet": "A popular viewer is \"HTML5 Stereo Viewer\" from Masuji SUTO. As far as I understood, it is only distributed with StereoPhotoMaker.",
+    "host_name": "forum.stereopi.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://v2.scrollsequence.com/converting-2d-images-to-fake-3d-immersive-content",
+    "name": "Converting 2D images to Fake 3D immersive content - Scrollsequence",
+    "snippet": "Tiefling (tiefling.app) is an MIT-licensed project that runs locally in the browser to generate a 3D photo effect github.com. It uses a JavaScript port",
+    "host_name": "v2.scrollsequence.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://3dthis.com/stereo.htm",
+    "name": "3D Stereoscopic Viewer free online application - 3Dthis.com",
+    "snippet": "Transform a stereoscopic photo from your computer or from the web into a WebGL 3D animated object, publish and share.",
+    "host_name": "3dthis.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.londonstereo.com/stereophotography.html",
+    "name": "The OWL Stereoscopic Viewer",
+    "snippet": "The 21st Century standard for Stereoscopic viewing. It's focussing, collapsible, and just a little prismatic to help your eyes in their convergence.",
+    "host_name": "www.londonstereo.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

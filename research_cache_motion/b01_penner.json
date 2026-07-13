@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://easings.net",
+    "name": "Easing Functions Cheat Sheet",
+    "snippet": "Easing functions specify the rate of change of a parameter over time. This page helps you choose the right easing function. allow you to specify an easing ...\nEasing functions specify the rate of change of a parameter over time. This page helps you choose the right easing function. an easing function.",
+    "host_name": "easings.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/easing-function",
+    "name": "<easing-function> CSS type - MDN Web Docs - Mozilla",
+    "snippet": "The <easing-function> CSS data type represents a mathematical function that describes the rate at which a value changes.\n/* Keyword cubic Bézier easing functions */ ease /* cubic-bezier(0.25, 0.1, 0.25, 1) */ ease-in /* cubic-bezier(0.42, 0, 1, 1) */ ease-out ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://radialglo.github.io/blog/2014/08/07/understanding-the-intuition-of-easing",
+    "name": "Understanding the Intuition of Easing - Anthony Su",
+    "snippet": "Now that you know how to apply easeIn, easeOut, and easeInOut you can change the power of your easing (Quad, Cubic, Quart …) to minimize or ...\nA limitation of using cubic bezier curves is that cubic bezier curves contain at most one peak and one valley. So if you want to use an easing ...",
+    "host_name": "radialglo.github.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.uwarp.design/easings",
+    "name": "Easing Functions Cheat Sheet - Uwarp",
+    "snippet": "Browse sine, quad, cubic, quart, quint, exponential, circular, back, elastic, and bounce families in ease-in, ease-out, and ease-in-out forms.",
+    "host_name": "www.uwarp.design",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=JXC3e52kcq0",
+    "name": "Easing functions cheatsheet #css #js - YouTube",
+    "snippet": "... easing functions (timing functions) to create delightful and realistic animations ... Bounce animation using Penner easing equations. FrontendTips ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kasperkamperman.com/blog/penner-easing-functions-processing",
+    "name": "Penner Easing functions in Processing - Kasper Kamperman",
+    "snippet": "Penner easing functions. The functions accept 4 values: t is time, Cubic cubic = new Cubic() Quart quart = new Quart(); sine, quad, cubic, ...",
+    "host_name": "www.kasperkamperman.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.svgator.com/blog/easing-functions",
+    "name": "Easing Functions Explained: Everything You Need to Know",
+    "snippet": "Cubic Bézier functions add flexibility by allowing animations to accelerate, decelerate, or combine both effects. Ease-in focuses on rolling ...",
+    "host_name": "www.svgator.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/17611-calling-just-the-ease-function",
+    "name": "Calling just the ease function - GSAP",
+    "snippet": "I'm trying to figure out how to just call the easing function (for example sine) to over-ride their css cubic bezier. Below you can see that I ...",
+    "host_name": "gsap.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

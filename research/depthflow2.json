@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://github.com/BrokenSource/DepthFlow",
+    "name": "BrokenSource/DepthFlow: Images to 3D parallax videos - GitHub",
+    "snippet": "DepthFlow is a fast image-to-video converter that turns static pictures into awesome 3D parallax animations, perfect for digital art, social media, stock ...",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=vwYItu2OaYk",
+    "name": "How To Quickly & Easily Animate Images using DepthFlow  - YouTube",
+    "snippet": "Turn your images into stunning 2.5D parallax animations using Depthflow in ComfyUI. An open source Immersity alternative with loads of ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/StableDiffusion/comments/1hzjpzx/depthflow_is_awesome_for_giving_your_images_more",
+    "name": "DepthFlow is awesome for giving your images more \"life\" : r/StableDiffusion",
+    "snippet": "Basically you just add an image, define camera motion (move to left, move in circle etc), and out comes a animated video with parallax movement. What method are people using to add parallax motion to still photos? Depth and Parallax in ComfyUI (image + video) : r/StableDiffusion More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/comfyui/posts/529858886453483",
+    "name": "ComfyUI Depth Pro node for parallax effects - Facebook",
+    "snippet": "Set different depth values for each layer to instantly create a stunning parallax effect with smooth camera movement. Fast, easy, and ...",
+    "host_name": "www.facebook.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pypi.org/project/depthflow",
+    "name": "depthflow · PyPI",
+    "snippet": "DepthFlow is a fast image-to-video converter that turns static pictures into awesome 3D parallax animations, perfect for digital art, social media, stock ...",
+    "host_name": "pypi.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=LIK0cDfB7CI",
+    "name": "2.5D Parallax Animating your Camera - YouTube",
+    "snippet": "2.5D Parallax Animating your Camera. @joshlandry93571.4K views8 ... 2.5D Parallax - Render your Animation. Josh Landry•1.1K views · 19:27.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/akatz-ai/ComfyUI-Depthflow-Nodes",
+    "name": "akatz-ai/ComfyUI-Depthflow-Nodes - GitHub",
+    "snippet": "This Depthflow Node Pack includes everything you need to create complex parallax animations. From basic motion presets to fine-tuned motion components.",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://waxy.org/2019/11/turning-photos-into-2-5d-parallax-animations-with-machine-learning",
+    "name": "Turning Photos into 2.5 Parallax Animations with Machine Learning",
+    "snippet": "This new technique uses deep learning and computer vision to turn a static photo into a 2.5D parallax animation in seconds.",
+    "host_name": "waxy.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.runcomfy.com/comfyui-nodes/ComfyUI-Depthflow-Nodes",
+    "name": "Depthflow Nodes detailed guide | ComfyUI - RunComfy",
+    "snippet": "This powerful tool is designed to transform your 2D images into captivating 2.5D parallax animations. By leveraging the Depthflow library ...",
+    "host_name": "www.runcomfy.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=_UeuLMO6LmY",
+    "name": "DepthFlow one-click package , 2.5D parallax animation generation , AI",
+    "snippet": "DepthFlow one-click package , 2.5D parallax animation generation , AI graphic video DepthFlow One Click Pack Integration Pack ...",
+    "host_name": "www.youtube.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

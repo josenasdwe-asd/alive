@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://github.com/BrokenSource/DepthFlow",
+    "name": "BrokenSource/DepthFlow: Images to 3D parallax videos - GitHub",
+    "snippet": "DepthFlow is a fast image-to-video converter that turns static pictures into awesome 3D parallax animations, perfect for digital art, social media, stock ...",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/StableDiffusion/comments/1hzjpzx/depthflow_is_awesome_for_giving_your_images_more",
+    "name": "DepthFlow is awesome for giving your images more \"life\" : r/StableDiffusion",
+    "snippet": "Basically you just add an image, define camera motion (move to left, move in circle etc), and out comes a animated video with parallax movement. Depth Pro with Depth Flow Workflow : r/StableDiffusion - Reddit Inpainting behind objects in DepthFlow animation? : r/comfyui More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=vwYItu2OaYk",
+    "name": "How To Quickly & Easily Animate Images using DepthFlow  - YouTube",
+    "snippet": "Turn your images into stunning 2.5D parallax animations using Depthflow in ComfyUI. An open source Immersity alternative with loads of ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/comfyui/posts/528157369956968",
+    "name": "Depthflow for simple image effects and animations - Facebook",
+    "snippet": "DepthFlow is a simple set of special effects tools that allows your photos and images to perform corresponding actions based on a depth map. Free software for animating views from depth map images - Facebook Depthmap run 2 _this time made a fake animated depth map and tried ... More results from www.facebook.com",
+    "host_name": "www.facebook.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.runcomfy.com/comfyui-nodes/ComfyUI-Depthflow-Nodes",
+    "name": "Depthflow Nodes detailed guide | ComfyUI - RunComfy",
+    "snippet": "This powerful tool is designed to transform your 2D images into captivating 2.5D parallax animations. By leveraging the Depthflow library, this ...",
+    "host_name": "www.runcomfy.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=mTQ_-CmK7GI",
+    "name": "Depthflow in ComfyUI - YouTube",
+    "snippet": "The example workflow is available for free on my Patreon: ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.depthflow.io",
+    "name": "Depthflow AI: Transform Images to 3D Depth Instantly.",
+    "snippet": "Depthflow is an AI-powered platform that converts 2D images into realistic 3D depth and motion renders. You can create engaging 3D-style videos from a single ...",
+    "host_name": "www.depthflow.io",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/akatz-ai/ComfyUI-Depthflow-Nodes",
+    "name": "akatz-ai/ComfyUI-Depthflow-Nodes - GitHub",
+    "snippet": "Turn your 2D images into stunning 2.5D parallax animations using Depthflow in ComfyUI. An open source Immersity alternative.",
+    "host_name": "github.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://depth.brokensrc.dev/about/changelog",
+    "name": "Changelog - DepthFlow",
+    "snippet": "Fixed a internal resolution doubling bug before the final resize · Recalled all executable releases, enough users didn't see warnings · Fixed ...",
+    "host_name": "depth.brokensrc.dev",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://v2.scrollsequence.com/converting-2d-images-to-fake-3d-immersive-content",
+    "name": "Converting 2D images to Fake 3D immersive content - Scrollsequence",
+    "snippet": "In fact, DepthFlow has been packaged into ComfyUI DepthFlow Nodes, allowing easy creation of 2.5D animations within a Stable Diffusion workflow​runcomfy.com.",
+    "host_name": "v2.scrollsequence.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

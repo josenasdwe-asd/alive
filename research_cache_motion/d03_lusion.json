@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.reddit.com/r/threejs/comments/1fzr6vf/how_to_create_a_cursor_animation_like_in_lusionco",
+    "name": "How to create a cursor animation like in Lusion.co WebGL ( three.js )",
+    "snippet": "In this same pass, take the previous low res result and carry its velocity and mix it to the output. blur the previous result to the lower res ... How to Recreate This Cursor Effect from lusion.co? (Three.js Beginner) Lusion.co WebGL (three.js) jaise cursor animation kaise banayein. More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=khu72P-R2fo",
+    "name": "This 3D Parallax Effect Made a Static Fullscreen Overlay Menu Feel",
+    "snippet": "Learn how to create a fullscreen overlay navigation menu with an immersive 3D parallax effect — built with HTML, CSS, JavaScript, ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2026/03/09/building-a-scroll-reactive-3d-gallery-with-three-js-velocity-and-mood-based-backgrounds",
+    "name": "Building a Scroll-Reactive 3D Gallery with Three.js, Velocity, and Mood",
+    "snippet": "A tutorial on building a scroll-driven WebGL gallery in Three.js with depth-layered images, palette-driven backgrounds, and motion that responds ...",
+    "host_name": "tympanus.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=fo0aYLSrcz8",
+    "name": "Why Settle for Flat? Build This 3D Parallax Video Gallery Landing",
+    "snippet": "Learn how to build a stunning 3D video gallery landing page with HTML, CSS, JavaScript, and Three.js, featuring parallax effects and ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discourse.threejs.org/t/mouse-effet-at-the-top-of-three-js-like-on-https-lusion-co/57385",
+    "name": "Mouse effet at the top of three.js like on https://lusion.co/ - Questions - three",
+    "snippet": "hello, i have a question : is it possible to apply a mouse effect like on this website https://lusion.co/ on the top of my three.js project?",
+    "host_name": "discourse.threejs.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DaN_eOuEXpk",
+    "name": "Kevin Levron's Tubes Cursor turns pointer movement into  - Instagram",
+    "snippet": "🖱️ Kevin Levron's Tubes Cursor turns pointer movement into glowing Three.js tube trails that can run through WebGL / WebGPU. https://webgpu.com ...",
+    "host_name": "www.instagram.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DasrrddNnHE",
+    "name": "Deep Parallax Systems: Engineering an Advanced 3D Pop-Out Monster",
+    "snippet": "While it's not fully 3D, it tricks your brain using math, depth and displacement maps, layered shifts to create a dynamic parallax illusion.",
+    "host_name": "www.instagram.com",
+    "rank": 6,
+    "date": "Jul 12, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/53537234/parallax-effect-using-three-js",
+    "name": "Parallax effect using three.js - javascript - Stack Overflow",
+    "snippet": "I would like to build a parallax effect from a 2D image using a depth map, similar to this, or this but using three.js. Question is, where should I start with?",
+    "host_name": "stackoverflow.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

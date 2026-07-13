@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=UgIwjLg4ONk",
+    "name": "The Parallax Effect // 5 Minute WebDev Project - YouTube",
+    "snippet": "... illusion that can give a website the appearance of 3D depth. Learn how to design a parallax website with React Spring in this 5 minute tutorial ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.vanyadoing-dev.com/depth-effects-quick-start",
+    "name": "3D Depth Effects Studio - Quick Start | Vanyadoing",
+    "snippet": "Master depth-based scanning effects, fluid simulations, and interactive parallax in minutes. A WebGL-powered rendering engine that analyzes depth information ...",
+    "host_name": "www.vanyadoing-dev.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2026/02/19/creating-a-smooth-horizontal-parallax-gallery-from-dom-to-webgl",
+    "name": "Creating a Smooth Horizontal Parallax Gallery: From DOM to WebGL",
+    "snippet": "In this tutorial, we'll create a horizontal parallax. The WebGL approach: using Three.js to render everything on the GPU with shader-based  ...",
+    "host_name": "tympanus.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=8tfqQ829bIQ",
+    "name": "Parallax Occlusion Mapping: Depth Illusion in Shader Graph | Unity",
+    "snippet": "NO! They are using this same technique to fake the depth ... Parallax Occlusion Mapping: Depth Illusion in Shader Graph | Unity Tutorial.",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/44372487/webgl-drawing-2d-image-with-depth-map-to-achieve-pseudo-3d-effect",
+    "name": "WebGL drawing 2D image with depth map to achieve pseudo-3D",
+    "snippet": "Parallax effect using three.js 1 How to create a 2D waving flag in webGL? Using depth image data to construct 3D model in WebGL 3 WebGL",
+    "host_name": "stackoverflow.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/AfterEffects/comments/1re903g/how_to_make_this_parallax_iphone_depth_3d_effect",
+    "name": "How to make this Parallax - iPhone Depth 3D effect in a photo?",
+    "snippet": "So I'm wondering if can this be properly achieved in After Effects using traditional techniques or is it more likely that brands are using a ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://clay.global/blog/web-design-guide/parallax-scrolling",
+    "name": "Elevate Your Website with the Depth and Movement of Parallax",
+    "snippet": "Parallax scrolling is a progressive web design technique in which background images move at different speeds compared to foreground elements during scrolling.",
+    "host_name": "clay.global",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://garagefarm.net/blog/parallax-effect-best-practices-and-examples",
+    "name": "The Parallax Effect: Enhancing Depth in Web Design & Digital Media",
+    "snippet": "The parallax effect is a visual phenomenon where objects appear to shift positions relative to each other based on the observer's perspective.",
+    "host_name": "garagefarm.net",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.uxpin.com/studio/blog/parallax-scrolling",
+    "name": "Designing with Parallax Scrolling: The Do's and Don'ts | UXPin",
+    "snippet": "Parallax scrolling is a web design technique where elements appear to be moving at different speeds to produce a 3D scrolling effect.",
+    "host_name": "www.uxpin.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.justinmind.com/web-design/parallax-effect-website-examples",
+    "name": "Parallax effect website design: best practices and examples",
+    "snippet": "In this post, we'll look at the parallax effect in action in web design as a scrolling feature as well as some best practices and some radical examples.",
+    "host_name": "www.justinmind.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

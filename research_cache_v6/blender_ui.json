@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=u918WfK3oac",
+    "name": "Back to Basics: The Outliner Viewport - YouTube",
+    "snippet": "... blender3d #blender #3dmodeling #3d.",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.blender.org/manual/en/latest/editors/properties_editor.html",
+    "name": "Properties Editor - Blender 5.1 Manual",
+    "snippet": "The Properties editor displays settings for the active scene, object, material, and other data types. It provides access to a wide range of context-sensitive ...",
+    "host_name": "docs.blender.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=ph6QUXNq5aE",
+    "name": "How to Use Blender's Outliner and Collections (Tutorial) - YouTube",
+    "snippet": "In this Blender Tutorial, I will show you how to use Blender's Outliner and Collections. Help Support the Channel: Patreon: ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blender.stackexchange.com/questions/156061/how-to-retain-3d-viewport-and-outliner-settings-while-changing-workspaces",
+    "name": "How to retain 3D Viewport and Outliner settings while changing",
+    "snippet": "Sadly there's still no native option in Blender to retain viewport position between workspaces. You'd need an add-on for that.",
+    "host_name": "blender.stackexchange.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blenderartists.org/t/a-redesigned-outliner-and-properties-inspector/649051",
+    "name": "A redesigned Outliner and Properties inspector. - Blender Artists Community",
+    "snippet": "You can create several Properties Editor and display not only selected active object properties but the group of ones you will work on during a ...",
+    "host_name": "blenderartists.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=rXK4DYLRGF0",
+    "name": "Blender 2.91 New Features - 01 User Interface, Outliner & Collections",
+    "snippet": "In this tutorial, we will talk about the new features and improvements to the User Interface of Blender 2.91 .",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.blender.org/manual/en/2.81/editors/outliner.html",
+    "name": "Outliner — Blender Manual",
+    "snippet": "The Outliner is a list that organizes data in the blend-file, i.e. the scene data, Video Sequencer data, or anything that gets stored in a blend-file.",
+    "host_name": "docs.blender.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=tNfjQVBD2jA",
+    "name": "Blender Tutorial: Introduction to the Outliner - YouTube",
+    "snippet": "A quick overview and introduction of the basic functionality of Blenders outliner. Some of the things I cover Selecting and Deselecting ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=zkupB5S3sUQ&vl=en",
+    "name": "How to Select Objects in Blender | Every Selection Tool Explained",
+    "snippet": "Get your Q's answered on CG Cookie: https://b3d.cgcookie.com/g5gmha ➤ Grab your FREE copy of Press Start - Your first Blender Project: ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DMutzGQM8qk/?hl=en",
+    "name": "Look for the lighter highlight Use the Outliner (top right panel  - Instagram",
+    "snippet": "Use the Outliner (top right panel) to view your scene's structure and select objects like you would files in a folder. It's perfect for complex ...",
+    "host_name": "www.instagram.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

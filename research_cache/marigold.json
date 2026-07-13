@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://github.com/prs-eth/Marigold",
+    "name": "GitHub - prs-eth/Marigold: [CVPR 2024 - Oral, Best Paper Award",
+    "snippet": "We present Marigold, a diffusion model, and an associated fine-tuning protocol for monocular depth estimation. Its core principle is to leverage the rich visual ...",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://marigoldmonodepth.github.io",
+    "name": "Repurposing Diffusion-Based Image Generators for Monocular Depth",
+    "snippet": "Marigold is the new state-of-the-art depth estimator for images ・ derived from Stable Diffusion ・ can zero-shot transfer to unseen data,",
+    "host_name": "marigoldmonodepth.github.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content/CVPR2024/papers/Ke_Repurposing_Diffusion-Based_Image_Generators_for_Monocular_Depth_Estimation_CVPR_2024_paper.pdf",
+    "name": "[PDF] Repurposing Diffusion-Based Image Generators for Monocular Depth",
+    "snippet": "We introduce Marigold, a method for affine-invariant monocular depth estimation that is derived from Stable Dif- fusion and retains its rich prior knowledge.",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2412.13389v1",
+    "name": "Marigold-DC: Zero-Shot Monocular Depth Completion with Guided",
+    "snippet": "Marigold-DC is a zero-shot, generative method for depth completion. It leverages a pretrained, diffusion-based monocular depth estimator as scene understanding ...",
+    "host_name": "arxiv.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://mlhonk.substack.com/p/31-marigold",
+    "name": "31. Marigold - by Massimiliano Viola - Machine Learning with a Honk",
+    "snippet": "Stable Diffusion is a latent diffusion model, meaning it operates in the compressed latent space of a variational autoencoder (VAE), rather ...",
+    "host_name": "mlhonk.substack.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.obukhov.ai/marigold",
+    "name": "Marigold: Generative Computer Vision - Anton Obukhov",
+    "snippet": "Marigold is a novel diffusion-based approach for dense prediction, providing foundation models and pipelines for a range of computer vision and image analysis ...",
+    "host_name": "www.obukhov.ai",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://huggingface.co/prs-eth/marigold-depth-v1-1",
+    "name": "prs-eth/marigold-depth-v1-1 - Hugging Face",
+    "snippet": "This is a model card for the marigold-depth-v1-1 model for monocular depth estimation from a single image. The model is fine-tuned from the ...",
+    "host_name": "huggingface.co",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.computer.org/csdl/journal/tp/5555/01/11086366/28xeIo4gVXi",
+    "name": "Marigold: Affordable Adaptation of Diffusion-Based Image Generators",
+    "snippet": "We present Marigold, a family of conditional generative models and a fine-tuning protocol that extracts the knowledge from pretrained latent diffusion models.",
+    "host_name": "www.computer.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

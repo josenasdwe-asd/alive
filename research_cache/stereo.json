@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.emergentmind.com/topics/semi-global-block-matching-sgbm",
+    "name": "Semi-Global Block Matching (SGBM) - Emergent Mind",
+    "snippet": "SGBM is a dense stereo matching algorithm that computes per-pixel disparities by aggregating costs along multiple paths, dense disparity maps ...",
+    "host_name": "www.emergentmind.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mathworks.com/help/visionhdl/ug/stereoscopic-disparity.html",
+    "name": "Stereo Disparity Using Semi-Global Block Matching - MATLAB & Simulink",
+    "snippet": "This example shows how to compute disparity between left and right stereo camera images using the Semi-Global Block Matching algorithm.",
+    "host_name": "www.mathworks.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pvphan.com/gatech-cs6476-stereo",
+    "name": "Stereo Matching with Semi-Global Matching (SGM) | Paul Vinh Phan",
+    "snippet": "The way these scores are assigned depend on the matching cost algorithm selected – in this case the SSD and CT algorithms were explored.",
+    "host_name": "pvphan.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Semi-global_matching",
+    "name": "Semi-global matching - Wikipedia",
+    "snippet": "Semi-global matching (SGM) is a computer vision algorithm for the estimation of a dense disparity map from a rectified stereo image pair.",
+    "host_name": "en.wikipedia.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/computervision/comments/9119qc/can_i_have_a_pseudo_code_explanation_of_the",
+    "name": "Can I have a pseudo code explanation of the Semi-Global",
+    "snippet": "Semi-Global Matching (SGM) We now compute a cost. This cost can be any similarity measure, e.g. gray value difference, census transform, ...",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10422658",
+    "name": "Research on the Improvement of Semi-Global Matching Algorithm for",
+    "snippet": "The proposed method first carries out a cost calculation based on the improved Census transform and an adaptive window based on a connected ...",
+    "host_name": "pmc.ncbi.nlm.nih.gov",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

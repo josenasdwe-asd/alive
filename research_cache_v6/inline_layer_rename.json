@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.instagram.com/reel/C84ME0vAyWZ",
+    "name": "Stop naming your layers in Figma Figma just launched their new",
+    "snippet": "Stop naming your layers in Figma Figma just launched their new rename layers AI tool which saves you a bunch of time.",
+    "host_name": "www.instagram.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://jitter.video/changelog/2021-08-26-rename-layers-inline",
+    "name": "Rename layers inline - Jitter",
+    "snippet": "It is now possible to rename your layers by double-clicking on the layer name in the layer list. This also works for most animations in the timeline.",
+    "host_name": "jitter.video",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=AG555ZjtekQ",
+    "name": "Bonus: Bulk Rename Layers - YouTube",
+    "snippet": "This is just a bonus video to explain or help you better understand the rename panel in Figma and bulk rename layers!",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://coyleandrew.medium.com/the-inline-edit-design-pattern-e6d46c933804",
+    "name": "The Inline Edit Design Pattern - Andrew Coyle - Medium",
+    "snippet": "Inline edit allows the user to change content directly within its display view. This interaction is more intuitive than being redirected to a separate edit ...",
+    "host_name": "coyleandrew.medium.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ux.stackexchange.com/questions/117932/what-is-the-name-of-the-design-pattern-used-to-create-rename-and-load-user-pres",
+    "name": "What is the name of the design pattern used to create, rename and",
+    "snippet": "The pattern is a minimalist save/load feature for things secondary to the actual user content. Good examples are: Styles in Word, Photoshop ... what's best approach - keep it together under edit or separate options? Real example of inline edit [closed] - UX Stack Exchange More results from ux.stackexchange.com",
+    "host_name": "ux.stackexchange.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DFyXITvxN1T",
+    "name": "In this Walkthrough Series video tutorial, you'll learn how to organize",
+    "snippet": "WALKTHROUGH SERIES Layer Commands & Gestures 1mm Rename Layer ... Photo by ...",
+    "host_name": "www.instagram.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sketch.com/docs/designing/layer-basics/renaming-layers",
+    "name": "Renaming layers - Sketch",
+    "snippet": "When you select a layer in the Layer List, you can use Edit > Rename or press ⌘ R to rename it, like you would with a file in Finder.",
+    "host_name": "www.sketch.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.shapeof.ai/patterns/inline-action",
+    "name": "AI UX Patterns | Inline Action | ShapeofAI.com - The Shape of AI",
+    "snippet": "Inline actions provide a direct way to target specific content, whether by replying, editing, or inserting new material, without breaking the flow of ...",
+    "host_name": "www.shapeof.ai",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

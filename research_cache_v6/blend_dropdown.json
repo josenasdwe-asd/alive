@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://community.adobe.com/questions-712/hovering-over-blend-modes-doesnt-show-a-full-preview-1144572",
+    "name": "Hovering over blend modes doesnt show a full preview | Community",
+    "snippet": "I noticed that when I hover over the blend modes it doesnt show a full preview like how it used to. I hover over the blend modes and get a  ...",
+    "host_name": "community.adobe.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=j7E7q3BehrA",
+    "name": "How To Use Live Preview & Live Blend Mode Preview - YouTube",
+    "snippet": "See changes directly on the canvas using the real-time feedback of Live Preview. It makes it easier to decide on layer order and better ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.figma.com/hc/en-us/articles/360040667874-Apply-blend-modes-to-layers-fills-and-effects",
+    "name": "Apply blend modes to layers, fills, and effects - Figma Learn",
+    "snippet": "Choose a blend mode option from the dropdown menu. Hover over each option to see a live preview on the canvas. Experimenting with different blend modes can ...",
+    "host_name": "help.figma.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://graphicdesign.stackexchange.com/questions/21485/how-to-cycle-through-blend-modes-with-instant-preview",
+    "name": "How to cycle through blend modes with instant preview?",
+    "snippet": "On a PC though, you can click on the blend mode drop down, choose normal then use the up/down arrow keys to cycle through for layers and blend modes within ...",
+    "host_name": "graphicdesign.stackexchange.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/41758662/mix-blend-mode-button-hover-event-issue",
+    "name": "Mix Blend Mode button hover event issue - Stack Overflow",
+    "snippet": "I'm trying to get a mix-blend-mode working so that a background slide happens. the blend modes are not cooperating with me",
+    "host_name": "stackoverflow.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=BYIBW-8Xgzc&vl=en",
+    "name": "The Blending Mode for Powerful Patterns in Illustrator - YouTube",
+    "snippet": "... design training - https://academy.dansky.com/30-days?video=BYIBW ... The Blending Mode for Powerful Patterns in Illustrator.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://d-libro.com/topic/blend-modes-explained-creating-blend-mode-css-code-with-ai",
+    "name": "Master CSS Blend Modes: Stunning Visuals with AI - Topic - D-Libro",
+    "snippet": "Discover how to create stunning visuals with CSS blend modes and AI. Learn to enhance web design with dynamic effects and interactive elements.",
+    "host_name": "d-libro.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.asktheegghead.com/blending-modes-a-complete-guide-for-graphic-and-web-design",
+    "name": "Blending Modes: A Complete Guide for Graphic and Web Design",
+    "snippet": "For Hover Effects CSS blend modes are also great for adding interactive hover effects using blend modes. For example, you can add a blend style to images on  ...",
+    "host_name": "www.asktheegghead.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://gsap.com/community/forums/topic/23374-locomotive-scroll-and-gsap",
+    "name": "Locomotive Scroll and GSAP",
+    "snippet": "This is a very basic (and ugly) test I put together to create the Locomotive smooth scrolling effect for an entire web page using the new Scroll ...",
+    "host_name": "gsap.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/24805-scrolltrigger-parallax-and-locomotive-scroll",
+    "name": "ScrollTrigger, Parallax and Locomotive Scroll - GSAP",
+    "snippet": "Hi, I would like to get Locomotive Scroll to work with some parallax code and ScrollTrigger. I am using the demosParallax scene on scroll ...",
+    "host_name": "gsap.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=ro7PqgRu0IU",
+    "name": "Loader and Parallax Effect using Locomotive Scroll and Motion One",
+    "snippet": "... github.com/nicubarbaros/youtube-tutorials-repo/tree/master/13.parallax-locomotive ... GreenSock ScrollTrigger with Smooth Scroll (locomotive).",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.olivierlarose.com/tutorials/smooth-scroll",
+    "name": "Build a Smooth Scroll Landing Page using Nextjs, GSAP, Locomotive",
+    "snippet": "A website tutorial on how to make a one pager landing page with a smooth scroll using Nextjs, GSAP and Locomotive Scroll v5.",
+    "host_name": "blog.olivierlarose.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/locomotivemtl/locomotive-scroll",
+    "name": "locomotivemtl/locomotive-scroll: Detection of elements in  - GitHub",
+    "snippet": "A lightweight & modern scroll library for detection, animation, and smooth scrolling. Built on top of Lenis. Documentation. Full documentation available at ...",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=PE6B3UpbC7o",
+    "name": "Incredible smooth scroll + parallax for your website! - YouTube",
+    "snippet": "This video will show you how to add Locomotive Scroll to your website. What is Locomotive Scroll? From the Github, it's \"a simple scroll ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.awwwards.com/websites/locomotive-scroll",
+    "name": "Best Locomotive Scroll Websites | Web Design Inspiration",
+    "snippet": "Locomotive Scroll is a tiny scroll library created by Locomotive based on ayamflow's virtual-scroll. Locomotive Scroll creates a smooth scrolling and parallax ...",
+    "host_name": "www.awwwards.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@terencegrover/smooth-scrolling-with-gsap-overcoming-fixed-positioning-challenges-dbce33b08d49",
+    "name": "Smooth Scrolling with GSAP: Overcoming Fixed Positioning",
+    "snippet": "This feature is a game-changer, similar to Locomotive Scroll but with the bonus of GSAP's comprehensive animation functionalities.",
+    "host_name": "medium.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/28547-having-an-issue-with-scrolltrigger-locomotive-scroll",
+    "name": "Having an issue with ScrollTrigger + Locomotive Scroll - GSAP",
+    "snippet": "The fake-horizontal scroll appears smooth because it has a scrub: 1 set which makes the animation take 1 second to catch up to the actual scroll ...",
+    "host_name": "gsap.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Ero_m7HTIgk",
+    "name": "Smooth Scrolling with Locomotive Scroll and GSAP ScrollTrigger (and",
+    "snippet": "In this video, I show you how you can combine the Locomotive Scroll library with GSAP ScrollTrigger to provide a smooth scrolling experience ...",
+    "host_name": "www.youtube.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.figma.com/blog/improving-performance-in-the-layers-panel",
+    "name": "Improving Performance in the Layers Panel | Figma Blog",
+    "snippet": "We rearchitected the layers panel with new computation and caching strategies, resulting in 30–50% faster interactions in some of the ...",
+    "host_name": "www.figma.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.figma.com/best-practices/the-ux-writers-guide-to-figma",
+    "name": "The UX writer's guide to Figma",
+    "snippet": "Riffing on copy · Handing off",
+    "host_name": "www.figma.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/UI_Design/comments/qlc57j/10_figma_best_practices_every_new_designer_needs",
+    "name": "10 Figma best practices every new designer needs to know asap - Reddit",
+    "snippet": "1) Use text and color styles. Create a style for every text and color needed in your design. Then apply those styles to every text layer, fill, ...",
+    "host_name": "www.reddit.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=-ep4J72cvUc",
+    "name": "#01: Figma Layers Panel Tips - YouTube",
+    "snippet": "Figma is fast becoming one of the industry's favorite design and prototype tools. In this series of videos Kezz Bracey will walk you through ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.figma.com/hc/en-us/articles/26584819173271-Layers-101-Get-started-with-layers",
+    "name": "Layers 101: Get started with layers – Figma Learn - Help Center",
+    "snippet": "You'll usually create designs from a combination of shapes, text, and other layers. You can arrange your layers and stack them on top of each other.",
+    "host_name": "help.figma.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.designsystemsforfigma.com/the-hidden-layers-of-design-systems-asking-why-454e58fdc5f7",
+    "name": "The Hidden Layers of Design Systems: Asking 'Why' | by Dan Donald",
+    "snippet": "Choose design patterns based on pain points: apply the right pattern with minimal over-engineering in any OO language.",
+    "host_name": "blog.designsystemsforfigma.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://uxdesign.cc/5-figma-tips-from-a-reformed-messy-designer-95b232bd58d4",
+    "name": "5 Figma tips from a reformed messy designer - UX Collective",
+    "snippet": "1. Give Components & Layers Descriptive Names · 2. Order Your Frames/Artboards · 3. Use Pages to Keep Things Tidy · 4. Use Components/Symbols · 5.",
+    "host_name": "uxdesign.cc",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.figma.com/blog/8-tips-for-designers-building-branded-templates-in-figma-buzz",
+    "name": "8 Tips for Designers Building Branded Templates in Figma Buzz",
+    "snippet": "1. Start in a Figma Design frame · 2. Create flexibility with auto layout · 3. Separate your text layers · 4. Lock aspect ratio for images and ...",
+    "host_name": "www.figma.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://supercharge.design/blog/advanced-figma-tips-for-ux-ui-designers",
+    "name": "Advanced Figma Tips for UX/UI Designers",
+    "snippet": "One of the most common ways to organize layers is by naming conventions. Instead of leaving your layers with generic names such as \"Rectangle 1\" ...",
+    "host_name": "supercharge.design",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.figma.com/best-practices/components-styles-and-shared-libraries",
+    "name": "Components, styles, and shared library best practices - Figma",
+    "snippet": "When you place an instance of a component into your design, Figma gives you access to its layers in the layers panel. This enables you to view and expand each ...",
+    "host_name": "www.figma.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

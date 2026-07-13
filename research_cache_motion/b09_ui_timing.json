@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://ux.stackexchange.com/questions/66604/optimal-duration-for-animating-transitions",
+    "name": "Optimal duration for animating transitions - UX Stack Exchange",
+    "snippet": "The sweet spot that shows up time after time in game and UI design is 250-300ms. For transitions that bounce or are elastic, 400-500ms lets the motion read ... What is a good duration time for UI animations? - UX Stack Exchange What, as a rule of thumb, is the maximum tolerable time the UI ... More results from ux.stackexchange.com",
+    "host_name": "ux.stackexchange.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nngroup.com/articles/animation-duration",
+    "name": "Executing UX Animations: Duration and Motion Characteristics - NN/G",
+    "snippet": "In most cases, a range of 100–400 ms is appropriate, with 400ms being a very slow animation, to be used only for big movements across large ...",
+    "host_name": "www.nngroup.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@domyen/guidelines-for-animation-timing-88b0b1ad3602",
+    "name": "Guidelines for animation timing - Medium",
+    "snippet": "While every use case has its own challenges, let the range of 150ms to 350ms serve as a guideline when timing your product's animations. Read ...",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.uxtigers.com/post/think-time-ux",
+    "name": "Think-Time UX: Design to Support Cognitive Latency - UX Tigers",
+    "snippet": "If nothing happens within 400 milliseconds (roughly the speed of a blink) the user's brain files a “maybe it didn't work” report and their ...",
+    "host_name": "www.uxtigers.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://jakobnielsenphd.substack.com/p/time-scale-ux",
+    "name": "Time Scales of UX: From 0.1 Seconds to 100 Years - Jakob Nielsen on UX",
+    "snippet": "Experience happens across an extensive range of time scales, from 0.1 seconds to a century. Millisecond UX is the realm of perceptual ...",
+    "host_name": "jakobnielsenphd.substack.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.appypie.com/blog/mobile-app-animation-guide",
+    "name": "How Long Should App Animations Be? The 200ms Rule for iOS",
+    "snippet": "Standard mobile app animations should last 200ms to 300ms with an ease-out curve. run longer at 300ms to 400ms.",
+    "host_name": "www.appypie.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nngroup.com/articles/response-times-3-important-limits",
+    "name": "Response Time Limits: Article by Jakob Nielsen - NN/G",
+    "snippet": "There are 3 main time limits (which are determined by human perceptual abilities) to keep in mind when optimizing web and application performance.",
+    "host_name": "www.nngroup.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/deanius/the-thresholds-of-perception-in-ux-435g",
+    "name": "The Thresholds of Perception in UX - DEV Community",
+    "snippet": "150 ms - the time it takes to blink, 200 and 400 ms - the time for short and long animations. 150 ms - Literally the blink of an eye, 250 ms ...",
+    "host_name": "dev.to",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

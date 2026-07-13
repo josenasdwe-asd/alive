@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://m3.material.io/styles/motion/easing-and-duration",
+    "name": "Easing and duration – Material Design 3",
+    "snippet": "Material easing and durations create responsive and expressive motion. now use the motion physics system, which uses springs. easing appears more natural. ...",
+    "host_name": "m3.material.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://m1.material.io/motion/duration-easing.html",
+    "name": "Duration & easing - Motion - Material Design",
+    "snippet": "Duration & easing. Material in motion is responsive and natural. Use these easing curves and duration patterns to create smooth and consistent motion.",
+    "host_name": "m1.material.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.figma.com/hc/en-us/articles/41238219562007-Motion-design-fundamentals-Easing",
+    "name": "Motion design fundamentals: Easing - Figma Learn",
+    "snippet": "Every easing curve is built on a relationship between acceleration and deceleration. Ease in: Creates an animation that starts slowly and accelerates toward the ...",
+    "host_name": "help.figma.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/Aftereffect/posts/2290665164346578",
+    "name": "What are standard animation curves for entering and leaving the screen?",
+    "snippet": "The deceleration curve is for elements entering the screen from outside and the acceleration curve is for elements leaving the screen.",
+    "host_name": "www.facebook.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=IOW0be3w0JQ",
+    "name": "Material Motion - 3 of 7 - Duration and Easing - YouTube",
+    "snippet": "... Material Design and Motion Design Introduction: https://youtu.be/7uy4gfOCWKQ Part 2 - Material Motion: https://youtu.be/5bQsrgMJL98 Part 3 - ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/graphic_design/comments/gd54ij/the_importance_of_easing_in_motion_design",
+    "name": "The Importance Of Easing In Motion Design : r/graphic_design - Reddit",
+    "snippet": "Would a bezier curve graphic that matches the curves I used in the graph editor in AE be a cool, in-depth way to look at all of the different ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://carbondesignsystem.com/elements/motion/overview",
+    "name": "Motion - Carbon Design System",
+    "snippet": "“Easing curves” describe the precise amount of accelerations in motion. We commonly. Avoid easing curves that are unnatural, distracting, or purely decorative.",
+    "host_name": "carbondesignsystem.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/google-design/implementing-motion-9f2839002016",
+    "name": "Implementing Motion. An introduction to Material Design's | - Medium",
+    "snippet": "You can adjust a transition's duration, easing, and motion path to express the style of your app. can use longer durations, emphasized easing, ...",
+    "host_name": "medium.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

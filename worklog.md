@@ -3118,3 +3118,167 @@ Stage Summary:
 - 4 tabs en panel derecho: Animar / Atmósfera / Hero / Exportar.
 - 0 dependencias nuevas (framer-motion ya instalado).
 - Push a git@github.com:josenasdwe-asd/alive.git main ✓
+
+---
+Task ID: MASTER-PLAN
+Agent: Z.ai Code — Senior Math/Algorithm/Design/Research Expert
+Task: Plan rotundo de mejora profunda basado en 3000+ líneas de investigación acumulada
+
+## PLAN ROTUNDO — ALIVE STUDIO v7
+
+Tras sintetizar 6 investigaciones previas (motion design, algoritmos VFX, competencia Awwwards, UX de herramientas creativas, pipeline 2.5D Disguise, técnicas Ken Burns 3D), identifico 5 pilares rotundos:
+
+---
+
+### PILAR 1 — EXTRACCIÓN DE CAPAS REAL (el problema principal del usuario)
+
+**Problema actual:** El K-means produce capas por banda de profundidad pero NO semánticas. El usuario quiere "solo nubes lejanas, solo el piso, solo montañas" — capas que correspondan a ELEMENTOS reales, no a bandas de gris.
+
+**Solución algorítmica elegante — Segmentación semántica por depth + color:**
+
+1. **Depth-aware GrabCut** (algoritmo clásico de segmentation): usar el depth map como seed para GrabCut — los píxeles de similar profundidad Y similar color se agrupan. Implementable con sharp + custom flood fill.
+2. **SLIC Superpixels** (Simple Linear Iterative Clustering): agrupa píxeles por similitud de color + posición + profundidad. Produce 200-500 superpixels que luego se agrupan en 6-8 capas semánticas por clustering jerárquico.
+3. **Edge-aware slicing**: en vez de K-means puro, detectar bordes con Sobel/Canny en el depth map y cortar las capas POR BORDES — así una montaña no se parte por la mitad.
+4. **VLM-guided element detection**: el VLM ya identifica "clouds, mountains, ground" — usar esas etiquetas para guiar la segmentación. Para cada elemento identificado, generar un mask prompt y usar image-edit para aislarlo.
+
+**Implementación recomendada (prioridad):**
+- Fase 1: Edge-aware K-means (mezclar K-means con detección de bordes Sobel) — 2 horas
+- Fase 2: SLIC superpixels para agrupación semántica — 4 horas
+- Fase 3: VLM-guided element extraction (el VLM nombra elementos, image-edit los aísla uno por uno con rate limiting inteligente) — 4 horas
+
+---
+
+### PILAR 2 — MOTOR DE ANIMACIÓN PROFESIONAL (principios Disney + matemática)
+
+**Problema actual:** Las animaciones son correctas pero no "viven". Faltan los 12 principios Disney aplicados.
+
+**Solución — 7 técnicas algorítmicas elegantes:**
+
+1. **Squash & Stretch en parallax extremo**: cuando el mouse llega al borde, la capa se estira (scaleX 1.0→1.03) y se aplasta (scaleY 1.0→0.98). Matemática: `scaleX = 1 + |mouseX| * 0.03`, `scaleY = 1 - |mouseX| * 0.02`. Da sensación de material elástico.
+
+2. **Anticipation antes del parallax**: al detectar cambio brusco de dirección del mouse, la capa retrocede 2px antes de avanzar. Implementación: detectar `sign(prevMouseX) !== sign(mouseX)` → aplicar offset de -2px por 100ms.
+
+3. **Follow-through con spring physics diferido**: las capas cercanas se mueven primero, las lejanas siguen con delay. `delay = (1 - depth) * 0.15s`. Cada capa usa spring con stiffness/damping diferente según su "material" (fondo=rígido, frente=elástico).
+
+4. **Arcs en movimiento del mouse**: las capas no se mueven en línea recta, siguen una parábola sutil. `y = baseY + parabola(mouseX) * 0.3`. Da naturalidad orgánica.
+
+5. **Slow-in/slow-out con easing personalizado por capa**: 
+   - Fondo: `cubic-bezier(0.4, 0, 0.2, 1)` (Material standard)
+   - Medio: `cubic-bezier(0.16, 1, 0.3, 1)` (expo.out, dramático)
+   - Frente: `cubic-bezier(0.34, 1.56, 0.64, 1)` (back.out, overshoot)
+
+6. **Secondary action con ruido Perlin diferenciado**: cada capa tiene su propio noise seed y frecuencia. Las capas cercanas usan noise de alta frecuencia (temblor sutil), las lejanas baja frecuencia (movimiento lento). `noiseFreq = 0.5 + depth * 2.0`.
+
+7. **Timing con ratio áureo para stagger**: los delays entre capas siguen la secuencia de Fibonacci: 0ms, 89ms, 144ms, 233ms, 377ms (proporción áurea 1.618). Más natural que intervalos uniformes.
+
+---
+
+### PILAR 3 — SISTEMA DE CAPAS PROFESIONAL (UX tipo Figma/AE)
+
+**Problema actual:** El editor de capas es básico. Falta la fluidez de herramientas profesionales.
+
+**Solución — 6 mejoras UX críticas:**
+
+1. **Layer panel con thumbnails live**: cada capa muestra un mini-preview de 40x40px que se actualiza en tiempo real. Click en thumbnail = seleccionar. Doble-click = renombrar inline.
+
+2. **Canvas con smart guides**: al mover una capa, aparecen guides magenta cuando se alinea con el centro o con otra capa. Implementación: detectar `|layerCenterX - stageCenterX| < 2px` → mostrar guide.
+
+3. **Keyboard shortcuts profesionales**:
+   - `V` = move tool, `R` = rotate, `S` = scale
+   - `Cmd+D` = duplicate, `Delete` = remove, `Cmd+G` = group
+   - `1-9` = select layer N, `Cmd+A` = select all
+   - `[` `]` = move layer back/front
+
+4. **Scrubby inputs**: hover sobre cualquier valor numérico (X, Y, scale) → drag izquierda/derecha para cambiar. Como After Effects. Implementación: `onPointerDown` + track `movementX`.
+
+5. **Contextual toolbar**: la toolbar cambia según lo seleccionado. Si seleccionas una capa de efecto (niebla), muestra controles de niebla. Si seleccionas una capa de imagen, muestra transform.
+
+6. **Mini-timeline visual**: una barra horizontal debajo del stage que muestra los 30s de animación con marcas en cada loop. Permite scrubbing para ver la animación en cualquier punto.
+
+---
+
+### PILAR 4 — EFECTOS ATMOSFÉRICOS CINEMATOGRÁFICOS (nuevos tipos de animación)
+
+**Problema actual:** Tenemos parallax + efectos básicos. Faltan animaciones que cambien el AMBIENTE completo, no solo el movimiento.
+
+**Solución — 6 nuevas animaciones atmosféricas:**
+
+1. **Time of Day cycle** (ya existe, mejorar): ciclo día→atardecer→noche→amanecer con cambio de color temperature, posición solar, y sombras dinámicas. 60s loop.
+
+2. **Weather system**: sistema modular de clima:
+   - Lluvia: partículas con física (gravedad + viento)
+   - Niebla: volumétrica con depth-aware density (más densa en el fondo)
+   - Nieve: partículas con flotación (sin gravedad, solo viento)
+   - Tormenta: lluvia + lightning flash + viento fuerte
+
+3. **Light leak orgánico**: gradientes de luz que se mueven con simplex noise, no en loop recto. Simula luz que entra por una ventana y se mueve con el viento.
+
+4. **Depth fog volumétrico**: niebla que es más densa en las capas lejanas. Matemática: `fogDensity = (1 - depth) * 0.4`. Cada capa se mezcla con un overlay blanco proporcional a su lejanía.
+
+5. **Color script cinematográfico**: cambio de paleta a lo largo del tiempo siguiendo un "color script" (como Pixar). 5 momentos: establishment → inciting incident → rising action → climax → resolution. Cada momento tiene su paleta.
+
+6. **Particle life cycles**: partículas que nacen, viven, mueren. No loops infinitos — cada partícula tiene `birthTime`, `lifeSpan`, y `deathFade`. Más natural que repetir.
+
+---
+
+### PILAR 5 — RENDER ENGINE DE ALTA GAMA (WebGL profesional)
+
+**Problema actual:** El 3D Ken Burns es bueno pero le falta iluminación dinámica y post-processing profesional.
+
+**Solución — 4 mejoras al pipeline WebGL:**
+
+1. **Relighting dinámico**: usar el depth map como normal map aproximado (gradiente de profundidad = dirección de la normal). Luz que se mueve → las capas se iluminan diferencialmente. `normal = normalize(cross(dFdx(depth), dFdy(depth)))`.
+
+2. **Screen-space reflections**: para capas con agua/suelo brillante, reflejar las capas superiores. Implementación: sample del framebuffer flipped.
+
+3. **Bloom + tone mapping ACES**: post-processing pipeline: render scene → extract bright pixels (>threshold) → Gaussian blur → additive blend → ACES tone map → output. Da el look "cinematográfico" de películas.
+
+4. **Motion blur direccional**: cuando el parallax es fuerte, aplicar motion blur en la dirección del movimiento. `blurDir = normalize(velocity)`, `blurAmount = length(velocity) * 0.1`. Implementación: 8-tap directional blur en fragment shader.
+
+---
+
+### PRIORIZACIÓN DE IMPLEMENTACIÓN
+
+**Fase 1 (impacto inmediato, 1 sesión):**
+- ✅ Edge-aware K-means (capas más limpias)
+- ✅ Squash & stretch en parallax
+- ✅ Follow-through con spring diferido
+- ✅ Keyboard shortcuts
+- ✅ Scrubby inputs
+
+**Fase 2 (calidad profesional, 1 sesión):**
+- SLIC superpixels para segmentación semántica
+- Arcs en movimiento
+- Smart guides en canvas
+- Depth fog volumétrico
+- Bloom + ACES tone mapping
+
+**Fase 3 (wow factor, 1 sesión):**
+- VLM-guided element extraction
+- Relighting dinámico con normal maps
+- Weather system completo
+- Color script cinematográfico
+- Motion blur direccional
+
+**Fase 4 (pulido Awwwards, 1 sesión):**
+- Mini-timeline visual
+- Particle life cycles
+- Screen-space reflections
+- Contextual toolbar
+- Layer thumbnails live
+
+---
+
+### MÉTRICAS DE ÉXITO
+
+- **Calidad de capas**: cada capa debe corresponder a un elemento semántico real (no una banda de gris)
+- **Feel "vivo"**: la imagen debe respirar naturalmente sin que el usuario pueda identificar por qué se mueve
+- **Performance**: 60fps en desktop, 30fps en mobile, con <100ms de input lag
+- **UX**: un usuario nuevo debe poder crear una animación profesional en <2 minutos
+- **Output**: el export HTML debe reproducir el efecto exacto en cualquier navegador
+
+Stage Summary:
+- Plan rotundo de 5 pilares con 29 técnicas concretas
+- Priorización en 4 fases (impacto inmediato → wow factor → pulido)
+- Cada técnica tiene su base matemática/algorítmica especificada
+- Foco en el problema principal del usuario: capas semánticas reales (no bandas de profundidad)

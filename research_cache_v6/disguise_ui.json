@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://help.disguise.one/designer/layers/layer-stacks",
+    "name": "Layer Stacks - Disguise User Guide",
+    "snippet": "A new time-independent feature designed to allow you to easily assign and manage layers of treatments to a live video input.",
+    "host_name": "help.disguise.one",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.disguise.one/designer/layers/layer-types/content/video-layer",
+    "name": "Video Layer - Disguise User Guide",
+    "snippet": "The Video layer plays pre-rendered video with editable colour, effects, keying, movement, cropping, audio and full timeline control, ...",
+    "host_name": "help.disguise.one",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=_htIo1IKsE8",
+    "name": "disguise Quick + Basic Setup - YouTube",
+    "snippet": "Kevin demonstrates the Stage View and Feed View of disguise (d3), and how to setup layers, apply content, create section breaks, ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.disguise.one/designer/layers/layer-types/layer-types-index",
+    "name": "Layers Types Index - Disguise User Guide",
+    "snippet": "The six Designer layer types — Content, Control, Effect, Generative, Legacy and Previsualisation — with a one-line summary of every layer.",
+    "host_name": "help.disguise.one",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=G_siJZXyGLk",
+    "name": "r26.3 2.5D Workflows - YouTube",
+    "snippet": "In this video, we will demonstrate how Designer supports 2.5D as a core workflow, with the 2.5D layer and 2.5D asset. 2.5D bridges the gap ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://s3.amazonaws.com/help.disguise.one/PublishedPDFs/Sequencing+Guide.pdf",
+    "name": "[PDF] Sequencing Guide - Amazon S3",
+    "snippet": "The disguise software uses mappings to control how layer content is copied from the Timeline to the screens in the Stage level. of large ...",
+    "host_name": "s3.amazonaws.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.disguise.one/en/products/designer",
+    "name": "Designer | Disguise",
+    "snippet": "Disguise Designer Timeline. Enables multiple users to edit a project simultaneously on their workstations.",
+    "host_name": "www.disguise.one",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=KZmWKK56VcA",
+    "name": "Disguise tricks for big shows. - YouTube",
+    "snippet": "Cue tables tutorial: https://youtu.be/crrSQJxUff0 If we've saved you some time and you think we're worth it, why not buy us a coffee on our ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.fxguide.com/fxfeatured/disguising-led-vp-stages",
+    "name": "Disguising LED virtual production stages - fxguide",
+    "snippet": "The 'Designer' software does this by allowing very specific details of either projectors or LED screens to be loaded with it then simulates as ...",
+    "host_name": "www.fxguide.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.disguise.one/designer/layers/compositing-layers",
+    "name": "Compositing Layers - Disguise User Guide",
+    "snippet": "Use Arrows to pipe one layer's output into another — for example a Video layer into a Scroll layer — chaining content layers together.",
+    "host_name": "help.disguise.one",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

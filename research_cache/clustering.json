@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.ijert.org/exploring-the-use-of-silhouette-score-in-k-means-clustering-for-image-segmentation",
+    "name": "Exploring the Use of Silhouette Score in K-Means Clustering for Image",
+    "snippet": "K-means consistently achieved higher silhouette scores, indicating better cluster separation compared to DBSCAN across various Epsilon values.",
+    "host_name": "www.ijert.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://scikit-learn.org/stable/modules/clustering.html",
+    "name": "2.3. Clustering — scikit-learn 1.9.0 documentation",
+    "snippet": "The k-means algorithm divides a set of N samples X into K disjoint clusters C , each described by the mean μ j of the samples in the cluster. The means are ...",
+    "host_name": "scikit-learn.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://hex.tech/blog/comparing-density-based-methods",
+    "name": "Comparing DBSCAN, k-means, and Hierarchical Clustering - Hex",
+    "snippet": "A guide to the intricacies of DBSCAN, k-means, and Hierarchical Clustering, comparing their methodologies, strengths, and limitations.",
+    "host_name": "hex.tech",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.newhorizons.com/resources/blog/dbscan-vs-kmeans-a-guide-in-python",
+    "name": "DBSCAN vs. K-Means: A Guide in Python - New Horizons",
+    "snippet": "Comparing DBSCAN and K-Means · DBSCAN is a density-based clustering algorithm, whereas K-Means is a centroid-based clustering algorithm. · DBSCAN ...",
+    "host_name": "www.newhorizons.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://datascience.stackexchange.com/questions/46106/kmeans-vs-dbscan",
+    "name": "KMeans vs. DBSCAN - Data Science Stack Exchange",
+    "snippet": "The main difference is that they work completely differently and solve different problems. Kmeans is a least-squares optimization, whereas DBSCAN finds density ...",
+    "host_name": "datascience.stackexchange.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.datacamp.com/blog/clustering-in-machine-learning-5-essential-clustering-algorithms",
+    "name": "Clustering in Machine Learning: 5 Essential Clustering Algorithms",
+    "snippet": "The most common use case for MeanShift clustering is image segmentation tasks. ... Comparing DBSCAN with K-Means algorithms, the most common differences are:.",
+    "host_name": "www.datacamp.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

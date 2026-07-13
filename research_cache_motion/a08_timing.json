@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.facebook.com/groups/1151469005024926/posts/3062938413877966",
+    "name": "Why do 60fps footages look juddery at 24fps? - Facebook",
+    "snippet": "To fix juddery 60fps footage on a 24fps timeline, slow down the 60fps clips to 40% or transcode to a multiple of 24fps, like 48fps. Does anyone render animation at 24fps? - Facebook What is the best frame rate for wedding videos to achieve a ... More results from www.facebook.com",
+    "host_name": "www.facebook.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=p3Jb3UPAw-w",
+    "name": "How mismatched framerates are ruining your videos - YouTube",
+    "snippet": "... 60FPS, then playing it at 30 0:26:02 Changing the VISIBLE ... 1:03:50 Stutter AND Judder at the same time?! (Light bulbs image) 1 ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.adobe.com/questions-529/jumpy-or-judder-animation-67470",
+    "name": "Jumpy or Judder Animation - Adobe Community",
+    "snippet": "It is caused by the stroboscopic effect of moving images and frame rate. You know how stagecoach wheels appear to turn backward or the blades of ...",
+    "host_name": "community.adobe.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.dpreview.com/forums/threads/shooting-at-60fps-instead-of-24fps-to-avoid-judder-and-then-converting-down-to-24ps-in-adobe-premie.4701588",
+    "name": "Shooting at 60fps instead of 24fps to avoid judder, and then converting",
+    "snippet": "60fps video, placed on a project timeline calibrated at 24 fps, will probably worsen the judder, or staccato effect, since the shutter speed was ...",
+    "host_name": "www.dpreview.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/videography/comments/xglzlh/trying_to_eliminate_judder",
+    "name": "Trying to eliminate judder : r/videography - Reddit",
+    "snippet": "If you are displaying the 24fps project on a monitor that refreshes at 60Hz then the \"judders\" will get even worse. One reason you get smooth ... Beginner struggling to decide whether to shoot in 24, 30 or 60 FPS? What about motion smoothness for 24fps and 25fps content? More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.eoshd.com/comments/topic/51372-why-do-people-still-shoot-at-24fps-it-always-ruins-the-footage-for-me",
+    "name": "Why Do People Still Shoot at 24FPS? It always ruins the footage for me",
+    "snippet": "My point was, I wonder if some of the jitter at 24FPS for some of the videos I have seen comes from shooting at 60FPS then delivering at 24FPS.",
+    "host_name": "www.eoshd.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.rtings.com/tv/learn/research/motion-cadence",
+    "name": "Stutter vs. Judder vs. Micro-Judder: Why A High Frame Rate TV Can't",
+    "snippet": "Judder is often seen in conjunction with stutter because judder is mainly seen in 24 fps and 25 fps content, which invariably presents stutter.",
+    "host_name": "www.rtings.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=e8k31lGWOfY",
+    "name": "How to avoid judder - it is just fps - YouTube",
+    "snippet": "Judder is maybe well known but still annoying and I am wondering why there is this 24 fps to be cinematic dogma for videos, that are being ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

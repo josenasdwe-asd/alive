@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://easings.net",
+    "name": "Easing Functions Cheat Sheet",
+    "snippet": "Easing functions specify the rate of change of a parameter over time. then bounce back up after hitting the floor. This page helps you choose the right easing ...",
+    "host_name": "easings.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.uwarp.design/easings",
+    "name": "Easing Functions Cheat Sheet - Uwarp",
+    "snippet": "An easing functions cheat sheet helps you define easing—the rate. Browse sine, quad, cubic, quart, quint, exponential, circular, back, elastic, and bounce ...",
+    "host_name": "www.uwarp.design",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.amazon.com/docs/react-native-vega/0.72/easing.html",
+    "name": "Easing | React Native Vega Reference - Amazon Developers",
+    "snippet": "Provides a cubic bezier curve, equivalent to CSS Transitions' transition-timing-function . A useful tool to visualize cubic bezier curves can be ...",
+    "host_name": "developer.amazon.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=JXC3e52kcq0",
+    "name": "Easing functions cheatsheet #css #js - YouTube",
+    "snippet": "Make sure to checkout Kodhus UI library: https://kodhus.com Easing funcitons: http://kodhus.com/easings/ In this tutorial we are going to ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://madegooddesigns.com/tools/cubic-bezier-editor",
+    "name": "Free Online Cubic Bezier Editor: CSS Easing Curves (2026)",
+    "snippet": "Easings.net is a widely used cheat sheet of around 30 named easing curves grouped into families such as sine, quad, cubic, quart, quint, expo, circ, and back,",
+    "host_name": "madegooddesigns.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://devforum.roblox.com/t/easing-functions-cheat-sheet/2224295",
+    "name": "Easing Functions Cheat Sheet - Developer Forum | Roblox",
+    "snippet": "This easing functions can be used to lerp any value you want. pretty useful if you want to make stuff like bezier projectiles that can move smoothly.",
+    "host_name": "devforum.roblox.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.remotion.dev/docs/easing",
+    "name": "Easing | Remotion | Make videos programmatically",
+    "snippet": "The Easing module implements common easing functions. You can use it with the interpolate() API. You can find a visualization of some common easing functions at",
+    "host_name": "www.remotion.dev",
+    "rank": 6,
+    "date": "Jul 11, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://news.ycombinator.com/item?id=6476963",
+    "name": "Easing Functions Cheat Sheet - Hacker News",
+    "snippet": "Easing Functions Cheat Sheet (easings.net) Railways use \"easements\" to guide trains in and out of curves, worth checking out http://cubic- ...",
+    "host_name": "news.ycombinator.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

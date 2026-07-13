@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=awCqRPTasBc",
+    "name": "Endless Particle World (loops, samples, and tips in After Effects)",
+    "snippet": "In this video, we'll create our own particles using the Particle World effect, then loop 'em with a single bonus effect. and hypnotists.",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "Jul 13, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/godotengine/posts/1888578301278755",
+    "name": "Please how can I add a particle animation to play when",
+    "snippet": "Why is the death animation not playing when the player dies from a deadly object in Unity? Is there a way to set the particle's life to ...",
+    "host_name": "www.facebook.com",
+    "rank": 1,
+    "date": "Jul 14, 2020",
+    "favicon": ""
+  },
+  {
+    "url": "https://blenderartists.org/t/blender-particle-system-birth-and-death-animations/508353",
+    "name": "Blender Particle System, Birth, and Death Animations",
+    "snippet": "I would like to have some animation sets, like “birth” and “death”. So when a particle is spawned, or emitted. The object can play the birth animation every ...",
+    "host_name": "blenderartists.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blender.stackexchange.com/questions/313831/how-to-create-a-particle-with-animation-on-birth-and-death-of-particles",
+    "name": "How to create a particle with animation on birth and death",
+    "snippet": "I want to create an emitter that emits particles that they have animation on birth, and they die when animation ends, or their life ends after their death ...\nI want to create an emitter that emits particles that they have animation on birth, and they die when animation ends, or their life ends after their death ...",
+    "host_name": "blender.stackexchange.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.unrealengine.com/t/particle-fade-on-random-life-broken/14357",
+    "name": "Particle Fade on Random life Broken? - Rendering",
+    "snippet": "Any particle that dies before the max life will pop off, not fade out. Check 'View Bounds' and make sure nothings going outside of them\nAny particle that dies before the max life will pop off, not fade out b/c the fade is across the whole particle no connected to each life.",
+    "host_name": "forums.unrealengine.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=xiUpAeos168",
+    "name": "Programming Particle Life",
+    "snippet": "Particle life is a recently developed model of interacting particles and forces that creates complex emergent behaviors mimicking many cellular ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "Jul 13, 2024",
+    "favicon": ""
+  },
+  {
+    "url": "https://vfxdoc.readthedocs.io/en/latest/vfx/particlesystems",
+    "name": "Particle Systems - VFXDoc - Read the Docs",
+    "snippet": "all particles are expected to die 2s after birth. This age of death is often called Lifetime and is computed per-particle at birth if needed",
+    "host_name": "vfxdoc.readthedocs.io",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com/t/particle-system-prevent-particles-from-dying/744503",
+    "name": "Particle System Prevent Particles from Dying - Unity Engine",
+    "snippet": "I have fading effect with Color by lifetime but even if I disable it particles go dissapearing. What I want is to keep the intensity of ...\nInfinite lifetime cannot be used with any “over lifetime” properties. If you need particles to change during their lifetime, they cannot last ...",
+    "host_name": "discussions.unity.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

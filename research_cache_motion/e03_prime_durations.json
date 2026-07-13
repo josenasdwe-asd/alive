@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.facebook.com/groups/reasonusers/posts/9290968070947452",
+    "name": "Avoid prime number BPMs for smoother video sync - Facebook",
+    "snippet": "Avoiding prime number BPMs helps with video syncing, with 128 BPM being more manageable than 127 BPM. not syncing might release a different ... How to configure layer tracks as overdubs on Boss RC-600 What's the difference in Prime sync vs Pioneer? - Facebook More results from www.facebook.com",
+    "host_name": "www.facebook.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/63871704/prime-number-calculation-algorithm-speed-makes-no-sense",
+    "name": "Prime number calculation algorithm speed makes no sense",
+    "snippet": "The second loop iterates all values up to sqrt(test) . This is inefficient in that many division candidates are not primes themselves. python - Why is the first solution way much slower than the second one ... Loop not faster despite looping through half as many iterations? More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forums.synfig.org/t/time-offset-param-and-time-loop-layer/1670",
+    "name": "Time Offset param and Time Loop Layer - Synfig Forums",
+    "snippet": "Time loop layer repeats what happens between Link time and Link time plus duration. That will happen form local time to the end of times.",
+    "host_name": "forums.synfig.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://support.headrushfx.com/en/support/solutions/articles/69000851199-sheeran-looper-frequently-asked-questions",
+    "name": "Sheeran Looper+ | Frequently Asked Questions - HeadRush Support",
+    "snippet": "The Sheeran Looper+ is a powerful and portable 2-channel looping device that enables near-limitless looping potential in a compact, robust package.",
+    "host_name": "support.headrushfx.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://news.ycombinator.com/item?id=24538043",
+    "name": "Whenever I use a scheduler I always use prime numbers wherever",
+    "snippet": "Using prime number for scheduling reduce the probability at a given time that those jobs collides. If you create a job every 5h and another ...",
+    "host_name": "news.ycombinator.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/askmath/comments/1nywko1/how_would_you_calculate_the_number_of_times_a",
+    "name": "How would you calculate the number of times a prime number  - Reddit",
+    "snippet": "Write a Boolean valued function called isPrime(). Modeling the clock is easier. Use nested loops. take a list of all the prime numbers less ...",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2410.23668v1",
+    "name": "Kernel Looping: Eliminating Synchronization Boundaries  - arXiv",
+    "snippet": "This paper presented kernel looping, a novel compiler optimization to improve inference performance by eliminating synchronization at kernel ...",
+    "host_name": "arxiv.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://synfig.readthedocs.io/en/latest/layers/time_loop.html",
+    "name": "Time Loop Layer — Synfig User Manual 1.5.1 documentation",
+    "snippet": "The Time Loop layer is used to repeat an animation over and over. It loops a section of the layers below and within the same canvas over and over.",
+    "host_name": "synfig.readthedocs.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.instagram.com/reel/DTEa6lckWA1/?hl=en",
+    "name": "How to use Layer Nodes in DaVinci Resolve #colorgrading  - Instagram",
+    "snippet": "Well, layer nodes are great to use when you're trying to create adjustments and color grade in a non-destructive sense in compositing. So, ...",
+    "host_name": "www.instagram.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/davinciresolve/comments/1ccvkwl/nodebased_colour_correcting_is_overwhelming",
+    "name": "Node-based colour correcting is overwhelming! : r/davinciresolve",
+    "snippet": "Think of nodes as layers. Each serial nice simply sets an order of operations for color grading. It's the same as if you stacked multiple ... Layers vs. Nodes - what are the differences for compositing? : r/vfx Do people actually use more than like 3–5 nodes in the Color page? More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.blackmagicdesign.com/products/davinciresolve/color",
+    "name": "Color - DaVinci Resolve - Blackmagic Design",
+    "snippet": "Nodes let you create unique looks without compromising image quality as you would grading with layers. The node editor at the top right is like a flow chart.",
+    "host_name": "www.blackmagicdesign.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=2BwucULkn14",
+    "name": "Do THIS With Your Layer Nodes - DaVinci Resolve Color Grading",
+    "snippet": "Layer nodes in DaVinci Resolve can be one of the most beneficial tools when color grading. When doing secondary changes, you can use it to ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.frame.io/2024/04/01/new-resolve-template-node-graphs-color-grading",
+    "name": "A New Approach to Grading Color in DaVinci Resolve - Frame.io Insider",
+    "snippet": "In this article, I'm going to discuss some changes I've made to the way I approach color grading. I've modified the way I use my template node graph.",
+    "host_name": "blog.frame.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/1151469005024926/posts/2870550113116798",
+    "name": "How to view adjustments in the final node of DaVinci Resolve color",
+    "snippet": "New Node Tutorial on the Davinci Resolve Color tab. First part where the nodes and some of them are explained, such as Serial, Parallel and ...",
+    "host_name": "www.facebook.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=8kJwFcsa6k4",
+    "name": "How color nodes work in DaVinci Resolve [Beginners Guide] - YouTube",
+    "snippet": "I was intimidated by the Color and Fusion page with all the nodes when I first started, but your videos have been very helpful.",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.blackmagicdesign.com/viewtopic.php?f=21&t=218336",
+    "name": "placement of effects and keys in a Node tree? - Blackmagic Forum",
+    "snippet": "I am curious what the differences are regarding where to place some corrections in a node tree. I get the idea that placing keys in parallel ...",
+    "host_name": "forum.blackmagicdesign.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DWQ7j64DMQ8",
+    "name": "Do you know layer nodes in DaVinci Resolve? #colorgrading #editing",
+    "snippet": "Let's talk about layer nodes and how we can use them. And here's a clip I graded really quickly. This is the before and after.",
+    "host_name": "www.instagram.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discuss.pixls.us/t/davinci-resolve-photo/57113",
+    "name": "DaVinci Resolve — Photo - Lounge - discuss.pixls.us",
+    "snippet": "Let's say you are not using a color-managed workflow. Your first node should be either a LUT or Color Space Transform to convert from the camera ...",
+    "host_name": "discuss.pixls.us",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

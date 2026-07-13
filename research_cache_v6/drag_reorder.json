@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.pencilandpaper.io/articles/ux-pattern-drag-and-drop",
+    "name": "Drag & Drop UX Design Best Practices - Pencil & Paper",
+    "snippet": "Generally speaking, use cases in drag and drop are moving items, reordering a list, resizing containers and power user drag and drop interactions.",
+    "host_name": "www.pencilandpaper.io",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.darins.page/articles/designing-a-reorderable-list-component",
+    "name": "Designing a reorderable list component - Darin Senneff",
+    "snippet": "Drag indicators # The items need a visual hint so users can identify them as draggable elements. These indicators typically appear as a cluster ...",
+    "host_name": "www.darins.page",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ux.stackexchange.com/questions/26121/what-is-a-good-visual-cue-for-drag-and-drop-for-reordering-a-list-of-items",
+    "name": "What is a good visual cue for drag and drop? (for reordering a list of items)",
+    "snippet": "Try to change the shape, color, etc. of the lists. Let them have some visual reaction when finger touches them. Best way to reorder long list of items - UX Stack Exchange Up & down arrows vs Drag & drop for reordering elements More results from ux.stackexchange.com",
+    "host_name": "ux.stackexchange.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://smart-interface-design-patterns.com/articles/drag-and-drop-ux",
+    "name": "Drag-and-Drop UX: Guidelines and Best Practices",
+    "snippet": "A dragged item should follow user's movements immediately. · Always leave a ghost image of the component to indicate where it used to be. · As the ...",
+    "host_name": "smart-interface-design-patterns.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.nngroup.com/articles/drag-drop",
+    "name": "Drag–and–Drop: How to Design for Ease of Use - NN/G",
+    "snippet": "Especially when drag–and–drop is used to reorder a list of items, it's important to show the background objects moving out of the way before ...",
+    "host_name": "www.nngroup.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sap.com/design-system/fiori-design-web/v1-136/foundations/interaction/drag-and-drop/reorder",
+    "name": "Drag and Drop – Reorder - SAP",
+    "snippet": "Reordering enables users to dynamically adjust the order of items by dragging an item and dropping it into a new position.",
+    "host_name": "www.sap.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.logrocket.com/ux-design/drag-and-drop-ui-examples",
+    "name": "Designing drag and drop UIs: Best practices and patterns",
+    "snippet": "In this article, we'll discuss how to design drag-and-drop interactions effectively in user interfaces and its use in different contexts.",
+    "host_name": "blog.logrocket.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://atlassian.design/components/pragmatic-drag-and-drop/design-guidelines",
+    "name": "Design guidelines - index - Components - Atlassian Design",
+    "snippet": "A drop indicator line should not be used when a draggable item is being dragged over a droppable area where there is no relative placement possible. Use the ...",
+    "host_name": "atlassian.design",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

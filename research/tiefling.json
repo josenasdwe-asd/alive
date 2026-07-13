@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://github.com/combatwombat/tiefling",
+    "name": "combatwombat/tiefling: 2D-to-3D image generator and viewer - GitHub",
+    "snippet": "Generates a depth map with DepthAnythingV2, then renders a 3D parallax view of the image to simulate depth. Runs locally and privately in your browser.",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/StableDiffusion/comments/1idxsp9/i_made_a_2dto3d_parallax_image_converter_and",
+    "name": "I made a 2D-to-3D parallax image converter and (VR-)viewer that runs",
+    "snippet": "It looks really good, with actual inpainting. Tieflings main thing is that it runs completely in the browser and doesn't take minutes to ...",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/r0d3r1ck0rd0n3z/Depth-map-viewer",
+    "name": "r0d3r1ck0rd0n3z/Depth-map-viewer: Creates a 3D parallax  - GitHub",
+    "snippet": "Creates a 3D parallax effect from images that have depth map data embedded. Image requirements Requires only one image but only works for images with an ...",
+    "host_name": "github.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tiefling.app",
+    "name": "Tiefling · 3D Image Converter & Viewer",
+    "snippet": "3D image converter and viewer + depth map generator. This website processes all images locally in your browser.",
+    "host_name": "tiefling.app",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/thygate/stable-diffusion-webui-depthmap-script/discussions/5",
+    "name": "depth map/RGBD viewer for VR headsets? #5 - GitHub",
+    "snippet": "I own a Quest 1 and the best way I found to view media is SteamVR+VirtualDesktop. I think VirtualDesktop is available for GearVR as well.",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/topics/depthflow",
+    "name": "depthflow · GitHub Topics",
+    "snippet": "BrokenSource / DepthFlow · BrokenSource / BrokenSource · RameezXD / Depthflow-Modal.",
+    "host_name": "github.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/google/model-viewer/discussions/2423",
+    "name": "Configurable Depth of Field (DOF) · google model-viewer - GitHub",
+    "snippet": "Are there any plans on adding configurable parameters for Depth of Field? It could contribute to a realistic look: https://threejs.org/examples/ ...",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://lorafib.github.io/ref_depth",
+    "name": "Refinement of Monocular Depth Maps via Multi-View Differentiable",
+    "snippet": "In this paper, we present a novel way to refine depth maps initialized from monoscopic depth estimators via mulit-view differential rendering.",
+    "host_name": "lorafib.github.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/parkchamchi/DepthViewer",
+    "name": "GitHub - parkchamchi/DepthViewer: Unity program that creates 3D",
+    "snippet": "This program is essentially a depthmap plotter with an integrated depthmap inferer, with VR support.",
+    "host_name": "github.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/thygate/stable-diffusion-webui-depthmap-script",
+    "name": "High Resolution Depth Maps for Stable Diffusion WebUI - GitHub",
+    "snippet": "This program is an addon for AUTOMATIC1111's Stable Diffusion WebUI that creates depth maps. Using either generated or custom depth maps, it can also create 3D ...",
+    "host_name": "github.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

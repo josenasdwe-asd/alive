@@ -216,6 +216,20 @@ export interface AnimationConfig {
   focusLayerId?: string;
   /** scale-with-depth: layers auto-scale based on Z position */
   scaleWithDepth: boolean;
+
+  // === Scene composition ===
+  /** scene composition preset (which layers are anchors vs drifters) */
+  sceneComposition: import("./scene-compositions").SceneCompositionId;
+
+  // === Atmospheric animations ===
+  /** light cycle (day/night) */
+  atmoLightCycle: boolean;
+  /** fog drift */
+  atmoFogDrift: boolean;
+  /** timelapse sun arc */
+  atmoTimelapse: boolean;
+  /** seasonal hue rotation */
+  atmoSeasonal: boolean;
 }
 
 /** .2p5d export format (Disguise-compatible container) */

@@ -35,6 +35,9 @@ export interface SliceOptions {
   dilationRadius?: number;
   /** alpha feathering sigma in px (soft edges) */
   featherSigma?: number;
+  /** "isolated" = each layer only its band (can look empty);
+   *  "cumulative" = each layer contains everything from its band forward (never empty, anchor-style) */
+  mode?: "isolated" | "cumulative";
 }
 
 /**
@@ -161,6 +164,7 @@ export async function sliceImageByDepth(
   const k = Math.max(2, Math.min(12, options.k ?? 6));
   const dilationRadius = options.dilationRadius ?? 18;
   const featherSigma = options.featherSigma ?? 6;
+  const mode = options.mode ?? "cumulative"; // default to cumulative (no empty layers)
 
   // Load both images at the same size (use original's dimensions)
   const originalMeta = await sharp(originalPath).metadata();
@@ -187,10 +191,23 @@ export async function sliceImageByDepth(
   const results: SlicedLayer[] = [];
 
   for (let clusterIdx = 0; clusterIdx < k; clusterIdx++) {
-    // build binary mask for this cluster
-    const maskBuf = Buffer.alloc(W * H);
-    for (let i = 0; i < labels.length; i++) {
-      maskBuf[i] = labels[i] === clusterIdx ? 255 : 0;
+    let maskBuf: Buffer;
+
+    if (mode === "cumulative") {
+      // CUMULATIVE: this layer shows everything from this cluster FORWARD (closer).
+      // So cluster 0 (farthest) shows only the farthest band,
+      // cluster k-1 (closest) shows the ENTIRE image.
+      // This ensures no layer is ever empty — the frontmost layer is always complete.
+      maskBuf = Buffer.alloc(W * H);
+      for (let i = 0; i < labels.length; i++) {
+        maskBuf[i] = labels[i] >= clusterIdx ? 255 : 0;
+      }
+    } else {
+      // ISOLATED: only this cluster's band (original behavior)
+      maskBuf = Buffer.alloc(W * H);
+      for (let i = 0; i < labels.length; i++) {
+        maskBuf[i] = labels[i] === clusterIdx ? 255 : 0;
+      }
     }
 
     // dilate + feather
@@ -219,10 +236,20 @@ export async function sliceImageByDepth(
     const saved = await saveGeneratedImage(pngBuffer, `slice-${clusterIdx}`);
     const depthCentroid = centers[clusterIdx] / 255;
 
+    // name based on position
+    const name =
+      clusterIdx === 0
+        ? "Fondo lejano"
+        : clusterIdx === k - 1
+          ? "Frente completo"
+          : clusterIdx === Math.floor(k / 2)
+            ? "Plano medio"
+            : `Plano ${clusterIdx + 1}`;
+
     results.push({
       url: saved.url,
       filename: saved.filename,
-      name: `Plano ${clusterIdx + 1}`,
+      name,
       depth: depthCentroid,
       index: clusterIdx,
     });

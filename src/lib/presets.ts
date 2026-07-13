@@ -548,6 +548,11 @@ export function buildAnimationFromPreset(
     aperture: 0.3,
     focusMode: "manual",
     scaleWithDepth: true,
+    sceneComposition: "free",
+    atmoLightCycle: false,
+    atmoFogDrift: false,
+    atmoTimelapse: false,
+    atmoSeasonal: false,
     layers,
     effects,
   };

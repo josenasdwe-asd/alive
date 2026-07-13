@@ -18,6 +18,7 @@ import {
   ALL_EFFECTS,
 } from "./types";
 import { buildAnimationFromPreset, PRESET_MAP } from "./presets";
+import { applySceneComposition, type SceneCompositionId } from "./scene-compositions";
 
 interface AliveStore extends ProjectState {
   reset: () => void;
@@ -53,6 +54,7 @@ interface AliveStore extends ProjectState {
   setSlicedLayers: (layers: Array<{ url: string; name: string; depth: number }>) => void;
   setTextOverlay: (t: Partial<import("./types").TextOverlay>) => void;
   setHeroMode: (v: boolean) => void;
+  applySceneComp: (sceneId: SceneCompositionId) => void;
 }
 
 const emptyEffects = ALL_EFFECTS.reduce(
@@ -90,6 +92,11 @@ const emptyAnim: AnimationConfig = {
   aperture: 0.3,
   focusMode: "manual",
   scaleWithDepth: true,
+  sceneComposition: "free",
+  atmoLightCycle: false,
+  atmoFogDrift: false,
+  atmoTimelapse: false,
+  atmoSeasonal: false,
 };
 
 const initialState: ProjectState = {
@@ -333,4 +340,26 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
     })),
 
   setHeroMode: (v) => set({ heroMode: v }),
+
+  applySceneComp: (sceneId) => {
+    const layers = get().layers;
+    const anim = get().animation;
+    const baseParallax = 20; // base parallax strength
+    const overrides = applySceneComposition(layers, sceneId, baseParallax);
+
+    const newLayers = { ...anim.layers };
+    for (const [id, patch] of Object.entries(overrides)) {
+      if (newLayers[id]) {
+        newLayers[id] = { ...newLayers[id], ...patch };
+      }
+    }
+
+    set({
+      animation: {
+        ...anim,
+        sceneComposition: sceneId,
+        layers: newLayers,
+      },
+    });
+  },
 }));

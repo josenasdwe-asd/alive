@@ -14,6 +14,7 @@ import { EffectsPanel } from "./EffectsPanel";
 import { ExportPanel } from "./ExportPanel";
 import { HeroPanel } from "./HeroPanel";
 import { Pipeline25DPanel } from "./Pipeline25DPanel";
+import { ScenePanel } from "./ScenePanel";
 import {
   Loader2,
   AlertCircle,
@@ -24,10 +25,11 @@ import {
   Sparkles,
   Code2,
   Maximize2,
+  Mountain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type RightTab = "animate" | "atmosphere" | "hero" | "export";
+type RightTab = "animate" | "scene" | "atmosphere" | "hero" | "export";
 
 export function Studio() {
   const {
@@ -200,6 +202,12 @@ function RightPanelTabs({
           label="Animar"
         />
         <TabButton
+          active={tab === "scene"}
+          onClick={() => setTab("scene")}
+          icon={<Mountain className="h-3.5 w-3.5" />}
+          label="Escena"
+        />
+        <TabButton
           active={tab === "atmosphere"}
           onClick={() => setTab("atmosphere")}
           icon={<Sparkles className="h-3.5 w-3.5" />}
@@ -226,6 +234,7 @@ function RightPanelTabs({
           <Pipeline25DPanel />
         </>
       )}
+      {tab === "scene" && <ScenePanel />}
       {tab === "atmosphere" && <EffectsPanel />}
       {tab === "hero" && <HeroPanel />}
       {tab === "export" && isReady && <ExportPanel />}

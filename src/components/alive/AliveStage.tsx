@@ -13,6 +13,7 @@ import { ShimmerOverlay } from "./ShimmerOverlay";
 import { EffectOverlays } from "./EffectOverlays";
 import { ParticleCanvas } from "./ParticleCanvas";
 import { ColorGrading } from "./ColorGrading";
+import { AtmosphericAnimation } from "./AtmosphericAnimation";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -170,6 +171,12 @@ export function AliveStage({
       <EffectOverlays effects={config.effects} speed={config.speed} />
 
       <ColorGrading grade={config.colorGrade} intensity={1} />
+
+      {/* Atmospheric animations (light cycle, fog, timelapse, seasonal) */}
+      <AtmosphericAnimation type="light-cycle" enabled={config.atmoLightCycle && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
+      <AtmosphericAnimation type="fog-drift" enabled={config.atmoFogDrift && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
+      <AtmosphericAnimation type="timelapse" enabled={config.atmoTimelapse && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
+      <AtmosphericAnimation type="seasonal" enabled={config.atmoSeasonal && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
 
       <div
         aria-hidden

@@ -3085,3 +3085,36 @@ Cross-referenced from the 10+ Awwwards inspiration articles in the search result
 - All citations above are traceable to those files.
 
 **No code was written. Only this entry was appended to worklog.md. The z-ai `web_search` and `page_reader` backends were fully available this session (no rate-limiting). All searches returned 8-10 results; all page reads succeeded except LinkedIn (returned login wall but title + intro were still extractable).**
+
+---
+Task ID: v6 (Hero mode Awwwards-tier)
+Agent: Main Builder v6 (Z.ai Code)
+Task: Hero mode profesional — scroll parallax, text overlay, entrance reveal, color grading
+
+Work Log:
+- Investigación Awwwards (agente v5, 20 búsquedas + 14 fuentes): CSS scroll-driven animations (animation-timeline: scroll()), framer-motion useScroll/useTransform, Cruip word-by-word blur-rise pattern, expo.out easing (cubic-bezier(0.16,1,0.3,1)), LUT via blend modes. Stack: 0 deps nuevas (framer-motion ya instalado).
+- Tipos expandidos: AnimationConfig + scrollParallax, entranceEnabled, colorGrade, letterbox, gateWeave. TextOverlay type. ProjectState + textOverlay, heroMode.
+- Store: setTextOverlay, setHeroMode, defaults para todos los campos nuevos.
+- ColorGrading.tsx: 5 LUTs cinematográficos (teal-orange, bleach-bypass, portra, blade-runner, noir-film) via gradient overlays + mix-blend-mode (soft-light, color, overlay, screen). Sin archivo LUT externo.
+- EntranceReveal: staggered back-to-front, expo.out, blur 8px→0, scale 1.08→1, delay = depth * 0.12 * min(total,6). Integrado en AliveLayers outer motion.div.
+- TextOverlay.tsx: headline word-by-word blur-rise (mask + inline-block + overflow-hidden), subheadline fade-up, CTA button with arrow. Scroll parallax en texto (y: scrollProgress * -150, opacity fade).
+- HeroMode.tsx: full-viewport sticky hero (height: 200vh, sticky top-0). useScroll con offset start-start/end-start. stageScale 1→1.15, stageOpacity 1→0.3, textOpacity 1→0, textY 0→-150. Incluye ColorGrading + letterbox + gate weave + scroll hint animado.
+- AliveLayers: scroll-driven Y offset por capa (back layers 20% del scroll, front layers 60%). Prop scrollY (MotionValue opcional).
+- HeroPanel.tsx: botón "Activar modo hero", slider scroll parallax, toggles entrance/letterbox/gateWeave, grid de 6 color grades con swatches, editor de texto (headline/sub/CTA/posición/alineación).
+- Studio: 4th tab "Hero" en panel derecho. heroMode renderiza HeroMode como overlay full-screen.
+- Fix crítico: buildAnimationFromPreset no incluía los nuevos campos (scrollParallax, entranceEnabled, colorGrade, letterbox, gateWeave) → crash "Cannot read properties of undefined (reading 'toFixed')". Arreglado añadiendo defaults.
+- Fix: src/app/api/upload/route.ts se perdió accidentalmente, restaurado desde git.
+- Verificación Agent Browser:
+  * Depth Slice: 6 capas en 872ms ✓
+  * Hero tab renderiza sin crash ✓
+  * "Activar modo hero" → full-viewport con montaña, botón salir, scroll hint ✓
+  * Text overlay "Mundo Vivo" + CTA "Explorar" visibles con blur-rise ✓
+  * Scroll parallax: image escala 1→1.15, text fade out ✓
+  * 0 errores, lint limpio ✓
+- Push a GitHub: commit c27f747 empujado a main ✓
+
+Stage Summary:
+- Hero mode Awwwards-tier completo: scroll-driven parallax + text overlay word-by-word + entrance reveal + 5 color grades cinematográficos + letterbox + gate weave.
+- 4 tabs en panel derecho: Animar / Atmósfera / Hero / Exportar.
+- 0 dependencias nuevas (framer-motion ya instalado).
+- Push a git@github.com:josenasdwe-asd/alive.git main ✓

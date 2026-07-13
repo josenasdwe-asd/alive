@@ -1,0 +1,299 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Light theme (kept for completeness; app is dark-first) */
+  --background: oklch(0.99 0.005 165);
+  --foreground: oklch(0.18 0.02 200);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 200);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 200);
+  --primary: oklch(0.62 0.15 165);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.01 165);
+  --secondary-foreground: oklch(0.25 0.02 200);
+  --muted: oklch(0.96 0.01 165);
+  --muted-foreground: oklch(0.5 0.02 200);
+  --accent: oklch(0.93 0.04 80);
+  --accent-foreground: oklch(0.25 0.02 200);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.01 200);
+  --input: oklch(0.9 0.01 200);
+  --ring: oklch(0.62 0.15 165);
+  --chart-1: oklch(0.62 0.15 165);
+  --chart-2: oklch(0.7 0.15 80);
+  --chart-3: oklch(0.65 0.2 350);
+  --chart-4: oklch(0.6 0.18 250);
+  --chart-5: oklch(0.7 0.18 30);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.18 0.02 200);
+  --sidebar-primary: oklch(0.62 0.15 165);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.96 0.01 165);
+  --sidebar-accent-foreground: oklch(0.25 0.02 200);
+  --sidebar-border: oklch(0.9 0.01 200);
+  --sidebar-ring: oklch(0.62 0.15 165);
+}
+
+.dark {
+  /* Premium dark — "alive image" studio aesthetic */
+  --background: oklch(0.13 0.012 220);
+  --foreground: oklch(0.97 0.005 165);
+  --card: oklch(0.17 0.014 220);
+  --card-foreground: oklch(0.97 0.005 165);
+  --popover: oklch(0.17 0.014 220);
+  --popover-foreground: oklch(0.97 0.005 165);
+  --primary: oklch(0.7 0.15 165);
+  --primary-foreground: oklch(0.13 0.012 220);
+  --secondary: oklch(0.22 0.016 220);
+  --secondary-foreground: oklch(0.97 0.005 165);
+  --muted: oklch(0.2 0.014 220);
+  --muted-foreground: oklch(0.68 0.015 220);
+  --accent: oklch(0.72 0.14 75);
+  --accent-foreground: oklch(0.16 0.012 220);
+  --destructive: oklch(0.65 0.2 25);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.7 0.15 165);
+  --chart-1: oklch(0.7 0.15 165);
+  --chart-2: oklch(0.72 0.14 75);
+  --chart-3: oklch(0.65 0.2 350);
+  --chart-4: oklch(0.6 0.18 250);
+  --chart-5: oklch(0.7 0.18 30);
+  --sidebar: oklch(0.15 0.013 220);
+  --sidebar-foreground: oklch(0.97 0.005 165);
+  --sidebar-primary: oklch(0.7 0.15 165);
+  --sidebar-primary-foreground: oklch(0.13 0.012 220);
+  --sidebar-accent: oklch(0.22 0.016 220);
+  --sidebar-accent-foreground: oklch(0.97 0.005 165);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.7 0.15 165);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01", "cv11";
+  }
+}
+
+/* ===== Custom scrollbar ===== */
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: oklch(1 0 0 / 12%);
+  border-radius: 9999px;
+}
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background: oklch(1 0 0 / 20%);
+}
+
+/* ===== Glass panels ===== */
+.glass {
+  background: oklch(1 0 0 / 4%);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid oklch(1 0 0 / 8%);
+}
+.glass-strong {
+  background: oklch(0.17 0.014 220 / 70%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid oklch(1 0 0 / 10%);
+}
+
+/* ===== Animated gradient text ===== */
+.text-gradient {
+  background: linear-gradient(
+    100deg,
+    oklch(0.78 0.16 165) 0%,
+    oklch(0.78 0.14 75) 50%,
+    oklch(0.72 0.18 350) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  animation: gradient-pan 12s ease-in-out infinite;
+}
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ===== Aurora background blobs ===== */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: aurora-drift 24s ease-in-out infinite;
+}
+.aurora::before {
+  background: radial-gradient(circle, oklch(0.7 0.15 165 / 0.6), transparent 70%);
+  top: -20%;
+  left: -10%;
+}
+.aurora::after {
+  background: radial-gradient(circle, oklch(0.72 0.14 75 / 0.5), transparent 70%);
+  bottom: -25%;
+  right: -15%;
+  animation-delay: -12s;
+}
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8%, 6%) scale(1.08); }
+  66% { transform: translate(-6%, 4%) scale(0.96); }
+}
+
+/* ===== Custom property types for stacked transform animations ===== */
+@property --breath {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --sway {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --float-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --drift-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+/* ===== "Alive" animation keyframes — organic, prime-duration ===== */
+@keyframes alive-breath {
+  0%, 100% { --breath: 0; }
+  50% { --breath: 1; }
+}
+@keyframes alive-sway {
+  0%, 100% { --sway: -0.4deg; }
+  50% { --sway: 0.4deg; }
+}
+@keyframes alive-float-y {
+  0%, 100% { --float-y: -6px; }
+  50% { --float-y: 6px; }
+}
+@keyframes alive-drift-x {
+  0%, 100% { --drift-x: -4px; }
+  50% { --drift-x: 4px; }
+}
+
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-120%) skewX(-15deg); }
+  100% { transform: translateX(220%) skewX(-15deg); }
+}
+@keyframes particle-rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-120px) translateX(var(--p-drift, 10px)); opacity: 0; }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+/* utility to apply the stacked transform from custom properties */
+.alive-layer {
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0)
+    translate3d(var(--drift-x, 0px), var(--float-y, 0px), 0)
+    scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02)))
+    rotate(var(--sway, 0deg));
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .alive-layer,
+  .aurora::before,
+  .aurora::after,
+  .text-gradient {
+    animation: none !important;
+  }
+}
+
+/* checkered transparency backdrop */
+.checker {
+  background-image:
+    linear-gradient(45deg, oklch(1 0 0 / 4%) 25%, transparent 25%),
+    linear-gradient(-45deg, oklch(1 0 0 / 4%) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, oklch(1 0 0 / 4%) 75%),
+    linear-gradient(-45deg, transparent 75%, oklch(1 0 0 / 4%) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}

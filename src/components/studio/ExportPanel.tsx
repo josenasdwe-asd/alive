@@ -1,0 +1,121 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { Code2, Copy, Check, Download } from "lucide-react";
+import { useAliveStore } from "@/lib/store";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { generateHtml, generateReact, type ExportFormat } from "@/lib/export-code";
+import { PRESET_MAP } from "@/lib/presets";
+
+export function ExportPanel() {
+  const [format, setFormat] = useState<ExportFormat>("html");
+  const [copied, setCopied] = useState(false);
+
+  const state = useAliveStore();
+
+  const code = useMemo(() => {
+    if (!state.originalUrl) return "";
+    const params = {
+      config: state.animation,
+      layers: state.layers,
+      originalUrl: state.originalUrl,
+      backgroundUrl: state.backgroundUrl,
+      depthUrl: state.depthMapUrl,
+      foregroundUrl: state.layers.find((l) => l.role === "foreground")?.url,
+      width: state.width || 1024,
+      height: state.height || 640,
+    };
+    return format === "html" ? generateHtml(params) : generateReact(params);
+  }, [format, state]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      toast.success("Código copiado al portapapeles");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("No se pudo copiar");
+    }
+  };
+
+  const handleDownload = () => {
+    const ext = format === "html" ? "html" : "tsx";
+    const mime = format === "html" ? "text/html" : "text/plain";
+    const blob = new Blob([code], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `alive-${state.animation.preset}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Descargado alive-${state.animation.preset}.${ext}`);
+  };
+
+  const presetName = PRESET_MAP[state.animation.preset]?.name ?? "";
+
+  return (
+    <section className="glass rounded-xl p-4">
+      <header className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">
+            <Code2 className="h-4 w-4" />
+          </span>
+          <h3 className="text-sm font-medium tracking-tight">Exportar</h3>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleDownload}
+            className="h-7 gap-1.5 px-2 text-xs text-muted-foreground"
+          >
+            <Download className="h-3 w-3" />
+            <span className="hidden sm:inline">Descargar</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleCopy}
+            className="h-7 gap-1.5 px-2 text-xs"
+          >
+            {copied ? (
+              <Check className="h-3 w-3 text-primary" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
+            {copied ? "Copiado" : "Copiar"}
+          </Button>
+        </div>
+      </header>
+
+      <Tabs value={format} onValueChange={(v) => setFormat(v as ExportFormat)}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="html" className="text-xs">
+            HTML/CSS/JS
+          </TabsTrigger>
+          <TabsTrigger value="react" className="text-xs">
+            React (TSX)
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value={format} className="mt-3">
+          <div className="relative">
+            <div className="absolute right-2 top-2 z-10 rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] text-muted-foreground backdrop-blur">
+              {presetName} · {format === "html" ? "self-contained" : "framer-motion"}
+            </div>
+            <pre className="scroll-thin max-h-72 overflow-auto rounded-lg border border-white/5 bg-black/40 p-3 text-[11px] leading-relaxed">
+              <code className="font-mono text-foreground/90">{code}</code>
+            </pre>
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Reemplaza las URLs de las imágenes con tus assets en producción.
+            {format === "react" &&
+              " Requiere framer-motion instalado."}
+          </p>
+        </TabsContent>
+      </Tabs>
+    </section>
+  );
+}

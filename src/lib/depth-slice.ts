@@ -35,9 +35,10 @@ export interface SliceOptions {
   dilationRadius?: number;
   /** alpha feathering sigma in px (soft edges) */
   featherSigma?: number;
-  /** "isolated" = each layer only its band (can look empty);
-   *  "cumulative" = each layer contains everything from its band forward (never empty, anchor-style) */
-  mode?: "isolated" | "cumulative";
+  /** "anchor-base" (default): layer 0 = full image (anchor), layers 1+ = isolated bands
+   *  "isolated": each layer only its band (transparent elsewhere)
+   *  "cumulative": each layer contains everything from its band forward */
+  mode?: "isolated" | "cumulative" | "anchor-base";
 }
 
 /**
@@ -164,7 +165,7 @@ export async function sliceImageByDepth(
   const k = Math.max(2, Math.min(12, options.k ?? 6));
   const dilationRadius = options.dilationRadius ?? 18;
   const featherSigma = options.featherSigma ?? 6;
-  const mode = options.mode ?? "cumulative"; // default to cumulative (no empty layers)
+  const mode = options.mode ?? "anchor-base"; // default: base + isolated bands
 
   // Load both images at the same size (use original's dimensions)
   const originalMeta = await sharp(originalPath).metadata();
@@ -190,45 +191,109 @@ export async function sliceImageByDepth(
 
   const results: SlicedLayer[] = [];
 
+  if (mode === "anchor-base") {
+    // === ANCHOR-BASE MODE ===
+    // Layer 0 = FULL original image (opaque, anchor — the complete scene)
+    // Layers 1..k-1 = ISOLATED depth bands (only their pixels, transparent elsewhere)
+    //
+    // This gives the user REAL separate layers:
+    //   - The base is always complete (no empty background)
+    //   - Each isolated layer shows ONLY its depth band (just clouds, just mountains, just ground)
+    //   - Hiding an isolated layer reveals the base underneath
+    //   - Parallax: isolated layers move, base stays anchored
+
+    // Layer 0: full image (anchor)
+    const fullRgba = Buffer.alloc(W * H * 4);
+    for (let i = 0; i < W * H; i++) {
+      fullRgba[i * 4] = originalRaw[i * 3];
+      fullRgba[i * 4 + 1] = originalRaw[i * 3 + 1];
+      fullRgba[i * 4 + 2] = originalRaw[i * 3 + 2];
+      fullRgba[i * 4 + 3] = 255; // fully opaque
+    }
+    const fullPng = await sharp(fullRgba, { raw: { width: W, height: H, channels: 4 } })
+      .png()
+      .toBuffer();
+    const fullSaved = await saveGeneratedImage(fullPng, "slice-base");
+    results.push({
+      url: fullSaved.url,
+      filename: fullSaved.filename,
+      name: "Escena base",
+      depth: 0.0, // farthest = anchor
+      index: 0,
+    });
+
+    // Layers 1..k-1: isolated bands
+    for (let clusterIdx = 0; clusterIdx < k; clusterIdx++) {
+      const maskBuf = Buffer.alloc(W * H);
+      for (let i = 0; i < labels.length; i++) {
+        maskBuf[i] = labels[i] === clusterIdx ? 255 : 0;
+      }
+
+      const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
+
+      const rgba = Buffer.alloc(W * H * 4);
+      for (let i = 0; i < W * H; i++) {
+        rgba[i * 4] = originalRaw[i * 3];
+        rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
+        rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
+        rgba[i * 4 + 3] = featheredMask[i];
+      }
+
+      const pngBuffer = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })
+        .png()
+        .toBuffer();
+
+      const saved = await saveGeneratedImage(pngBuffer, `slice-${clusterIdx}`);
+      const depthCentroid = centers[clusterIdx] / 255;
+
+      const name =
+        clusterIdx === 0
+          ? "Fondo lejano"
+          : clusterIdx === k - 1
+            ? "Primer plano"
+            : clusterIdx === Math.floor(k / 2)
+              ? "Plano medio"
+              : `Plano ${clusterIdx + 1}`;
+
+      results.push({
+        url: saved.url,
+        filename: saved.filename,
+        name,
+        depth: depthCentroid,
+        index: clusterIdx + 1,
+      });
+    }
+
+    return results;
+  }
+
+  // === ISOLATED or CUMULATIVE modes (original behavior) ===
   for (let clusterIdx = 0; clusterIdx < k; clusterIdx++) {
     let maskBuf: Buffer;
 
     if (mode === "cumulative") {
-      // CUMULATIVE: this layer shows everything from this cluster FORWARD (closer).
-      // So cluster 0 (farthest) shows only the farthest band,
-      // cluster k-1 (closest) shows the ENTIRE image.
-      // This ensures no layer is ever empty — the frontmost layer is always complete.
       maskBuf = Buffer.alloc(W * H);
       for (let i = 0; i < labels.length; i++) {
         maskBuf[i] = labels[i] >= clusterIdx ? 255 : 0;
       }
     } else {
-      // ISOLATED: only this cluster's band (original behavior)
+      // isolated
       maskBuf = Buffer.alloc(W * H);
       for (let i = 0; i < labels.length; i++) {
         maskBuf[i] = labels[i] === clusterIdx ? 255 : 0;
       }
     }
 
-    // dilate + feather
-    const featheredMask = await makeFeatheredMask(
-      maskBuf,
-      W,
-      H,
-      dilationRadius,
-      featherSigma
-    );
+    const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
 
-    // build RGBA buffer: RGB from original, A from feathered mask
     const rgba = Buffer.alloc(W * H * 4);
     for (let i = 0; i < W * H; i++) {
-      rgba[i * 4] = originalRaw[i * 3]; // R
-      rgba[i * 4 + 1] = originalRaw[i * 3 + 1]; // G
-      rgba[i * 4 + 2] = originalRaw[i * 3 + 2]; // B
-      rgba[i * 4 + 3] = featheredMask[i]; // A (feathered)
+      rgba[i * 4] = originalRaw[i * 3];
+      rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
+      rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
+      rgba[i * 4 + 3] = featheredMask[i];
     }
 
-    // encode as PNG (preserves alpha)
     const pngBuffer = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })
       .png()
       .toBuffer();
@@ -236,7 +301,6 @@ export async function sliceImageByDepth(
     const saved = await saveGeneratedImage(pngBuffer, `slice-${clusterIdx}`);
     const depthCentroid = centers[clusterIdx] / 255;
 
-    // name based on position
     const name =
       clusterIdx === 0
         ? "Fondo lejano"

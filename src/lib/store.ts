@@ -9,6 +9,8 @@ import type {
   SceneAnalysis,
   LayerTransform,
   EffectType,
+  DecompositionStrategy,
+  PipelineStep,
 } from "./types";
 import {
   DEFAULT_TRANSFORM,
@@ -46,6 +48,10 @@ interface AliveStore extends ProjectState {
   ) => void;
   toggleEffect: (effect: EffectType) => void;
   setReducedMotion: (v: boolean) => void;
+  setStrategy: (s: DecompositionStrategy) => void;
+  setPipelineStep: (s: PipelineStep) => void;
+  /** set layers from depth-slicing (back→front, with depth centroids) */
+  setSlicedLayers: (layers: Array<{ url: string; name: string; depth: number }>) => void;
 }
 
 const emptyEffects = ALL_EFFECTS.reduce(
@@ -265,4 +271,41 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
 
   setReducedMotion: (v) =>
     set((s) => ({ animation: { ...s.animation, reducedMotion: v } })),
+
+  setStrategy: (s) => set({ strategy: s }),
+
+  setPipelineStep: (s) => set({ pipelineStep: s }),
+
+  setSlicedLayers: (sliced) => {
+    // build ImageLayer[] from sliced layers (already back→front with depth centroids)
+    const layers: ImageLayer[] = sliced.map((s, i) => ({
+      id: `slice-${i}-${Math.random().toString(36).slice(2, 7)}`,
+      name: s.name,
+      role:
+        i === 0
+          ? "background"
+          : i === sliced.length - 1
+            ? "foreground"
+            : i === Math.floor(sliced.length / 2)
+              ? "subject"
+              : "midground",
+      depth: s.depth,
+      url: s.url,
+      description: `Depth band ${i + 1}`,
+      source: "depth-slice",
+      transform: { ...DEFAULT_TRANSFORM },
+    }));
+    set({ layers, pipelineStep: "animate", status: "ready" });
+    // build animation config from current preset
+    const preset = get().animation.preset;
+    const depths: Record<string, number> = {};
+    layers.forEach((l) => (depths[l.id] = l.depth));
+    set({
+      animation: buildAnimationFromPreset(
+        preset,
+        layers.map((l) => l.id),
+        depths
+      ),
+    });
+  },
 }));

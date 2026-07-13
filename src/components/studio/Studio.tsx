@@ -17,8 +17,13 @@ import {
   ImageOff,
   MousePointer2,
   Hand,
+  SlidersHorizontal,
+  Sparkles,
+  Code2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type RightTab = "animate" | "atmosphere" | "export";
 
 export function Studio() {
   const {
@@ -37,6 +42,7 @@ export function Studio() {
 
   const stageWrapperRef = useRef<HTMLDivElement>(null);
   const [editorMode, setEditorMode] = useState(false);
+  const [rightTab, setRightTab] = useState<RightTab>("animate");
 
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";
@@ -48,15 +54,15 @@ export function Studio() {
 
   return (
     <div className="mx-auto max-w-[1600px] px-3 py-4 sm:px-6 sm:py-6">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_300px]">
-        {/* Left column */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)_300px]">
+        {/* Left column — layers */}
         <aside className="space-y-3 lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
           <AnalysisPanel />
           {isReady && <LayersPanel />}
           {isReady && selectedLayerId && <LayerInspector />}
         </aside>
 
-        {/* Center: live preview stage */}
+        {/* Center — stage */}
         <main className="space-y-3">
           <div ref={stageWrapperRef} className="relative">
             {showStage ? (
@@ -108,7 +114,7 @@ export function Studio() {
                 ) : (
                   <Hand className="h-3 w-3" />
                 )}
-                {editorMode ? "Editar capas" : "Mover capas"}
+                {editorMode ? "Editando" : "Mover capas"}
               </button>
 
               <div className="h-4 w-px bg-white/10" />
@@ -123,25 +129,19 @@ export function Studio() {
                   <>
                     <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                     <span>
-                      preset <span className="text-foreground">{animation.preset}</span>
-                    </span>
-                    <span>·</span>
-                    <span>
-                      modo <span className="text-foreground">{animation.renderMode}</span>
-                    </span>
-                    <span>·</span>
-                    <span>
+                      <span className="text-foreground">{animation.preset}</span>
+                      <span className="mx-1">·</span>
+                      {animation.renderMode}
+                      <span className="mx-1">·</span>
                       {layers.length} capas
                     </span>
-                    <span>·</span>
-                    <span>{animation.intensity.toFixed(2)}×</span>
                   </>
                 )}
               </div>
 
               {editorMode && (
                 <span className="ml-auto text-[11px] text-muted-foreground">
-                  Clic en una capa para seleccionarla · arrastra para mover
+                  Clic en una capa para seleccionarla
                 </span>
               )}
             </div>
@@ -149,22 +149,100 @@ export function Studio() {
 
           {/* Mobile: panels below stage */}
           <div className="space-y-3 lg:hidden">
-            <PresetPicker />
-            <EffectsPanel />
-            <ControlPanel />
-            <ExportPanel />
+            {isReady && (
+              <RightPanelTabs
+                tab={rightTab}
+                setTab={setRightTab}
+                isReady={isReady}
+              />
+            )}
           </div>
         </main>
 
-        {/* Right column */}
-        <aside className="hidden space-y-3 lg:block lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
-          <PresetPicker />
-          <EffectsPanel />
-          <ControlPanel />
-          {isReady && <ExportPanel />}
+        {/* Right column — contextual tabs (desktop) */}
+        <aside className="hidden lg:block lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
+          {isReady ? (
+            <RightPanelTabs
+              tab={rightTab}
+              setTab={setRightTab}
+              isReady={isReady}
+            />
+          ) : null}
         </aside>
       </div>
     </div>
+  );
+}
+
+function RightPanelTabs({
+  tab,
+  setTab,
+  isReady,
+}: {
+  tab: RightTab;
+  setTab: (t: RightTab) => void;
+  isReady: boolean;
+}) {
+  return (
+    <div className="space-y-3">
+      {/* Tab selector */}
+      <div className="flex items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] p-1">
+        <TabButton
+          active={tab === "animate"}
+          onClick={() => setTab("animate")}
+          icon={<SlidersHorizontal className="h-3.5 w-3.5" />}
+          label="Animar"
+        />
+        <TabButton
+          active={tab === "atmosphere"}
+          onClick={() => setTab("atmosphere")}
+          icon={<Sparkles className="h-3.5 w-3.5" />}
+          label="Atmósfera"
+        />
+        <TabButton
+          active={tab === "export"}
+          onClick={() => setTab("export")}
+          icon={<Code2 className="h-3.5 w-3.5" />}
+          label="Exportar"
+        />
+      </div>
+
+      {tab === "animate" && (
+        <>
+          <PresetPicker />
+          <ControlPanel />
+        </>
+      )}
+      {tab === "atmosphere" && <EffectsPanel />}
+      {tab === "export" && isReady && <ExportPanel />}
+    </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+        active
+          ? "bg-primary/15 text-primary"
+          : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      {icon}
+      {label}
+    </button>
   );
 }
 
@@ -177,9 +255,9 @@ function PreviewLoading({
 }) {
   const labels: Record<string, string> = {
     uploaded: "Iniciando análisis…",
-    analyzing: "VLM entendiendo la escena (6-8 capas)…",
-    analyzed: "Generando capas (fondo + depth + extracciones)…",
-    separating: "Extrayendo elementos con IA…",
+    analyzing: "VLM entendiendo la escena…",
+    analyzed: "Elige estrategia de desacoplo…",
+    separating: "Generando capas…",
   };
   return (
     <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
@@ -195,7 +273,7 @@ function PreviewLoading({
           {labels[status] ?? "Procesando…"}
         </p>
         <p className="text-xs text-white/50">
-          La IA está desacoplando tu imagen en múltiples capas
+          La IA está entendiendo tu imagen
         </p>
       </div>
     </div>

@@ -20,12 +20,14 @@ interface SeparateBody {
     extractPrompt?: string;
     depth: number;
   }>;
+  /** when true, only generate bg + depth map (no per-element extraction) */
+  baseOnly?: boolean;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body: SeparateBody = await req.json();
-    const { url, subject, layers } = body;
+    const { url, subject, layers, baseOnly } = body;
 
     if (!url || !subject) {
       return NextResponse.json(
@@ -55,16 +57,33 @@ export async function POST(req: NextRequest) {
         }),
     ];
 
+    const essentialResults = (await Promise.allSettled(essential)) as any[];
+    const out: Record<string, { url: string; filename: string } | null> = {};
+    for (const r of essentialResults) {
+      if (r.status === "fulfilled" && r.value) {
+        out[r.value.key] = { url: r.value.url, filename: r.value.filename };
+      }
+    }
+
+    // If baseOnly, skip per-element extraction
+    if (baseOnly) {
+      return NextResponse.json({
+        success: true,
+        background: out.background,
+        depth: out.depth,
+        extracted: [],
+      });
+    }
+
     // Phase 2: extract each non-background layer that has an extractPrompt
-    // Run up to 3 in parallel to avoid rate limiting
     const extractTargets = (layers ?? [])
       .filter(
         (l) =>
           l.role !== "background" &&
           l.extractPrompt &&
-          l.depth > 0.25 // skip very-far midground that won't extract well
+          l.depth > 0.25
       )
-      .slice(0, 5); // cap at 5 extractions to stay within rate limits
+      .slice(0, 5);
 
     const extractResults: Array<{
       layerName: string;
@@ -85,14 +104,6 @@ export async function POST(req: NextRequest) {
       for (const r of results) {
         if (r.status === "fulfilled") extractResults.push(r.value);
         else console.warn("[separate] extract failed", r.reason);
-      }
-    }
-
-    const essentialResults = (await Promise.allSettled(essential)) as any[];
-    const out: Record<string, { url: string; filename: string } | null> = {};
-    for (const r of essentialResults) {
-      if (r.status === "fulfilled" && r.value) {
-        out[r.value.key] = { url: r.value.url, filename: r.value.filename };
       }
     }
 

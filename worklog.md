@@ -1852,3 +1852,47 @@ Stage Summary:
 - Nivel 2 implementado: CSS 3D estereoscópico con translateZ real + preserve-3d + rotación del mouse. Parallax matemáticamente correcto.
 - Nivel 4 implementado: Canvas 2D con sistema de partículas (humo, fuego, brasas) con física simplex noise + mouse interactivo.
 - 3 modos de render seleccionables: CSS multiplane (Nivel 1) / CSS 3D (Nivel 2) / WebGL2 shader (Nivel 5).
+
+---
+Task ID: v4 (Mathematical extractor + UX simplification)
+Agent: Main Builder v4 (Z.ai Code)
+Task: Extractor matemático (K-means 1D + dilatación morfológica) + simplificar UX
+
+Work Log:
+- Construido depth-slice.ts — extractor matemático puro con sharp:
+  * K-means 1D clustering sobre el histograma de profundidad (256 bins, 20 iteraciones máx, init por cuantiles)
+  * Remap de clusters para ordenarlos back→front (dark=far=0, light=near=k-1)
+  * Máscara binaria por cluster
+  * Dilatación morfológica (blur + threshold, radio 18px) — pre-expande el fondo para que el parallax no muestre huecos
+  * Alpha feathering (Gaussian blur sigma 6) — bordes suaves sin costuras duras
+  * Composición RGBA: RGB del original + A de la máscara feathered → PNG con transparencia
+  * Determinístico, rápido: 933ms para 6 capas a 1024px (40x más rápido que AI Extract)
+- Construido /api/slice endpoint (acepta originalUrl, depthUrl, k, dilationRadius, featherSigma)
+- Actualizado /api/separate con flag baseOnly (solo bg + depth, sin extracciones) para el flujo Depth Slice
+- Añadido al store: DecompositionStrategy, PipelineStep, setStrategy, setPipelineStep, setSlicedLayers
+- Rediseñado AnalysisPanel con nuevo flujo de 4 estados:
+  1. analyzing → VLM analiza
+  2. choose-strategy → muestra resumen del análisis + 2 StrategyCards (Depth Slice con slider de capas 4-10 / AI Extract)
+  3. decomposing → progreso con mensaje según estrategia
+  4. ready → resumen final
+- Construido PipelineIndicator (Subir → Analizar → Desacoplar → Animar) con check/spinner/futuro
+- Añadido PipelineIndicator al Header (centro, siempre visible)
+- Rediseñado Studio con layout simplificado:
+  * Sidebar izquierdo: AnalysisPanel + LayersPanel + LayerInspector
+  * Centro: Stage + toolbar
+  * Sidebar derecho: tabs contextuales (Animar / Atmósfera / Exportar) — menos ruido visual, el usuario ve solo lo que necesita
+- Verificación Agent Browser:
+  * Paisaje montañoso → analyze 7.7s → strategy selector aparece ✓
+  * Slider de capas visible (valor 6) ✓
+  * Click Depth Slice → separate baseOnly 16.5s + slice 933ms → 5-6 capas renderizadas ✓
+  * Pipeline indicator: Subir(done) → Analizar(done) → Desacoplar(done) → Animar(active) ✓
+  * Tabs derecho: Animar/Atmósfera/Exportar funcionan ✓
+  * Atmósfera tab muestra 8 efectos CSS + 3 partículas canvas ✓
+  * 0 errores, lint limpio ✓
+
+Stage Summary:
+- Extractor matemático K-means 1D + dilatación morfológica: 933ms para 6 capas (40x más rápido que AI Extract)
+- UX simplificada: selector de estrategia claro (Depth Slice rápido vs AI Extract profundo)
+- Pipeline indicator visual de 4 pasos siempre visible en el header
+- Panel derecho contextual con tabs (Animar/Atmósfera/Exportar) reduce ruido visual
+- Dos caminos: matemático (determinístico, rápido) o IA (semántico, profundo) — el usuario elige

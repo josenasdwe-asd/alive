@@ -3,6 +3,7 @@
 import { Sparkles, Github, Wand2 } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
+import { PipelineIndicator } from "./PipelineIndicator";
 
 export function Header() {
   const status = useAliveStore((s) => s.status);
@@ -10,10 +11,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/5 glass-strong">
-      <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between gap-3 px-4 sm:px-6">
         <button
           onClick={reset}
-          className="group flex items-center gap-2.5"
+          className="group flex flex-shrink-0 items-center gap-2.5"
           aria-label="Alive — volver al inicio"
         >
           <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/30 to-accent/30 ring-1 ring-white/10">
@@ -28,13 +29,12 @@ export function Header() {
           </div>
         </button>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          <span className="rounded-full border border-white/5 bg-white/[0.03] px-3 py-1 text-[11px] text-muted-foreground">
-            VLM · Depth Map · WebGL2 · SVG Liquid
-          </span>
-        </nav>
+        {/* Center: pipeline indicator */}
+        <div className="hidden flex-1 justify-center md:flex">
+          <PipelineIndicator />
+        </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           {status !== "idle" && (
             <Button
               variant="ghost"
@@ -49,7 +49,7 @@ export function Header() {
             variant="ghost"
             size="sm"
             asChild
-            className="text-muted-foreground hover:text-foreground"
+            className="hidden text-muted-foreground hover:text-foreground sm:flex"
           >
             <a
               href="https://github.com"

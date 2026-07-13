@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=HjBOiSqrejY",
+    "name": "Secret to Easy God Rays in Blender - Beginner Tutorial - YouTube",
+    "snippet": "blender3d #gamedev #3dart Here's a detailed rundown of the quickest way to make awesome god rays of light shining down on your objects My ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/blender/comments/zudheq/need_help_how_do_i_create_god_rays_as_seen_here",
+    "name": "Need help, how do I create god rays as seen here in cycles without",
+    "snippet": "It's a mix mode set to multiply. In the 'Materials' tab set the 'Blend Mode' from Opaque to 'Alpha Blend' you can change the color to match ... Need help to create more visible godrays (2nd image to see ... - Reddit God Rays : r/GraphicsProgramming - Reddit More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.babylonjs.com/t/how-to-generate-god-rays/6957",
+    "name": "How to generate God Rays? - Questions - Babylon.js Forum",
+    "snippet": "Hi, God Rays effect is very beatiful, this example come from Maya, I found the Volumetric LightScattering post-process can achieve it, ...",
+    "host_name": "forum.babylonjs.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ca.pinterest.com/pin/god-rays--308074430781806695",
+    "name": "God Rays | V-ray volumetric light in 3DsMax - Pinterest",
+    "snippet": "This is a tutorial on how to create Volumetric light in vray 3dsmax using Vray Volumetric Fog.Comment below if you want to know more.",
+    "host_name": "ca.pinterest.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=o0M_QPkhNi4",
+    "name": "Volumetric light rays with three.js #8 - YouTube",
+    "snippet": "Gathering money for one air defence unit where my friend is working. 2k$. https://send.monobank.ua/jar/8kBAr15Gw Paypal: akellaa@gmail.com ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mix-blend-mode",
+    "name": "mix-blend-mode CSS property - MDN Web Docs",
+    "snippet": "The mix-blend-mode CSS property sets how an element's content should blend with its backdrop — the content rendered behind the element within ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://web.dev/learn/css/blend-modes",
+    "name": "Blend Modes - web.dev",
+    "snippet": "This blend mode— overlay —combines multiply and screen . Base dark colors become darker and base light colors become lighter. Mid-range colors, ...",
+    "host_name": "web.dev",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=GSgIgmbr67w",
+    "name": "The Difference between CSS Blending Modes: multiply & screen",
+    "snippet": "CSS Blending Modes are awesome—if used properly. Here's the difference between multiply & screen mix-blend-modes and how to use them ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sitepoint.com/close-up-css-mix-blend-mode-property",
+    "name": "A Close-up Look at the CSS mix-blend-mode Property - SitePoint",
+    "snippet": "The CSS mix-blend-mode property allows for the blending of two or more background colors or images, creating artistic effects directly from your ...",
+    "host_name": "www.sitepoint.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://css-tricks.com/basics-css-blend-modes",
+    "name": "Basics of CSS Blend Modes",
+    "snippet": "Multiply is a nice and useful one, but there is also: screen , overlay , darken , lighten , color-dodge , color-burn , hard-light , soft-light ...",
+    "host_name": "css-tricks.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/32892363/is-it-possible-to-use-canvas-blend-mode-over-parent-dom-element",
+    "name": "Is it possible to use canvas blend-mode over parent dom element?",
+    "snippet": "I'd like to blend a small canvas element over a large parent background element. I've tried the following without success.",
+    "host_name": "stackoverflow.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

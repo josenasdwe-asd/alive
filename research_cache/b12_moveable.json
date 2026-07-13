@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://github.com/daybrush/moveable",
+    "name": "Moveable! Draggable! Resizable! Scalable! Rotatable! Warpable",
+    "snippet": "Draggable refers to the ability to drag and move targets. · Resizable indicates whether the target's width and height can be increased or decreased.",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.npmjs.com/package/react-moveable",
+    "name": "react-moveable - NPM",
+    "snippet": "A React Component that create Moveable, Draggable, Resizable, Scalable, Rotatable, Warpable, Pinchable, Groupable, Snappable.",
+    "host_name": "www.npmjs.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://kinggh.tistory.com/126",
+    "name": "[React] react-moveable로 인터랙션 추가하기",
+    "snippet": "rotatable 속성을 true로 설정하고, onRotateStart, onRotate, onRotateEnd 이벤트에 로직을 추가한다. Moveable 컨트롤러를 회전시킬 컴포넌트 안에 ...",
+    "host_name": "kinggh.tistory.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/javascript/comments/cdq838/moveable_draggable_resizable_scalable_rotatable",
+    "name": "Moveable! Draggable! Resizable! Scalable! Rotatable! : r/javascript",
+    "snippet": "I created draggable, resizable and snapping window components in react · I would humbly request the ModTeam input · Draggable/Moveable window ... A React Component that create Moveable, Draggable, Resizable ... r/reactjs - react-moveable Editor Tool 0.21 Release! Drag, Resize, Scale ... More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://daybrush.com/moveable/release/latest/doc/Moveable.Resizable.html",
+    "name": "Resizable - Documentation - Daybrush",
+    "snippet": "Resizable indicates whether the target's width and height can be increased or decreased. Members throttleResize throttle of width, height when resize. Missing: component | Show results with: component",
+    "host_name": "daybrush.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

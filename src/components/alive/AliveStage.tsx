@@ -8,6 +8,7 @@ import { AliveWebGL } from "./AliveWebGL";
 import { LiquidFilter } from "./LiquidFilter";
 import { Particles } from "./Particles";
 import { ShimmerOverlay } from "./ShimmerOverlay";
+import { EffectOverlays } from "./EffectOverlays";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -15,11 +16,18 @@ interface AliveStageProps {
   originalUrl: string;
   backgroundUrl?: string;
   depthUrl?: string;
-  foregroundUrl?: string;
   /** show a thin frame around the stage (studio mode) */
   framed?: boolean;
-  /** aspect ratio class, e.g. 'aspect-video' */
+  /** aspect ratio class */
   aspectClass?: string;
+  /** editor mode enables layer selection + transform handles */
+  editorMode?: boolean;
+  selectedLayerId?: string;
+  onSelectLayer?: (id: string) => void;
+  onLayerTransform?: (
+    id: string,
+    transform: Partial<ImageLayer["transform"]>
+  ) => void;
 }
 
 export function AliveStage({
@@ -28,14 +36,16 @@ export function AliveStage({
   originalUrl,
   backgroundUrl,
   depthUrl,
-  foregroundUrl,
   framed = false,
   aspectClass = "aspect-[16/10]",
+  editorMode = false,
+  selectedLayerId,
+  onSelectLayer,
+  onLayerTransform,
 }: AliveStageProps) {
   const liquidId = useId().replace(/:/g, "");
   const liquidFilterId = `liquid-${liquidId}`;
 
-  // ken burns is a slow zoom on the whole stage
   const isKenBurns = config.preset === "kenburns" && !config.reducedMotion;
 
   const vignetteStyle = useMemo(
@@ -47,6 +57,9 @@ export function AliveStage({
   );
 
   const canWebGL = config.renderMode === "webgl" && !!depthUrl;
+  const foregroundUrl = layers.find(
+    (l) => l.role === "foreground" && l.url
+  )?.url;
 
   return (
     <div
@@ -54,10 +67,8 @@ export function AliveStage({
         framed ? "ring-1 ring-white/10" : ""
       }`}
     >
-      {/* subtle checker behind transparent layers */}
       <div className="absolute inset-0 checker opacity-30" />
 
-      {/* Ken Burns wrapper — slow zoom/pan on entire stage */}
       <motion.div
         className="absolute inset-0"
         animate={
@@ -89,14 +100,15 @@ export function AliveStage({
             backgroundUrl={backgroundUrl}
             originalUrl={originalUrl}
             foregroundUrl={foregroundUrl}
-            liquidFilterId={
-              config.liquidEnabled ? liquidFilterId : undefined
-            }
+            liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
+            editorMode={editorMode}
+            selectedLayerId={selectedLayerId}
+            onSelectLayer={onSelectLayer}
+            onLayerTransform={onLayerTransform}
           />
         )}
       </motion.div>
 
-      {/* Liquid SVG filter def (rendered once, applied via CSS) */}
       {config.liquidEnabled && (
         <LiquidFilter
           id={liquidFilterId}
@@ -105,7 +117,6 @@ export function AliveStage({
         />
       )}
 
-      {/* Particles */}
       {config.particlesEnabled && !config.reducedMotion && (
         <Particles
           count={config.preset === "dream" ? 20 : 14}
@@ -113,19 +124,33 @@ export function AliveStage({
         />
       )}
 
-      {/* Shimmer */}
       <ShimmerOverlay
         enabled={config.shimmerEnabled && !config.reducedMotion}
         speed={config.speed}
         intensity={config.intensity}
       />
 
-      {/* Vignette */}
+      {/* Effect overlays (fog, snow, rain, godrays, bokeh, etc) */}
+      <EffectOverlays effects={config.effects} speed={config.speed} />
+
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 transition-opacity duration-500"
         style={vignetteStyle}
       />
+
+      {/* chromatic aberration overlay (radial RGB split) */}
+      {config.chromaticAberration > 0 && !canWebGL && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 mix-blend-screen opacity-30"
+          style={{
+            background:
+              "radial-gradient(circle at center, transparent 30%, rgba(255,0,80,0.15) 70%, rgba(0,80,255,0.15) 100%)",
+            opacity: Math.min(0.5, config.chromaticAberration / 12),
+          }}
+        />
+      )}
     </div>
   );
 }

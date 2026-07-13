@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://blog.maximeheckel.com/posts/the-physics-behind-spring-animations",
+    "name": "The physics behind spring animations - The Blog of Maxime Heckel",
+    "snippet": "By default, Framer Motion sets the stiffness of the spring animation to 100, the damping to 10, and the mass to 1 according to the docs.",
+    "host_name": "blog.maximeheckel.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/docs/react-transitions",
+    "name": "React transitions | Configure Motion animations",
+    "snippet": "Physics-based spring animations are set via stiffness , damping and mass , and these incorporate the velocity of any existing gestures or animations for natural ...",
+    "host_name": "motion.dev",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=utz0BcmvjdQ",
+    "name": "Framer Update: Time-Based Springs - YouTube",
+    "snippet": "... springs with other transitions. Benjamin shows how these work compared to the traditional physics-based springs that use stiffness, damping ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/kaliberinteractive/how-i-transitioned-from-ease-to-spring-animations-5a09eeca0325",
+    "name": "How I Transitioned from Ease to Spring Animations | by Joost Kiens",
+    "snippet": "An animation with easing always needs at least 2 things: a duration usually expressed in seconds or milliseconds and an easing function representing a curve.",
+    "host_name": "medium.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.joshwcomeau.com/animation/a-friendly-introduction-to-spring-physics",
+    "name": "A Friendly Introduction to Spring Physics Animation in JavaScript",
+    "snippet": "Spring physics are like a secret ingredient; they make all animations taste better. The motion produced using spring physics is fluid and organic.",
+    "host_name": "www.joshwcomeau.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.carmenansio.com/articles/spring-physics-css",
+    "name": "Spring Physics in CSS - Carmen Ansio",
+    "snippet": "Doubling stiffness without touching damping makes the spring bouncier. Increasing damping to compensate keeps the settle speed while reducing ...",
+    "host_name": "www.carmenansio.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

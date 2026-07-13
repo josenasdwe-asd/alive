@@ -1,0 +1,23 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "external": {},
+    "html": "<html><head>\n    <link rel=\"stylesheet\" href=\"chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_embedder.css\">\n  </head>\n  <body>\n    \n  \n\n</body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "OK",
+    "metadata": {},
+    "publishedTime": "Mon, 29 Jun 2020 01:09:20 GMT",
+    "title": "",
+    "url": "https://openaccess.thecvf.com/content_CVPR_2020/papers/Shih_3D_Photography_Using_Context-Aware_Layered_Depth_Inpainting_CVPR_2020_paper.pdf",
+    "usage": {
+      "tokens": 55
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 55
+    }
+  },
+  "status": 20000
+}

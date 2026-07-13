@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/45244188/whats-the-right-way-to-order-polygons-when-implementing-the-painters-algorithm",
+    "name": "What's the right way to order polygons when implementing the painter's",
+    "snippet": "The basic steps are: 1. Sort polygons based on their \"z\". 2. Paint all polygons, but paint the ones farthest away first. But I'm confused about how to find ... HTML canvas game, painter algorithm - javascript - Stack Overflow Is Z-Buffering generally faster than the Painter's Algorithm? - Stack Overflow More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/learnprogramming/comments/3ddw0v/computer_graphics_painter_algorithm_vs_zbuffer",
+    "name": "[Computer Graphics] Painter Algorithm vs. Z-Buffer : r/learnprogramming",
+    "snippet": "My question is : Describe the Z buffer algorithm and the painter's algorithm. For what type of scenes Z-buffer does not perform well? What's the right way to order polygons when implementing the painter's ... For drawing many layered 2D tiles, should one use the painter's ... More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.geeksforgeeks.org/dsa/painters-algorithm-in-computer-graphics",
+    "name": "Painter's Algorithm in Computer Graphics - GeeksforGeeks",
+    "snippet": "This algorithm is basically used to paint the polygons in the view plane by considering their distance from the viewer. The polygons which are ...",
+    "host_name": "www.geeksforgeeks.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=RqWkLuTrx6c",
+    "name": "Painter Algorithm in Computer Graphics | Lec-30 - YouTube",
+    "snippet": "This lecture is all about Painter Algorithm which is a very important topic in Computer Graphics, where we have discussed everything in ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Painter%27s_algorithm",
+    "name": "Painter's algorithm - Wikipedia",
+    "snippet": "The painter's algorithm creates images by sorting the polygons within the image by their depth and placing each polygon in order from the farthest to the ...",
+    "host_name": "en.wikipedia.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scribd.com/document/981427511/Depth-Sort-Algorithm",
+    "name": "Depth Sort Algorithm Explained | PDF | Rendering (Computer Graphics)",
+    "snippet": "The Depth Sort Algorithm, also known as the Painter's Algorithm, is a method used in computer graphics to render 3D objects by drawing polygons from back to ...",
+    "host_name": "www.scribd.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

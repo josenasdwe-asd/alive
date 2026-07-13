@@ -15,20 +15,11 @@ import { useAliveStore } from "@/lib/store";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export function ControlPanel() {
   const config = useAliveStore((s) => s.animation);
-  const layers = useAliveStore((s) => s.layers);
   const updateAnimation = useAliveStore((s) => s.updateAnimation);
-  const updateLayerAnim = useAliveStore((s) => s.updateLayerAnim);
 
   return (
     <section className="glass rounded-xl p-4">
@@ -145,85 +136,22 @@ export function ControlPanel() {
           />
         </div>
 
-        {/* Per-layer controls */}
-        {layers.length > 0 && (
-          <Accordion type="multiple" className="w-full">
-            <AccordionItem
-              value="layers"
-              className="border-white/5"
-            >
-              <AccordionTrigger className="text-xs hover:no-underline">
-                <span className="flex items-center gap-1.5">
-                  Por capa
-                  <Badge variant="secondary" className="text-[10px]">
-                    {layers.length}
-                  </Badge>
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3 pt-2">
-                {layers.map((layer) => {
-                  const la = config.layers[layer.id];
-                  if (!la) return null;
-                  return (
-                    <div
-                      key={layer.id}
-                      className="space-y-2 rounded-lg border border-white/5 bg-white/[0.02] p-2.5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium">{layer.name}</span>
-                        <span className="text-[10px] uppercase text-muted-foreground">
-                          {layer.role}
-                        </span>
-                      </div>
-                      <SliderRow
-                        compact
-                        label="Parallax"
-                        value={la.parallaxStrength}
-                        min={0}
-                        max={60}
-                        step={1}
-                        format={(v) => `${v.toFixed(0)}px`}
-                        onChange={(v) =>
-                          updateLayerAnim(layer.id, { parallaxStrength: v })
-                        }
-                      />
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                        <MiniToggle
-                          label="Respira"
-                          checked={la.breathing}
-                          onChange={(v) =>
-                            updateLayerAnim(layer.id, { breathing: v })
-                          }
-                        />
-                        <MiniToggle
-                          label="Balanceo"
-                          checked={la.sway}
-                          onChange={(v) =>
-                            updateLayerAnim(layer.id, { sway: v })
-                          }
-                        />
-                        <MiniToggle
-                          label="Flota"
-                          checked={la.floatY}
-                          onChange={(v) =>
-                            updateLayerAnim(layer.id, { floatY: v })
-                          }
-                        />
-                        <MiniToggle
-                          label="Líquido"
-                          checked={la.liquid}
-                          onChange={(v) =>
-                            updateLayerAnim(layer.id, { liquid: v })
-                          }
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        )}
+        {/* Mouse smoothing */}
+        <SliderRow
+          icon={<MousePointer2 className="h-3.5 w-3.5" />}
+          label="Suavizado mouse"
+          value={config.mouseSmoothing}
+          min={0.01}
+          max={0.3}
+          step={0.01}
+          format={(v) => v.toFixed(2)}
+          onChange={(v) => updateAnimation({ mouseSmoothing: v })}
+        />
+
+        <p className="rounded-md border border-white/5 bg-white/[0.02] p-2 text-[10px] leading-relaxed text-muted-foreground">
+          Selecciona una capa en el panel de capas para editar su posición,
+          escala, rotación y efectos individuales.
+        </p>
       </div>
     </section>
   );
@@ -292,36 +220,6 @@ function ToggleRow({
       </Label>
       <Switch checked={checked} onCheckedChange={onChange} />
     </div>
-  );
-}
-
-function MiniToggle({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <button
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "flex items-center justify-between rounded-md border px-2 py-1 text-[11px] transition-colors",
-        checked
-          ? "border-primary/40 bg-primary/10 text-foreground"
-          : "border-white/5 bg-white/[0.02] text-muted-foreground hover:text-foreground"
-      )}
-    >
-      <span>{label}</span>
-      <span
-        className={cn(
-          "h-2 w-2 rounded-full",
-          checked ? "bg-primary" : "bg-white/20"
-        )}
-      />
-    </button>
   );
 }
 

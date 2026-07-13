@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/74320441/css-attempting-to-animate-hue-rotate-has-no-effect",
+    "name": "CSS - Attempting to animate hue-rotate has no effect",
+    "snippet": "I'm trying to do some animation with CSS. However, I can't seem to get hue-rotate to actually... well, animate. Slowing down the delay between \"frames\" in a CSS animation? How to make the animation of changing colors in animate.css More results from stackoverflow.com\nI'm trying to do some animation with CSS. However, I can't seem to get hue-rotate to actually... well, animate. Hue rotate changes the image and not the drop shadow - Stack Overflow CSS filter: use hue rotation to change certain colors only (like Photoshop ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/filter-function/hue-rotate",
+    "name": "hue-rotate() CSS function - MDN Web Docs",
+    "snippet": "A positive hue rotation increases the hue value, while a negative rotation decreases the hue value. The initial value for interpolation is 0 .",
+    "host_name": "developer.mozilla.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/10025-tweening-hue-rotate-on-an-image",
+    "name": "Tweening hue-rotate on an image - GSAP",
+    "snippet": "I can do this instantly with the simple CSS value of {-webkit-filter: hue-rotate(180deg);} but I would much rather have the colors fade through ...",
+    "host_name": "gsap.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.joshwcomeau.com/animation/color-shifting",
+    "name": "Color Shifting in CSS • Josh W. Comeau",
+    "snippet": "Each particle starts on a random color and changes hue as it fades out. This seems pretty straightforward, but appearances can be deceiving. In ...",
+    "host_name": "www.joshwcomeau.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://css-tricks.com/almanac/functions/h/hue-rotate",
+    "name": "hue-rotate() - CSS-Tricks",
+    "snippet": "The hue-rotate() function rotates the color of an element and its content to a specified hue on the color wheel.",
+    "host_name": "css-tricks.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/shorts/T1T1cC_T5xo",
+    "name": "Text Color Animation with CSS Filter Hue Rotate | Happy Diwali - YouTube",
+    "snippet": "In this video you'll learn to create text color animation using hue-rotate() and keyframes of CSS3.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

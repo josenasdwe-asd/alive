@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://dndkit.com/react/quickstart",
+    "name": "React Quickstart - dnd kit",
+    "snippet": "Multiple sortable lists ... For example, you can render multiple draggable elements and droppable targets, and listen to drag and drop events to move elements ...",
+    "host_name": "dndkit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=wmk50PEsVrs",
+    "name": "React DND Kit: Creating Vertical Sortable Lists Tutorial - YouTube",
+    "snippet": "Check out MiniTool MovieMaker: https://bit.ly/4hKFA9A Discover how to make sortable lists in React using DND Kit. This easy-to-follow guide ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/61052932/react-dnd-sortable-list-using-custom-drag-layer",
+    "name": "react-dnd sortable list using custom drag layer - Stack Overflow",
+    "snippet": "I've created a simple sortable list with react-dnd using code similar to react-dnd's sortable example found here in codesandbox. react dnd-kit sortable : why is the first element of my ... - Stack Overflow Dnd-kit sortable list with drag handle - setActivatorNodeRef has no ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@wangfupeng1988/react-dnd-kit-implement-tree-list-drag-and-drop-sortable-f54f84b1b605",
+    "name": "React + dnd-kit, implement tree-list drag and drop sortable - Medium",
+    "snippet": "In this article, I will share how to implement tree-list drag and drop sortable by React and dnd-kit. The source code link is at the bottom of this article. Dnd-kit and Sortable component · Multi-level nested... · Multi level conversion to a...",
+    "host_name": "medium.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/clauderic/dnd-kit",
+    "name": "GitHub - clauderic/dnd-kit: The modern toolkit for building drag and",
+    "snippet": "Sortable: Need to build a sortable interface? Check out @dnd-kit/dom/sortable , a thin layer built on top of the core. Getting started. Choose your preferred ...",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dndkit.com/concepts/sortable",
+    "name": "Sortable Lists - Core Concepts - dnd kit",
+    "snippet": "A sortable element is both Droppable and Draggable, which means you can drag it and drop it to reorder. First, create a DragDropManager instance and use it ...",
+    "host_name": "dndkit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dndkit.com/react/guides/sortable-state-management",
+    "name": "Managing Sortable State - React - dnd kit",
+    "snippet": "Learn how to manage sortable state using the move helper or manual state management, including integration with external state libraries like React Query, ...",
+    "host_name": "dndkit.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=dL5SOdgMbRY",
+    "name": "React Drag And Drop (dnd-kit) | Beginners Tutorial - YouTube",
+    "snippet": "The focus is on creating a practical to-do list application, where users can add tasks and easily reorder them through drag-and-drop actions ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

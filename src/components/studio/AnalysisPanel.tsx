@@ -81,22 +81,25 @@ export function AnalysisPanel() {
 
   async function runSeparate(
     subject: string,
-    sceneLayers: { name: string; role: string; description: string }[]
+    sceneLayers: Array<{
+      name: string;
+      role: string;
+      description: string;
+      extractPrompt?: string;
+      depth: number;
+    }>
   ) {
     setStage("separating");
     setStatus("separating");
-    setProgress(70);
+    setProgress(65);
     try {
-      const foregroundLayer = sceneLayers.find(
-        (l) => l.role === "foreground"
-      );
       const res = await fetch("/api/separate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: originalUrl,
           subject,
-          foreground: foregroundLayer?.description,
+          layers: sceneLayers,
         }),
       });
       setProgress(90);
@@ -106,15 +109,18 @@ export function AnalysisPanel() {
       if (data.background) setBackground(data.background.url);
       if (data.depth) setDepthMap(data.depth.url);
 
-      // build final layer list with real asset URLs
+      // build final layer list — use extracted assets where available, else original
       const currentLayers = useAliveStore.getState().layers;
+      const extractedMap = new Map<string, string>();
+      for (const ex of data.extracted ?? []) {
+        extractedMap.set(ex.layerName, ex.url);
+      }
+
       const updatedLayers = currentLayers.map((l) => {
         if (l.role === "background" && data.background)
           return { ...l, url: data.background.url };
-        if (l.role === "subject") return { ...l, url: originalUrl };
-        if (l.role === "midground") return { ...l, url: originalUrl };
-        if (l.role === "foreground" && data.foreground)
-          return { ...l, url: data.foreground.url };
+        const exUrl = extractedMap.get(l.name);
+        if (exUrl) return { ...l, url: exUrl };
         return { ...l, url: originalUrl };
       });
       setLayers(updatedLayers);
@@ -122,7 +128,7 @@ export function AnalysisPanel() {
       setStage("ready");
       setStatus("ready");
       setProgress(100);
-      toast.success("¡Capas listas! La imagen está viva.");
+      toast.success(`¡${updatedLayers.length} capas listas! La imagen está viva.`);
       // apply recommended preset
       const preset = useAliveStore.getState().analysis?.recommendedPreset;
       if (preset) applyPreset(preset as any);

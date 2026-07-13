@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.researchgate.net/publication/252551488_Depth_maps_Faster_higher_and_stronger",
+    "name": "(PDF) Depth maps: Faster, higher and stronger? - ResearchGate",
+    "snippet": "In this paper we present experimental evidence of the redundancy of depth maps for 3D visualization. To this end, we performed a series of statistical ...",
+    "host_name": "www.researchgate.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136620018.pdf",
+    "name": "[PDF] Depth Map Decomposition for Monocular Depth Estimation - ECVA",
+    "snippet": "Abstract. We propose a novel algorithm for monocular depth estima- tion that decomposes a metric depth map into a normalized depth map and scale features.",
+    "host_name": "www.ecva.net",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://asp-eurasipjournals.springeropen.com/articles/10.1186/1687-6180-2012-25",
+    "name": "Methods for depth-map filtering in view-plus-depth 3D video",
+    "snippet": "In this article, we study the problem of post-processing of depth maps degraded by improper estimation or by block-transform-based compression.",
+    "host_name": "asp-eurasipjournals.springeropen.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://itiis.org/digital-library/manuscript/file/20035/TIIS_Vol5No11P17November2011.pdf",
+    "name": "[PDF] Effects of Depth Map Quantization for Computer-Generated",
+    "snippet": "This paper presents the effects of depth map quantization for multiview intermediate image generation using depth image-based rendering (DIBR).",
+    "host_name": "itiis.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://link.springer.com/article/10.1186/1687-6180-2012-25",
+    "name": "Methods for depth-map filtering in view-plus-depth 3D video",
+    "snippet": "In this article, we study the problem of post-processing of depth maps degraded by improper estimation or by block-transform-based compression.",
+    "host_name": "link.springer.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2104.04678v2",
+    "name": "A Versatile Depth Video Encoding Scheme Based on Low-rank",
+    "snippet": "In this paper, we introduce a novel low-complexity scheme for depth video compression based on low-rank tensor decomposition and HEVC intra ...",
+    "host_name": "arxiv.org",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://fishbain.net.technion.ac.il/files/2024/12/Depth-Map-Manipulation-for-3D-Visualization.pdf",
+    "name": "[PDF] Depth Map Manipulation for 3D Visualization - Barak Fishbain",
+    "snippet": "Using depth maps for 3D visualization is superior to acquiring a stereo video stream in that that it allows transformations on the depth and ...",
+    "host_name": "fishbain.net.technion.ac.il",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mdpi.com/2072-4292/15/12/2970",
+    "name": "DDL-MVS: Depth Discontinuity Learning for Multi-View Stereo",
+    "snippet": "We introduce a technique to regularize the depth map by incorporating an estimated boundary map. Our approach distinguishes itself from DEF-MVSNet [38] in terms ...",
+    "host_name": "www.mdpi.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

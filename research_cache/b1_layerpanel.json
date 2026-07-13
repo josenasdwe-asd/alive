@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.figma.com/community/plugin/1580507266892253595/layer-reorder-arrange-layers-by-canvas",
+    "name": "Layer Reorder - Arrange Layers by Canvas - Figma",
+    "snippet": "This plugin automatically sorts all frames, Sections, and nested Sections so that the Layers Panel matches the visual order on your canvas.",
+    "host_name": "www.figma.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=kUJmlSneBVE",
+    "name": "How to Reorder Layers in Figma [2026 Full Guide] - YouTube",
+    "snippet": "... Figma, Figma Tutorial, Figma Guide, Figma Layer Hierarchy, Move Layers Figma, Professional UI Design, Figma Admin Settings, Digital Workflow ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.figma.com/ko-kr/community/plugin/767379414704079825/sort-layers",
+    "name": "Sort Layers - Figma",
+    "snippet": "Randomize the sort order of the selected layers. Reposition Layers by Layer Order. Reposition the selected layers based on their order in the Layers panel.",
+    "host_name": "www.figma.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://polotno.com/sdk/product/features/canvas-editor",
+    "name": "Enable drag-and-drop canvas editing to your product - Polotno",
+    "snippet": "Layers panel. Organize, reorder, lock, or hide elements using a full layers panel. It provides a structured view of every canvas object — text, image, video ...",
+    "host_name": "polotno.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.captain-design.com/blog/figma-tips-reorder-your-layers",
+    "name": "Figma Tips - Reorder your layers - Captain Design",
+    "snippet": "Right-click to open the Context menu. · Choose Bring to front to move your layer to the top,.",
+    "host_name": "www.captain-design.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://help.figma.com/hc/en-us/articles/360039832014-Design-prototype-and-explore-layer-properties-in-the-right-sidebar",
+    "name": "Design, prototype, and explore layer properties in the right sidebar",
+    "snippet": "Tip: You can also add interactions directly on the canvas by selecting the Prototype tab, then clicking and dragging connections between objects. Learn more ...",
+    "host_name": "help.figma.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=-ep4J72cvUc",
+    "name": "#01: Figma Layers Panel Tips - YouTube",
+    "snippet": "Figma is fast becoming one of the industry's favorite design and prototype tools. In this series of videos Kezz Bracey will walk you through ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.figma.com/community/plugin/1549672217295099991/layer-sorter",
+    "name": "Layer Sorter - Figma",
+    "snippet": "Layer Sorter helps you keep your Figma files clean and easy to manage. Sort layers visually from left to right, top to bottom.",
+    "host_name": "www.figma.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

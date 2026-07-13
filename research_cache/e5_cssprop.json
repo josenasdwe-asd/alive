@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Animations/Animatable_properties",
+    "name": "Animatable CSS properties - MDN Web Docs - Mozilla",
+    "snippet": "Each property's animation type determines how values combine - interpolate, add, or accumulate - for this property.",
+    "host_name": "developer.mozilla.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=10OlgM6_JL0",
+    "name": "CSS @property Tutorial | Create Custom Animations Easily - YouTube",
+    "snippet": "... CSS variables and @property ✓ Understanding syntax, inherits, and initial-value ✓ How to register and control custom CSS properties ✓ How to ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://egghead.io/lessons/css-use-css-property-to-animate-and-transition-custom-properties",
+    "name": "Use CSS @property to Animate and Transition Custom  - Egghead.io",
+    "snippet": "In this lesson, we take a look at how to animate and transition custom properties with CSS Houdini @property.",
+    "host_name": "egghead.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/posts/utsavmeena_how-to-animate-custom-css-properties-activity-7461811642792570881-XfBa",
+    "name": "Animate Custom CSS Properties with @property - LinkedIn",
+    "snippet": "To animate them, you first need to register the custom property using `@property`, defining its type (like `<angle>`, `<color>`, or `<number>`) ...",
+    "host_name": "www.linkedin.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pqina.nl/blog/css-custom-property-mix-transition-animation",
+    "name": "Animating And Transitioning CSS Custom Properties - Pqina",
+    "snippet": "This code animates a CSS property, and transitions a custom CSS property. The transition property is used in the animation.",
+    "host_name": "pqina.nl",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

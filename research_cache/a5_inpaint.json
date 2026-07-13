@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.researchgate.net/publication/296475799_Spatio-temporal_consistent_depth-image-based_rendering_using_layered_depth_image_and_inpainting",
+    "name": "(PDF) Spatio-temporal consistent depth-image-based rendering",
+    "snippet": "In this paper, we propose a layered depth image (LDI) approach that improves the spatio-temporal consistency. In the process of LDI generation, ...",
+    "host_name": "www.researchgate.net",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://openaccess.thecvf.com/content_CVPR_2020/papers/Shih_3D_Photography_Using_Context-Aware_Layered_Depth_Inpainting_CVPR_2020_paper.pdf",
+    "name": "[PDF] 3D Photography Using Context-Aware Layered Depth Inpainting",
+    "snippet": "We start by lifting the image onto an LDI, i.e., creating a single layer everywhere and connecting every LDI pixel to its four cardinal neighbors. Since our ...",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=srvek4ucH-A",
+    "name": "Stable Diffusion Inpainting Tutorial - YouTube",
+    "snippet": "Stable Diffusion Inpainting Tutorial! If you're keen on learning how to fix mistakes and enhance your images using the Stable Diffusion ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scitepress.org/Papers/2025/130900/130900.pdf",
+    "name": "[PDF] D-LaMa: Depth Inpainting of Perspective-Occluded Environments",
+    "snippet": "A straightforward but also promising method for the occlusion problem is image inpainting, where the missing information within the image is masked and filled ...",
+    "host_name": "www.scitepress.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://patents.google.com/patent/EP4150560A1/en",
+    "name": "EP4150560A1 - Single image 3d photography with soft-layering and",
+    "snippet": "The soft background disocclusion mask may be used by an inpainting model to inpaint disoccluded background regions of the monocular image and the depth image, ...",
+    "host_name": "patents.google.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/html/2605.30987v1",
+    "name": "Benchmarking Single-Step Inpainting Methods for Multi-Object 3D",
+    "snippet": "The tasks of object removal and inpainting 3D Gaussian Splatting (3DGS) scenes face challenges such as 3D consistency across camera views.",
+    "host_name": "arxiv.org",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/comfyui/comments/1g6xrn6/inpainting_behind_objects_in_depthflow_animation",
+    "name": "Inpainting behind objects in DepthFlow animation? : r/comfyui - Reddit",
+    "snippet": "I've been trying out the DepthFlow nodes lately to do some basic parallax-style animations based on still images. I'm struggling to make it ...",
+    "host_name": "www.reddit.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/thygate/stable-diffusion-webui-depthmap-script/discussions/50",
+    "name": "3D Photography using Context-aware Layered Depth Inpainting #50",
+    "snippet": "Is there any way to re-use the code you have implemented for filling the gaps in stereo image pairs as inpainting color information for the 3d-photo-inpainting ...",
+    "host_name": "github.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

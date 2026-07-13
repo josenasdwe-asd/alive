@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://konvajs.org/docs/select_and_transform/Basic_demo.html",
+    "name": "HTML5 Canvas Shape select, resize and rotate - Konva.js",
+    "snippet": "Learn how to select, resize, and rotate shapes on HTML5 Canvas with Konva.js Transformer. Add interactive handles for resizing and rotating any shape.",
+    "host_name": "konvajs.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/79435394/how-to-transform-the-canvas-objects-while-keeping-opposite-side-fixed",
+    "name": "How to transform the canvas objects while keeping opposite side fixed?",
+    "snippet": "Implemented resizing using handles: I added multiple resize handles around the object. Each handle adjusts the width and height when dragged. HTML5 canvas, user drawing resize and rotate - Stack Overflow Resizing rotated rectangle on HTML canvas - Stack Overflow More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=5vxygxshTQ4",
+    "name": "Canvas - Transforms - Episode 6 - YouTube",
+    "snippet": "This video covers how you can use the scale, translate, and rotate methods with the HTML5 Canvas to change how your shapes, text, ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/rotate",
+    "name": "CanvasRenderingContext2D: rotate() method - Web APIs | MDN",
+    "snippet": "The CanvasRenderingContext2D.rotate() method of the Canvas 2D API adds a rotation to the transformation matrix.",
+    "host_name": "developer.mozilla.org",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://uploadcare.com/blog/resize-rotate-images-javascript",
+    "name": "Resize and rotate images using JavaScript - Uploadcare",
+    "snippet": "Learn to resize, rotate, zoom in and out images using JavaScript. Sample code included! Just copy, paste and tweak it!",
+    "host_name": "uploadcare.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gamedev.stackexchange.com/questions/172597/how-do-i-rotate-individual-shapes-on-an-html5-canvas",
+    "name": "How do I rotate individual shapes on an html5 canvas?",
+    "snippet": "I am doing a basic Asteroids clone as an intro to HTML5 canvas. I want to be able to rotate the main player while leaving the other objects on screen alone.",
+    "host_name": "gamedev.stackexchange.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.w3schools.com/graphics/canvas_transformations.asp",
+    "name": "HTML Canvas Transformations - W3Schools",
+    "snippet": "With transformations we can translate the origin to a different position, rotate and scale it. The six methods for transformations are: translate() - moves ...",
+    "host_name": "www.w3schools.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://konvajs.org/docs/vue/Transformer.html",
+    "name": "How to resize and rotate canvas shapes with Vue and Konva?",
+    "snippet": "Instructions: Click on a shape to select it. You can then resize and rotate it using the transformer handles. The shape will change color after transformation.",
+    "host_name": "konvajs.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

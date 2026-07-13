@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://openaccess.thecvf.com/content_CVPR_2020/papers/Shih_3D_Photography_Using_Context-Aware_Layered_Depth_Inpainting_CVPR_2020_paper.pdf",
+    "name": "[PDF] 3D Photography using Context-aware Layered Depth Inpainting - Meng-Li",
+    "snippet": "We use a Layered Depth Image with explicit pixel connectivity as underlying representation, and present a learning-based inpainting model that synthesizes new ...\nOnce inpainted, we merge the synthesized pixels back into the LDI (Section 3.4). Our method iteratively pro- ceeds in this manner until all depth edges have ...",
+    "host_name": "openaccess.thecvf.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.researchgate.net/publication/343461051_3D_Photography_Using_Context-Aware_Layered_Depth_Inpainting",
+    "name": "3D Photography Using Context-Aware Layered Depth",
+    "snippet": "3D Photo Inpainting produces a layered depth image from an input RGB-D image … to identify depth edges and inpaint color and depth behind them.\n3D Photography using Context-aware Layered Depth Inpainting ... We propose a method for converting a single RGB-D input image into a 3D photo - a multi-layer ...\nWe propose a method for converting a single RGB-D input image into a 3D photo - a multi-layer representation for novel view synthesis that contains hallucinated ...",
+    "host_name": "www.researchgate.net",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Zw-R3mhkGfQ",
+    "name": "3D Photography using Context aware Layered Depth Inpainting - YouTube",
+    "snippet": "This content isn't available. Mia Tang: 3D Photography using Context aware Layered Depth Inpainting. 337 views · 3 years ago ...more ...\nKavya Tummalapalli: Multi Flash Imaging Techniques for Edge Detection and Non Photorealistic... Carnegie Mellon Computational Imaging ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://leeyngdo.github.io/blog/computer-vision/2023-12-31-3d-photography",
+    "name": "[CV] 3D Photography - Youngdo Lee",
+    "snippet": "The Layered depth image (LDI) representation is a view of the scene from a single input camera view, incorporating multiple pixels along each ...",
+    "host_name": "leeyngdo.github.io",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://wandb.ai/authors/3D-Inpainting/reports/3D-Image-Inpainting-With-Weights-Biases--VmlldzoxNzIwNTY",
+    "name": "3D Image Inpainting With Weights & Biases - Wandb",
+    "snippet": "Layer Depth Image(LDI) Representation: In simple terms, an LDI is a view of the scene from a single input camera view, but with multiple pixels ...",
+    "host_name": "wandb.ai",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@jdseo/3d-photography-using-context-aware-layered-depth-inpainting-f1a9eec51d74",
+    "name": "3D Photography using Context-aware Layered Depth Inpainting - Medium",
+    "snippet": "Layered Depth Inpainting We propose a method for converting a single RGB-D input image into a 3D photo, i.e., a multi-layer representation\nWe propose a method for converting a single RGB-D input image into a 3D photo, ie, a multi-layer representation.",
+    "host_name": "medium.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://web.stanford.edu/class/cs231a/prev_projects_2021/finalreport-cs231a.pdf",
+    "name": "[PDF] 3D Photography using Layered Depth Imaging (LDI) and learning-based",
+    "snippet": "By using the technique called Layered. Depth Image with explicit pixel connectivity as underlying representation and a learning-based inpainting model as in-.\nImage Inpainting is a task of reconstructing missing re- gions in an image. It allows us to fill in missing regions in images with plausible content. It has ...\nIn the next step, we hope to improve the performance of our model by using depth edge as guidance and dilation heuristic as well as color inpainting model to ...",
+    "host_name": "web.stanford.edu",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://arxiv.org/abs/2004.04727",
+    "name": "3D Photography using Context-aware Layered Depth Inpainting - arXiv",
+    "snippet": "We propose a method for converting a single RGB-D input image into a 3D photo - a multi-layer representation for novel view synthesis.",
+    "host_name": "arxiv.org",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

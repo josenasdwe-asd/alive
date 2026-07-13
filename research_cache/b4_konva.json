@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/39102493/how-to-select-covered-objects-via-mouse-in-fabricjs",
+    "name": "How to select covered objects via mouse in fabricJS? - Stack Overflow",
+    "snippet": "I'm trying to develop a way to select objects that are layered below and (totally) covered by other objects. One idea is to select the top object and then via ... How to increase the selection area of a fabric Object? canvas and pattern fabric.js and perspective.js More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@www.blog4j.com/konva-js-vs-fabric-js-in-depth-technical-comparison-and-use-case-analysis-9c247968dd0f",
+    "name": "Konva.js vs Fabric.js: In-Depth Technical Comparison and Use",
+    "snippet": "Precise Hit Detection — Advanced algorithms ensure accurate event targeting even with complex transformed objects and irregular shapes.",
+    "host_name": "medium.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://konvajs.org/docs/faq.html",
+    "name": "Frequently Asked Questions | Konva - JavaScript Canvas 2d Library",
+    "snippet": "Konva uses a Stage → Layer → Shape hierarchy where each Layer is a separate <canvas> element for optimal rendering performance. Read the full overview →. Is ...",
+    "host_name": "konvajs.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.pkgpulse.com/guides/fabricjs-vs-konva-vs-pixijs-canvas-2d-graphics-2026",
+    "name": "Fabric.js vs Konva vs PixiJS: Canvas & 2D Graphics 2026 - PkgPulse",
+    "snippet": "Compare Fabric.js, Konva, and PixiJS for canvas-based 2D graphics in JavaScript. Object model, event handling, WebGL rendering, and which ...",
+    "host_name": "www.pkgpulse.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://fabric5.fabricjs.com/using-transformations",
+    "name": "Using transformations, Introduction to Fabric.js",
+    "snippet": "In this page we refer to matrix as an array of 6 numbers that represent a transformation on the plane and to point as a simple JS object.",
+    "host_name": "fabric5.fabricjs.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/fabricjs/fabric.js/discussions/6835",
+    "name": "Pan limits flickers · fabricjs fabric.js · Discussion #6835 - GitHub",
+    "snippet": "Hi I'm testing Fabric after testing Konva and I found at least one feature on Fabric that is 100% better than Konva that is the Textbox that allows to edit ...",
+    "host_name": "github.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/lico/react-comparison-of-js-canvas-libraries-konvajs-vs-fabricjs-1dan",
+    "name": "React: Comparison of JS Canvas Libraries (Konvajs vs Fabricjs)",
+    "snippet": "Konvajs has many features. It provides a library(react-konva) for React. Fabricjs : Create an instance using fabric.Rect and add it into canvas ...",
+    "host_name": "dev.to",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=SdBhBAcAH84",
+    "name": "FabricJs 6 and React Tutorial | Building a Dynamic Settings Panel",
+    "snippet": "... hit the notification bell! Let me know in the comments if there's something specific you'd like to learn next. #fabricjs #reactapp #javascript ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

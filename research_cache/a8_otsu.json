@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://en.wikipedia.org/wiki/Otsu%27s_method",
+    "name": "Otsu's method - Wikipedia",
+    "snippet": "Otsu's method, is used to perform automatic image thresholding. algorithm returns a single intensity threshold that separate pixels into two classes – ...",
+    "host_name": "en.wikipedia.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://scikit-image.org/docs/0.25.x/auto_examples/segmentation/plot_multiotsu.html",
+    "name": "Multi-Otsu Thresholding — skimage 0.25.2 documentation",
+    "snippet": "The multi-Otsu threshold [1] is a thresholding algorithm that is used to separate the pixels of an input image into several different classes, each one obtained",
+    "host_name": "scikit-image.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.mdpi.com/1099-4300/23/11/1429",
+    "name": "An Interval Iteration Based Multilevel Thresholding Algorithm for Brain",
+    "snippet": "In this paper, we propose an interval iteration multilevel thresholding method (IIMT). This approach is based on the Otsu method but iteratively searches ...",
+    "host_name": "www.mdpi.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://learnopencv.com/otsu-thresholding-with-opencv",
+    "name": "Otsu's Thresholding Technique | LearnOpenCV",
+    "snippet": "Image thresholding is used to binarize the image based on pixel intensities. Otsu's method is a global image thresholding algorithm. The method ...",
+    "host_name": "learnopencv.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.researchgate.net/publication/220587301_A_Fast_Algorithm_for_Multilevel_Thresholding",
+    "name": "A Fast Algorithm for Multilevel Thresholding. - ResearchGate",
+    "snippet": "In this paper, a faster version of Otsu's method is proposed for improving the efficiency of computation for the optimal thresholds of an image.",
+    "host_name": "www.researchgate.net",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scribd.com/document/787838147/Otsus-Method-and-Adaptive-Thresholding",
+    "name": "Otsu's Method and Adaptive Thresholding | PDF | Voxel - Scribd",
+    "snippet": "Adaptive thresholding addresses varying lighting by calculating different thresholds across the image. The thresholding is done on smaller, localized regions, ...",
+    "host_name": "www.scribd.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

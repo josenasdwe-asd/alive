@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=JGOzdcp0fNQ",
+    "name": "Build a React.js Timeline Video Trimmer Editor in Browser Using",
+    "snippet": "Build a React.js Timeline Video Trimmer Editor in Browser Using FFMPEG WASM & Fabric.js Using TS · Comments.",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.npmjs.com/search?q=keywords:video%20editor",
+    "name": "keywords:video editor - npm search",
+    "snippet": "A React Native module for VideoEditor SDK. Integrate the video editor into your own HTML5, iOS or Android app - in minutes!",
+    "host_name": "www.npmjs.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reactvideoeditor.com/features/timeline",
+    "name": "A Modular Video Timeline in React | RVE - React Video Editor",
+    "snippet": "Build professional-grade video editors in React with a powerful, drag-and-drop timeline. Designed for precision and performance, it lets users trim, snap, zoom, ...",
+    "host_name": "www.reactvideoeditor.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/react/comments/1bwv0nn/building_a_video_editor_that_allows_you_to_trim",
+    "name": "Building a video editor that allows you to trim videos : r/react - Reddit",
+    "snippet": "Building a timeline component and actually editing a video file are two worlds apart. I've done enough image editing/manipulation in Javascript, ...",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/xzdarcy/react-timeline-editor",
+    "name": "xzdarcy/react-timeline-editor - GitHub",
+    "snippet": "React Timeline Editor. npm version npm downloads. React Timeline Editor is a react component used to quickly build a timeline animation editor.",
+    "host_name": "github.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

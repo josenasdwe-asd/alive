@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   generateBackgroundPlate,
   generateDepthMap,
-  generateForegroundLayer,
+  extractElement,
 } from "@/lib/ai";
 import { readImageAsDataUrl, saveGeneratedImage } from "@/lib/image-utils";
 import path from "path";
@@ -10,13 +10,22 @@ import path from "path";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+interface SeparateBody {
+  url: string;
+  subject: string;
+  layers: Array<{
+    name: string;
+    role: string;
+    description: string;
+    extractPrompt?: string;
+    depth: number;
+  }>;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const {
-      url,
-      subject,
-      foreground,
-    }: { url: string; subject: string; foreground?: string } = await req.json();
+    const body: SeparateBody = await req.json();
+    const { url, subject, layers } = body;
 
     if (!url || !subject) {
       return NextResponse.json(
@@ -28,31 +37,60 @@ export async function POST(req: NextRequest) {
     const safeUrl = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
     const dataUrl = await readImageAsDataUrl(safeUrl);
 
-    // Run background plate + depth map in parallel (the two essential assets)
-    const tasks: Promise<unknown>[] = [
+    // Phase 1: essential assets in parallel (bg + depth)
+    const essential: Promise<unknown>[] = [
       generateBackgroundPlate(dataUrl, subject)
         .then((buf) => saveGeneratedImage(buf, "bg"))
-        .then((r) => ({ key: "background", ...r })),
+        .then((r) => ({ key: "background", ...r }))
+        .catch((e) => {
+          console.warn("[separate] background failed", e);
+          return null;
+        }),
       generateDepthMap(dataUrl, subject)
         .then((buf) => saveGeneratedImage(buf, "depth"))
-        .then((r) => ({ key: "depth", ...r })),
+        .then((r) => ({ key: "depth", ...r }))
+        .catch((e) => {
+          console.warn("[separate] depth failed", e);
+          return null;
+        }),
     ];
 
-    if (foreground) {
-      tasks.push(
-        generateForegroundLayer(dataUrl, foreground)
-          .then((buf) => saveGeneratedImage(buf, "fg"))
-          .then((r) => ({ key: "foreground", ...r }))
-          .catch((e) => {
-            console.warn("[separate] foreground failed", e);
-            return null;
-          })
+    // Phase 2: extract each non-background layer that has an extractPrompt
+    // Run up to 3 in parallel to avoid rate limiting
+    const extractTargets = (layers ?? [])
+      .filter(
+        (l) =>
+          l.role !== "background" &&
+          l.extractPrompt &&
+          l.depth > 0.25 // skip very-far midground that won't extract well
+      )
+      .slice(0, 5); // cap at 5 extractions to stay within rate limits
+
+    const extractResults: Array<{
+      layerName: string;
+      url: string;
+      filename: string;
+    }> = [];
+
+    // run extracts in batches of 2 to respect rate limits
+    for (let i = 0; i < extractTargets.length; i += 2) {
+      const batch = extractTargets.slice(i, i + 2);
+      const results = await Promise.allSettled(
+        batch.map(async (t) => {
+          const buf = await extractElement(dataUrl, t.extractPrompt!);
+          const r = await saveGeneratedImage(buf, `layer-${t.name.toLowerCase().replace(/\s+/g, "-")}`);
+          return { layerName: t.name, ...r };
+        })
       );
+      for (const r of results) {
+        if (r.status === "fulfilled") extractResults.push(r.value);
+        else console.warn("[separate] extract failed", r.reason);
+      }
     }
 
-    const results = (await Promise.allSettled(tasks)) as any[];
+    const essentialResults = (await Promise.allSettled(essential)) as any[];
     const out: Record<string, { url: string; filename: string } | null> = {};
-    for (const r of results) {
+    for (const r of essentialResults) {
       if (r.status === "fulfilled" && r.value) {
         out[r.value.key] = { url: r.value.url, filename: r.value.filename };
       }
@@ -60,17 +98,17 @@ export async function POST(req: NextRequest) {
 
     if (!out.background && !out.depth) {
       return NextResponse.json(
-        {
-          error: "Layer generation failed for all assets",
-          details: results.map((r) =>
-            r.status === "rejected" ? String(r.reason) : "ok"
-          ),
-        },
+        { error: "Layer generation failed for all essential assets" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, ...out });
+    return NextResponse.json({
+      success: true,
+      background: out.background,
+      depth: out.depth,
+      extracted: extractResults,
+    });
   } catch (err: any) {
     console.error("[separate] error", err);
     return NextResponse.json(

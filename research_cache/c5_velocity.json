@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=3RO5BtMiolo",
+    "name": "Parallax Part 5: Mouse Parallax - YouTube",
+    "snippet": "In the fifth installment of my Parallax deep dive, I go into parallax based on mouse movement. We also explore 3D element rotation as well ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/21885065/smooth-mouse-move-parallax",
+    "name": "Smooth mouse move parallax - Stack Overflow",
+    "snippet": "I want to achieve a gradual decay effect on the parallax when the mouse moves like the one on the following website. http://brightmedia.pl/. Most efficient way to implement mouse smoothing - Stack Overflow Improving Performance on Background Parallax Scrolling More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.npmjs.com/package/react-parallax-mouse",
+    "name": "react-parallax-mouse - npm",
+    "snippet": "A lightweight react component to add a mouse parallax effect to your website. Efficient and lag free animations optimized for performance.",
+    "host_name": "www.npmjs.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=E5NK61vO_sg",
+    "name": "Build Smooth Scrolling Parallax Effects with React & Framer Motion",
+    "snippet": "Animated UI components for React, Tailwind CSS, Framer Motion & More ✨ https://www.hover.dev Today we'll learn how to add smooth scrolling ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/17320-background-parallax-effect-on-mouse-move",
+    "name": "Background parallax effect on mouse move - GSAP",
+    "snippet": "Here is demo with delay before parallax effect happens. You can play with movement, timeout and ease effects to see what works best for you.",
+    "host_name": "gsap.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com/t/need-help-smoothing-out-my-mouse-look-solved/710168",
+    "name": "Need help smoothing out my mouse look. (SOLVED) - Unity Discussions",
+    "snippet": "Lerp is an easy way to do that and has nothing to do with Quaternions. Another way to do that is a time-smoothed average. You can get as ...",
+    "host_name": "discussions.unity.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

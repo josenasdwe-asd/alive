@@ -223,12 +223,57 @@
   inherits: false;
   initial-value: 0deg;
 }
+@property --twist {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 @property --float-y {
   syntax: "<length>";
   inherits: false;
   initial-value: 0px;
 }
 @property --drift-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --wave-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --jitter-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --jitter-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --glow {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --hue {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --focus {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --shadow-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --shadow-y {
   syntax: "<length>";
   inherits: false;
   initial-value: 0px;
@@ -243,6 +288,12 @@
   0%, 100% { --sway: -0.4deg; }
   50% { --sway: 0.4deg; }
 }
+@keyframes alive-twist {
+  0%, 100% { --twist: -1.2deg; }
+  25% { --twist: 0.8deg; }
+  50% { --twist: 1.2deg; }
+  75% { --twist: -0.8deg; }
+}
 @keyframes alive-float-y {
   0%, 100% { --float-y: -6px; }
   50% { --float-y: 6px; }
@@ -250,6 +301,37 @@
 @keyframes alive-drift-x {
   0%, 100% { --drift-x: -4px; }
   50% { --drift-x: 4px; }
+}
+@keyframes alive-wave {
+  0% { --wave-x: -8px; }
+  25% { --wave-x: 4px; }
+  50% { --wave-x: 8px; }
+  75% { --wave-x: -4px; }
+  100% { --wave-x: -8px; }
+}
+@keyframes alive-jitter {
+  0%   { --jitter-x: -1px; --jitter-y:  0px; }
+  20%  { --jitter-x:  1px; --jitter-y: -1px; }
+  40%  { --jitter-x:  0px; --jitter-y:  1px; }
+  60%  { --jitter-x: -1px; --jitter-y: -1px; }
+  80%  { --jitter-x:  1px; --jitter-y:  1px; }
+  100% { --jitter-x: -1px; --jitter-y:  0px; }
+}
+@keyframes alive-glow {
+  0%, 100% { --glow: 0; }
+  50% { --glow: 1; }
+}
+@keyframes alive-hue {
+  0% { --hue: 0deg; }
+  100% { --hue: 360deg; }
+}
+@keyframes alive-focus {
+  0%, 100% { --focus: 0px; }
+  50% { --focus: 3px; }
+}
+@keyframes alive-shadow {
+  0%, 100% { --shadow-x: 4px; --shadow-y: 4px; }
+  50% { --shadow-x: -4px; --shadow-y: -4px; }
 }
 
 @keyframes shimmer-sweep {
@@ -262,6 +344,24 @@
   90% { opacity: 0.5; }
   100% { transform: translateY(-120px) translateX(var(--p-drift, 10px)); opacity: 0; }
 }
+@keyframes snow-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  100% { transform: translate3d(var(--snow-drift, 20px), 110vh, 0) rotate(360deg); opacity: 0.2; }
+}
+@keyframes rain-fall {
+  0% { transform: translate3d(0, -10vh, 0); opacity: 0; }
+  10% { opacity: 0.5; }
+  100% { transform: translate3d(var(--rain-drift, -40px), 110vh, 0); opacity: 0; }
+}
+@keyframes godray-shimmer {
+  0%, 100% { opacity: 0.25; transform: translateX(0) scaleY(1); }
+  50% { opacity: 0.45; transform: translateX(8px) scaleY(1.05); }
+}
+@keyframes fog-drift {
+  0% { transform: translateX(-15%); }
+  100% { transform: translateX(15%); }
+}
 
 @keyframes spin-slow {
   to { transform: rotate(360deg); }
@@ -270,11 +370,20 @@
 /* utility to apply the stacked transform from custom properties */
 .alive-layer {
   transform: translate3d(var(--px, 0px), var(--py, 0px), 0)
-    translate3d(var(--drift-x, 0px), var(--float-y, 0px), 0)
+    translate3d(
+      calc(var(--drift-x, 0px) + var(--wave-x, 0px) + var(--jitter-x, 0px)),
+      calc(var(--float-y, 0px) + var(--jitter-y, 0px)),
+      0
+    )
     scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02)))
-    rotate(var(--sway, 0deg));
+    rotate(calc(var(--sway, 0deg) + var(--twist, 0deg)));
   transform-origin: center;
-  will-change: transform;
+  filter:
+    blur(calc(var(--focus, 0px) + var(--layer-blur, 0px)))
+    brightness(calc(1 + var(--glow, 0) * 0.25))
+    drop-shadow(var(--shadow-x, 0px) var(--shadow-y, 0px) 12px rgba(0,0,0,0.35))
+    hue-rotate(var(--hue, 0deg));
+  will-change: transform, filter;
 }
 
 /* reduced motion */
@@ -296,4 +405,20 @@
     linear-gradient(-45deg, transparent 75%, oklch(1 0 0 / 4%) 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* ===== Editor selection ring ===== */
+.alive-layer.selected::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1.5px solid oklch(0.7 0.15 165);
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px oklch(0.7 0.15 165 / 30%), 0 0 20px oklch(0.7 0.15 165 / 40%);
+}
+
+/* ===== Editor canvas handles ===== */
+.moveable-control-box {
+  --moveable-color: oklch(0.7 0.15 165) !important;
 }

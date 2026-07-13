@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://medium.com/data-science/image-quantization-with-k-means-db7127503bcb",
+    "name": "Image Quantization with K-Means - Medium",
+    "snippet": "In this tutorial, I will show you how to implement color quantization yourself with very few lines of code. We are going to use Python with scikit-learn, numpy ...",
+    "host_name": "medium.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kaggle.com/code/misterfour/k-means-clustering-image-quantization",
+    "name": "K-Means Clustering - Image Quantization - Kaggle",
+    "snippet": "K-Means is highly effective for image quantization (or color quantization), a process that reduces the number of distinct colors used in an image while ... Missing: 1D histogram",
+    "host_name": "www.kaggle.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dylannalex.github.io/image_quantization",
+    "name": "K-Means Clustering for Image Quantization - Dylan Tintenfich",
+    "snippet": "In this post we explore image quantization by applying the k-means algorithm to a sample flower image. We will explore how different values of k affects the ... Missing: depth 1D histogram",
+    "host_name": "dylannalex.github.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://machinelearningmastery.com/k-means-clustering-in-opencv-and-application-for-color-quantization",
+    "name": "K-Means Clustering in OpenCV and Application for Color Quantization",
+    "snippet": "In this tutorial, you will learn how to apply OpenCV's k-means clustering algorithm for color quantization of images. Missing: 1D histogram",
+    "host_name": "machinelearningmastery.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://towardsdatascience.com/image-segmentation-with-k-means-clustering-1bc53601f033",
+    "name": "Image Segmentation With K-Means Clustering | Towards Data Science",
+    "snippet": "The machine learning technique powering this process is known as clustering. It's a process used to identify clusters, or groups, within a dataset.",
+    "host_name": "towardsdatascience.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.devgenius.io/color-quantization-using-k-means-clustering-in-python-bccbd99f648c",
+    "name": "Color Quantization Using K-Means Clustering in Python - DevGenius.io",
+    "snippet": "Color quantization using k-means clustering is a powerful technique to reduce the number of colors in an image while maintaining its overall appearance. Missing: histogram | Show results with: histogram",
+    "host_name": "blog.devgenius.io",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tita.lecturer.pens.ac.id/KDD/04-05.%20Clustering/referensi/04-05.%20K-Means%20Clustering_%20Python%20Implementation%20from%20Scratch.pdf",
+    "name": "[PDF] K-Means Clustering: Python Implementation from Scratch",
+    "snippet": "The main objective of the K-Means algorithm is to minimize the sum of distances between the data points and their respective cluster's centroid. The scope of ...",
+    "host_name": "tita.lecturer.pens.ac.id",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.idtools.com.au/segmentation-using-k-means-clustering-in-python-2",
+    "name": "Segmentation using k-means clustering in Python",
+    "snippet": "Segmentation using k-means clustering in Python Segmentation is a common procedure for feature extraction in images and volumes. Segmenting an image. Missing: depth | Show results with: depth",
+    "host_name": "www.idtools.com.au",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

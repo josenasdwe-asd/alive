@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://dev.to/andresclua/let-it-flow-effortless-noise-animation-for-the-dom-4aca",
+    "name": "Let It Flow – Effortless Noise Animation for the DOM",
+    "snippet": "PerlinDOM is a super lightweight (less than 1 kB gzipped), zero-dependency JavaScript library that gives any HTML element natural, Perlin-style ...",
+    "host_name": "dev.to",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://totemgame.wordpress.com/2014/01/11/simplex-curl-noise-for-real-time-particle-systems",
+    "name": "Simplex Curl Noise for Real-Time Particle Systems - TOTM",
+    "snippet": "We found our ideal candidate for turbulence in a method called Curl Noise by Robert Bridson et al. that we since implemented using Ken Perlin's ...",
+    "host_name": "totemgame.wordpress.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Qf4dIN99e2w",
+    "name": "Perlin Noise in p5.js - YouTube",
+    "snippet": "In this new multi-part Perlin Noise Tutorial, I show you what Perlin noise is and how it can be used in creative coding, more specifically ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/10510828/porting-classic-perlin-noise-to-javascript-getting-periodic-pattern-why-jsfi",
+    "name": "Porting classic Perlin Noise to JavaScript: Getting periodic pattern",
+    "snippet": "How does linear interpolation work in classic Perlin noise? 2 · JavaScript Noise Function Problems · 3 · I cannot generate smooth Simplex noise ... What's the difference between Perlin and Simplex noise? - Stack Overflow perlin simplex worley noise libraries for tiling in javascript or HTML5 in ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Simplex_noise",
+    "name": "Simplex noise - Wikipedia",
+    "snippet": "Simplex noise is the result of an n-dimensional noise function comparable to Perlin noise (\"classic\" noise) but with fewer directional artifacts, in higher ...",
+    "host_name": "en.wikipedia.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://thirafi.com/en/blog/perlin-noise",
+    "name": "Manipulating Perlin Noise for Organic Procedural Animations - Thirafi Dide",
+    "snippet": "Essentially, perlin noise start with a grid of random vectors. These should be a normal vector (vector with a length of 1). These vectors are ...",
+    "host_name": "thirafi.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

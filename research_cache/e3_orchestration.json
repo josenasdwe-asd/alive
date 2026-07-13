@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://gsap.com/community/forums/topic/40358-usegsap-with-advanced-timeline-orchestration",
+    "name": "useGSAP with Advanced Timeline Orchestration - GSAP",
+    "snippet": "In a complex react application using the passing down a timeline prop outline here, what is the best / correct way to orchestrate animations ...",
+    "host_name": "gsap.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/resources/getting-started/Staggers",
+    "name": "Staggers | GSAP | Docs & Learning",
+    "snippet": "If you haven't tried creating staggered animations in GSAP yet, you're in for a treat - Staggers are totally configurable and SUPER powerful.",
+    "host_name": "gsap.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://annnimate.com/learn/timeline/gsap-timeline",
+    "name": "GSAP Timeline - Annnimate",
+    "snippet": "gsap.timeline() creates a sequenced container for multiple tweens. Each child tween starts when the previous one ends by default, but the position parameter, ...",
+    "host_name": "annnimate.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=6r-mUIPO4e0&vl=en",
+    "name": "GSAP Timeline Mastery: Create Professional Animations with Nesting",
+    "snippet": "Master GSAP Timeline and learn how to create complex, professional animations through timeline nesting ... sequences using add() method ✓ ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/28787-stagger-timelines",
+    "name": "Stagger Timelines - GSAP",
+    "snippet": "I'm having a hard time trying to figure how to launch multiple timelines in a sequence with interval (or staggered). I have 30 times the same component.",
+    "host_name": "gsap.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

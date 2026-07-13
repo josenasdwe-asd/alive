@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=cUn9xdn9Mro",
+    "name": "Animating Drop Shadows - YouTube",
+    "snippet": "Learn how to use the drop-shadow CSS filter to smoothly animate an element's drop-shadow.",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/filter-function/drop-shadow",
+    "name": "drop-shadow() CSS function - MDN Web Docs",
+    "snippet": "A drop shadow is effectively a blurred, offset version of the input image's alpha mask, drawn in a specific color and composited below the image ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.kirupa.com/animations/animating_drop_shadows.htm",
+    "name": "Animating Drop Shadows - KIRUPA",
+    "snippet": "To animate our drop shadow, we have a great deal of flexibility. We can use CSS Animations, CSS Transitions, JS-based requestAnimationFrame Animations, or the ...",
+    "host_name": "www.kirupa.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.joshwcomeau.com/css/designing-shadows",
+    "name": "Designing Beautiful Shadows in CSS • Josh W. Comeau",
+    "snippet": "In this tutorial, we'll learn how to transform typical box-shadows into beautiful, life-like ones.",
+    "host_name": "www.joshwcomeau.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://egghead.io/lessons/egghead-use-css-filter-to-create-a-drop-shadow",
+    "name": "Use CSS filter to Create a Drop Shadow - Egghead.io",
+    "snippet": "In this lesson, we look at how you can use the CSS filter property to create a drop shadow effect around an element's content.",
+    "host_name": "egghead.io",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

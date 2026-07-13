@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://github.com/tweenjs/tween.js",
+    "name": "Tween.js - JavaScript/TypeScript animation engine · GitHub",
+    "snippet": "JavaScript (TypeScript) tweening engine for easy animations, incorporating optimised Robert Penner's equations. NPM Version CDNJS NPM Downloads Build and Tests.",
+    "host_name": "github.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://createjs.com/tweenjs",
+    "name": "TweenJS | A JavaScript library for tweening and animating HTML5",
+    "snippet": "A simple but powerful JavaScript library for tweening and animating HTML5 and JavaScript properties. Works stand-alone or integrated with EaselJS.",
+    "host_name": "createjs.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.npmjs.com/search?q=tweenjs",
+    "name": "tweenjs - npm search",
+    "snippet": "TweenJS is a simple tweening library for use in Javascript. It was developed to integrate well with the EaselJS library, but is not dependent on or specific ...",
+    "host_name": "www.npmjs.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://cdnjs.com/libraries/tweenjs",
+    "name": "tweenjs - Libraries - cdnjs - The #1 free and open source CDN built to",
+    "snippet": "TweenJS is a simple tweening library for use in Javascript. It was developed to integrate well with the EaselJS library, but is not dependent on or specific ...",
+    "host_name": "cdnjs.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/23283901/combining-easeljs-and-tweenjs-for-fade-over-time",
+    "name": "Combining EaselJS and TweenJS for Fade Over Time - Stack Overflow",
+    "snippet": "You need to ensure you update the stage during a tween, or whenever a property changes. Here is a quick fiddle using your code.",
+    "host_name": "stackoverflow.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

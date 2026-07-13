@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.instagram.com/reel/DTYUc7gDSlW",
+    "name": "Super slick and simple UI Scroll made in after effects using 2 pieces",
+    "snippet": "... each layer is made with Extended Ease Keyframes. Follow for more ... Need lightweight CSS-only animations that work without React -> Eldora.",
+    "host_name": "www.instagram.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=lY2TZXEgYUw",
+    "name": "Framer Motion (for React) #9 - Keyframes - YouTube",
+    "snippet": "JOIN THE GANG - https://www.youtube.com/channel/UCW5YeuERMmlnqo4oq8vwUpg/join ---------------------------------------- ‍   ‍   My Udemy ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/docs/react-animation",
+    "name": "React Animation | Keyframes, Transitions & Gestures - Motion.dev",
+    "snippet": "For cases that need sequencing, timeline scrubbing, or triggering animations from events outside React's render cycle, the useAnimate hook provides imperative ...",
+    "host_name": "motion.dev",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://keyframer.dev",
+    "name": "Keyframer.dev — Visual Animation Editor for React Native",
+    "snippet": "Drag keyframes, scrub to any frame, and watch the canvas update live. Set easing, duration, and stagger without leaving the timeline. 02. Instant code output.",
+    "host_name": "keyframer.dev",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/react.native.community/posts/1371718296297078",
+    "name": "Pure JS slider component with animation published - Facebook",
+    "snippet": "I am currently writing a code inside React component that animates while users are scrolling the page from top to bottom. What I want to happen ...",
+    "host_name": "www.facebook.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

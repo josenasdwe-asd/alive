@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.photopea.com/learn/layers",
+    "name": "Layers - Photopea",
+    "snippet": "Layers panel is the main place for working with the layer structure of the document. You can find it in the sidebar on the right.",
+    "host_name": "www.photopea.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.photopea.com/api",
+    "name": "Photopea API",
+    "snippet": "Every document opened in Photopea will have the File - Save option. After a user clicks it, document data are sent to your server in a HTTP request using POST ...",
+    "host_name": "www.photopea.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=u-XBctV7iuY",
+    "name": "Photopea: Layers, Basic Tools, and Saving - YouTube",
+    "snippet": "Learning how to open a file, work in layers, create shapes, add text, and save a file.",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.photopea.com/api/environment",
+    "name": "Environment - Photopea API",
+    "snippet": "Six flags to show / hide six items: Auto-Select, Transformation controls, Distances, Quick Save (Get PNG...), Vertical Align, Horizontal Align.",
+    "host_name": "www.photopea.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.scribd.com/document/781790340/3rd-Grading-Photopea",
+    "name": "Photopea: A Comprehensive User Guide | PDF - Scribd",
+    "snippet": "Changing the structure. You can drag and drop layers inside the Layers panel. This way, you can reorder layers (e.g. put the layers from the back to ...",
+    "host_name": "www.scribd.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

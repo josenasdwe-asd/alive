@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=lisZT8JIeKk",
+    "name": "SVG Turbulence Filter Animation [ CSS3 Creative Menu Hover Effects",
+    "snippet": "Let's take a look at CSS filters, specifically SVG turbulence animation (and displacement map) which apply 'perlin noise' effect to any HTML ... Missing: spider- verse",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://camillovisini.com/coding/simulating-hand-drawn-motion-with-svg-filters",
+    "name": "Simulating Hand-Drawn Motion with SVG Filters - Camillo Visini",
+    "snippet": "This effect uses an SVG filter combining feTurbulence and feDisplacementMap to simulate a boiling distortion on the image. You can control the ... Missing: spider- verse",
+    "host_name": "camillovisini.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2019/02/19/svg-filter-effects-creating-texture-with-feturbulence",
+    "name": "SVG Filter Effects: Creating Texture with <feTurbulence> - Codrops",
+    "snippet": "This filter primitive creates an image using the Perlin turbulence function. It allows the synthesis of artificial textures like clouds or marble. Missing: boiling spider- verse",
+    "host_name": "tympanus.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/74073741/ramp-in-and-out-svg-turbulence-filter",
+    "name": "Ramp in and out SVG turbulence filter - Stack Overflow",
+    "snippet": "The \"ramp up\" effect is the result of \"damping\" the alpha channel of the turbulence before it is fed to the displacement map. Alpha values are ... Missing: spider- verse\nThe \"ramp up\" effect is the result of \"damping\" the alpha channel of the turbulence before it is fed to the displacement map. Alpha values are ... Optimize svg filter turbulence to get better performance How to perfectly loop feTurbulence animation - svg More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=zu4Kw1EwTbs",
+    "name": "Line Boil Animation Using Turbulent Noise & Displacement Map in After",
+    "snippet": "Adobe After Effects CC 2025: How To Create A Line Boil Animation Using Turbulent Noise & Displacement Map Effect. This tutorial will show ... Missing: svg turbulence spider- verse",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/12735-displacement-mapping",
+    "name": "Displacement mapping - Banner Animation - GSAP",
+    "snippet": "If you are using SVG. You can use SVG displacement turbulence filter. You would basically be using the GSAP AttrPlugin to animate it. SVG ... Missing: boiling spider- verse",
+    "host_name": "gsap.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

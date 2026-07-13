@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://polotno.com/ai-info-page",
+    "name": "Polotno SDK – AI info",
+    "snippet": "It ships an embeddable React canvas editor, a programmatic API for code- or AI-driven design generation,",
+    "host_name": "polotno.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=ZYBaLpERWpI",
+    "name": "I Built a FREE Canva Clone in React Using Polotno Studio - YouTube",
+    "snippet": "Buy the Full Source Code of Application here: ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://polotno.com/docs/full-canvas-editor",
+    "name": "Full Canvas Editor | Polotno SDK Documentation",
+    "snippet": "Ready-to-ship editor with workspace, side panel, toolbar, zoom, and timeline. This is the default starting point for integrating ...",
+    "host_name": "polotno.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.usetools.design/tools/polotno",
+    "name": "Polotno | Usetools.Design",
+    "snippet": "Polotno is a JavaScript framework and SDK for building design editors — Canva-style canvas apps — inside your own product. It also offers Polotno Studio, a free ...",
+    "host_name": "www.usetools.design",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://orshot.com/blog/polotno-studio-alternative",
+    "name": "A Polotno Studio Alternative with Unlimited Loads and API - Orshot",
+    "snippet": "Free Dec 13, 2025 · Polotno is a solid JavaScript image editor SDK for building canvas editors. code gives you a full white-label design editor in your app.",
+    "host_name": "orshot.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/rutvik_panchal_b48b8efc56/building-an-open-source-polotno-alternative-canva-like-editor-53pp",
+    "name": "Building an Open-Source Polotno Alternative (Canva-like Editor)",
+    "snippet": "In the past few weeks, I built an open-source design editor that works similarly to Polotno — and decided to open-source it as OpenPolotno.",
+    "host_name": "dev.to",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  }
+]

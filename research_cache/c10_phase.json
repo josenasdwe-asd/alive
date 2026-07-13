@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://css-tricks.com/different-approaches-for-creating-a-staggered-animation",
+    "name": "Different Approaches for Creating a Staggered Animation - CSS-Tricks",
+    "snippet": "Animating elements, at its most basic, is fairly straightforward. Define the keyframes. Name the animation. Call it on an element.",
+    "host_name": "css-tricks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=a0a0Ka6gg8o",
+    "name": "Pro-Level Staggered Animation in Seconds! - YouTube",
+    "snippet": "... Each layer will start at a slightly different time, creating a polished, cascading look. In this video, we'll use a fixed delay of 5 frames ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.svgator.com/blog/offset-delay-motion-design",
+    "name": "Offset And Delay In Motion Design: A Complete Guide - SVGator",
+    "snippet": "Offset is the staggered timing between similar elements. Delay is an intentional pause before an animation starts. Offset staggers multiple ...",
+    "host_name": "www.svgator.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/docs/stagger",
+    "name": "Stagger the delay of multiple animations - Motion.dev",
+    "snippet": "A stagger animation delays each element in a group by a fixed amount, creating a cascading, wave, or ripple effect. How do I stagger from a different origin?",
+    "host_name": "motion.dev",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://docs.nosleepcreative.com/after-effects/cookbook/staggering",
+    "name": "Staggering - NoSleepCreative Wiki",
+    "snippet": "Staggering animation is one of the most common technique used in Motion Design. keyframes from one layer to another and offset the timing.",
+    "host_name": "docs.nosleepcreative.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

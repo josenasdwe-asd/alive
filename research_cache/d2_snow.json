@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://vincentgarreau.com/particles.js",
+    "name": "particles.js - A lightweight JavaScript library for creating particles",
+    "snippet": "Download. 40 particles. Default. Default; NASA; Bubble; Snow ...",
+    "host_name": "vincentgarreau.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://freefrontend.com/css-snow-effects",
+    "name": "CSS Snow Effects: Free Examples & Code Snippets - FreeFrontend",
+    "snippet": "Explore brilliant CSS snow effects to build atmospheric winter layouts. Find optimized, responsive particle templates utilizing native ...",
+    "host_name": "freefrontend.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=qK3cgD09Qf0",
+    "name": "Create Particle Effects With Particles.js - YouTube",
+    "snippet": "In this tutorial we will be looking at the Particle.js JavaScript library which allows us to create really cool particle systems and effects ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=8dfyqUlLcZw",
+    "name": "Particle Effect System Tutorial Snow Falling Animation - YouTube",
+    "snippet": "Learn to program a particle effect system on the canvas element using JavaScript. We demonstrate a snow fall particle effect using many tiny ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://cdnjs.com/libraries/tsparticles-preset-snow/1.42.2",
+    "name": "tsparticles-preset-snow - Libraries - cdnjs - The #1 free and open",
+    "snippet": "tsparticles-preset-snow. Easily create highly customizable particle animations and use them as animated backgrounds for your website.",
+    "host_name": "cdnjs.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

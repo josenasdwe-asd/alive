@@ -32,7 +32,7 @@ export async function imageToDataUrl(filePath: string): Promise<string> {
 export async function analyzeImage(dataUrl: string): Promise<SceneAnalysis> {
   const zai = await getZai();
 
-  const prompt = `You are a visual depth & composition expert. Analyze this image and decompose it into semantic depth layers for a parallax animation.
+  const prompt = `You are a visual depth & composition expert. Analyze this image and decompose it into MANY semantic depth layers for a high-quality parallax animation.
 
 Return ONLY a valid JSON object (no markdown, no prose) with this exact schema:
 {
@@ -42,22 +42,25 @@ Return ONLY a valid JSON object (no markdown, no prose) with this exact schema:
   "palette": ["#hex1", "#hex2", "#hex3", "#hex4"],
   "layers": [
     {
-      "name": "short layer name (e.g. Sky, Mountains, Subject, Foreground Grass)",
+      "name": "short layer name (e.g. Distant Sky, Clouds, Far Mountains, Near Hills, Trees, Subject, Foreground Grass)",
       "role": "background | midground | subject | foreground",
       "depth": <number 0..1, 0=farthest from camera, 1=closest>,
-      "description": "one short phrase describing this layer"
+      "description": "one short phrase describing this layer",
+      "extractPrompt": "a precise visual description of this element to isolate it (e.g. 'the snow-capped mountain peaks in the center', 'the person's face and torso', 'the green leaves in the bottom right')"
     }
   ],
-  "recommendedPreset": "dream | float | pulse | liquid | cinematic3d | shimmer | boil | kenburns"
+  "recommendedPreset": "dream | float | pulse | liquid | cinematic3d | shimmer | boil | kenburns | aurora | underwater | ethereal | noir | cosmic"
 }
 
 Rules:
-- Provide between 3 and 5 layers, ordered from farthest (background) to closest (foreground).
+- Provide between 6 and 8 layers, ordered from farthest (background) to closest (foreground).
+- Be GRANULAR: split scenes into as many distinct depth planes as possible. For a landscape: distant sky, clouds, far mountains, mid hills, near trees, subject, foreground ground, etc.
 - Exactly one layer must have role "subject" — the main focal element.
-- The "subject" layer should have the highest or second-highest depth.
-- "background" = sky, far landscape, walls. "midground" = mid-distance elements. "subject" = the focal subject. "foreground" = anything closer than the subject (foreground props, ground, plants).
+- The "subject" layer should have a high depth (0.6-0.9).
+- "background" = sky, far landscape, walls, distant elements. "midground" = mid-distance elements (hills, mid trees, furniture). "subject" = the focal subject. "foreground" = anything closer than the subject (foreground props, ground, plants, hands).
 - Depth values must be strictly increasing from first to last layer.
-- Choose recommendedPreset based on scene type: landscapes → cinematic3d or dream, portraits → float or shimmer, products → shimmer, illustrations → boil, abstract → liquid, scenes with strong depth → cinematic3d.
+- The extractPrompt for each non-background layer must be a precise description so an image-editing AI can isolate that element onto a transparent / flat background.
+- Choose recommendedPreset based on scene type: landscapes → cinematic3d or aurora, portraits → ethereal or float, products → shimmer, illustrations → boil, underwater/ocean → underwater, night/cosmic → cosmic, moody/dark → noir, abstract → liquid, dreamy → dream.
 - Respond with raw JSON only.`;
 
   const response = await zai.chat.completions.createVision({
@@ -100,10 +103,11 @@ function parseAnalysis(content: string): SceneAnalysis {
         : i === 0
           ? "background"
           : "midground") as SceneAnalysis["layers"][number]["role"],
-      depth: Math.max(0, Math.min(1, Number(l.depth ?? i / 4))),
+      depth: Math.max(0, Math.min(1, Number(l.depth ?? i / 8))),
       description: String(l.description ?? ""),
+      extractPrompt: l.extractPrompt ? String(l.extractPrompt) : undefined,
     }))
-    .slice(0, 5);
+    .slice(0, 10);
 
   // ensure exactly one subject
   if (!layers.some((l: any) => l.role === "subject") && layers.length > 0) {
@@ -119,6 +123,11 @@ function parseAnalysis(content: string): SceneAnalysis {
     "shimmer",
     "boil",
     "kenburns",
+    "aurora",
+    "underwater",
+    "ethereal",
+    "noir",
+    "cosmic",
   ];
   const preset = validPresets.includes(parsed.recommendedPreset)
     ? parsed.recommendedPreset
@@ -198,5 +207,27 @@ export async function generateForegroundLayer(
 
   const b64 = response.data?.[0]?.base64;
   if (!b64) throw new Error("No image returned from foreground generation");
+  return Buffer.from(b64, "base64");
+}
+
+/**
+ * Extract a single named element from the image as its own layer.
+ * Returns the element on a transparent / flat background so it can be composited.
+ */
+export async function extractElement(
+  dataUrl: string,
+  elementDescription: string
+): Promise<Buffer> {
+  const zai = await getZai();
+  const prompt = `Isolate ONLY the ${elementDescription} from this image. Show ONLY those elements on a flat solid neutral gray background (#7f7f7f). Remove everything else — no other objects, no background scene, no text. Preserve the original detail, color, lighting, and proportions of the isolated elements. The result is the ${elementDescription} floating centered on flat gray, ready to be used as a separate layer in a composite.`;
+
+  const response = await zai.images.generations.edit({
+    prompt,
+    images: [{ url: dataUrl }],
+    size: "1024x1024",
+  });
+
+  const b64 = response.data?.[0]?.base64;
+  if (!b64) throw new Error("No image returned from element extraction");
   return Buffer.from(b64, "base64");
 }

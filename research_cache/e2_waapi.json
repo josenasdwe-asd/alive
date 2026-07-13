@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.joshwcomeau.com/animation/css-vs-javascript",
+    "name": "CSS vs. JavaScript • Josh W. Comeau",
+    "snippet": "One of the most common questions around animation performance is whether JS-based animations are slower than CSS-based ones.",
+    "host_name": "www.joshwcomeau.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/CSS_JavaScript_animation_performance",
+    "name": "CSS and JavaScript animation performance - MDN Web Docs",
+    "snippet": "The fact is that, in most cases, the performance of CSS-based animations is almost the same as JavaScripted animations — in Firefox at least.",
+    "host_name": "developer.mozilla.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/57522499/javascript-web-animations-api-or-css-animation-keyframes",
+    "name": "Javascript Web Animations API or CSS Animation Keyframes?",
+    "snippet": "Both are good candidates to use in your project. However do note that the Web Animations API is not (yet) supported in Safari, so it will break there. CSS keyframe animation CPU usage is high, should it be this way? Performance of CSS Transitions vs. JS animation packages - Stack Overflow More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://css-tricks.com/comparison-animation-technologies",
+    "name": "A Comparison of Animation Technologies - CSS-Tricks",
+    "snippet": "Just check out this example from Dan Wilson which compares CSS keyframes and the web animation API. Performance seems to be on track to being ...",
+    "host_name": "css-tricks.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/magazine/web-animation-performance-tier-list",
+    "name": "The Web Animation Performance Tier List | Motion Magazine",
+    "snippet": "Learn what makes web animations fast, slow, and everything in between with our 2025 web animation performance tier list.",
+    "host_name": "motion.dev",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

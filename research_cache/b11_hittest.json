@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/12987177/html5-canvas-hit-testing-with-ispointinpath",
+    "name": "html - HTML5 canvas hit testing with isPointInPath() - Stack Overflow",
+    "snippet": "Make your canvas small, like 10x10. It should not affect the path calculation and it takes less memory. You can test out more complex path ... Checking if the Raycast hit, hits a layer from the LayerMask? canvas isPointInPath does not work with ctx.drawImage() - Stack Overflow More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath",
+    "name": "CanvasRenderingContext2D: isPointInPath() method - Web APIs",
+    "snippet": "The CanvasRenderingContext2D.isPointInPath() method of the Canvas 2D API reports whether or not the specified point is contained in the current path.",
+    "host_name": "developer.mozilla.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discussions.unity.com/t/solved-physics-raycast-reports-no-hits-with-layer/889213",
+    "name": "[Solved] Physics Raycast reports no hits with layer - Unity Discussions",
+    "snippet": "I am currently working on a program that uses raycast to detect if the player is looking at an interactable object and places a dot on the center of the screen. How to raycast onto a unity canvas ui image? Using Physics.Raycast to interact with canvas in WorldSpace (VR and ... More results from discussions.unity.com",
+    "host_name": "discussions.unity.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=KD_f-XbdIlk",
+    "name": "Advanced hit-test HTML Canvas tutorial - YouTube",
+    "snippet": "We do this advanced hit detection by using a multi-canvas technique and unique color codes for the pieces. In this way we can select a ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://konvajs.org/docs/events/Custom_Hit_Region.html",
+    "name": "HTML5 Canvas Custom Hit Detection Function Tutorial - Konva.js",
+    "snippet": "Learn how to define custom hit detection regions for HTML5 Canvas shapes with Konva.js. Override default hit areas with hitFunc for precise click detection.",
+    "host_name": "konvajs.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

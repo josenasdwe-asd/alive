@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.npmjs.com/package/simplex-noise",
+    "name": "simplex-noise - NPM",
+    "snippet": "simplex-noise.js is a simplex noise implementation in Javascript/TypeScript. It works in the browser and Node.js, using CommonJS and ES Modules.",
+    "host_name": "www.npmjs.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/13623663/i-cannot-generate-smooth-simplex-noise-in-javascript",
+    "name": "I cannot generate smooth Simplex noise in Javascript - Stack Overflow",
+    "snippet": "Try sampling simplexNoise.GenerateSimplexNoise(x * 0.05, y * 0.05, 5, 0.5) The problem may be that your samples are too far apart. Cannot get npm simplex-noise package import to work in JS project Can I use a 3-dimensional simplex noise implementation to generate ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://totemgame.wordpress.com/2014/01/11/simplex-curl-noise-for-real-time-particle-systems",
+    "name": "Simplex Curl Noise for Real-Time Particle Systems - TOTM",
+    "snippet": "Looking around the internet, I saw that some people don't use full 3D functions for curl noise, opting for one 2D function per dimension instead ...",
+    "host_name": "totemgame.wordpress.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/josephg/noisejs",
+    "name": "GitHub - josephg/noisejs: Javascript 2D Perlin & Simplex noise functions",
+    "snippet": "This is a simple library for 2d & 3d perlin noise and simplex noise in javascript. Noise is pretty. The library is pretty fast (10M queries / sec).",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://sourceforge.net/projects/simplex-noise-js.mirror",
+    "name": "Simplex Noise.js download | SourceForge.net",
+    "snippet": "Implements 2D, 3D, and 4D Simplex noise generation · Open-source and widely used in game development · Provides smooth and continuous random ...",
+    "host_name": "sourceforge.net",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

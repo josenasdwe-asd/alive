@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=lisZT8JIeKk",
+    "name": "SVG Turbulence Filter Animation [ CSS3 Creative Menu Hover Effects",
+    "snippet": "Let's take a look at CSS filters, specifically SVG turbulence animation (and displacement map) which apply 'perlin noise' effect to any HTML ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2019/02/19/svg-filter-effects-creating-texture-with-feturbulence",
+    "name": "SVG Filter Effects: Creating Texture with <feTurbulence> - Codrops",
+    "snippet": "This filter primitive creates an image using the Perlin turbulence function. It allows the synthesis of artificial textures like clouds or marble.",
+    "host_name": "tympanus.net",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feTurbulence",
+    "name": "<feTurbulence> - SVG - MDN Web Docs",
+    "snippet": "The <feTurbulence> SVG filter primitive creates an image using the Perlin turbulence function. It allows the synthesis of artificial textures like clouds or ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=XYdDiZa_O3k",
+    "name": "SVG Filters are Sick! Image Turbulence & Displacement Tutorial",
+    "snippet": "... SVG filters to create a very cool effect on some photographs. SVG filters are a huge topic that I'm excited to start covering here on the ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/79808186/how-do-i-use-this-svg-filter-as-an-animated-css-mask",
+    "name": "How do I use this SVG filter as an animated CSS mask?",
+    "snippet": "I want to put a horizontal line with a subtle moving-fog opacity effect beneath the headings on a webpage. I want the line itself to be ... Ramp in and out SVG turbulence filter - Stack Overflow Optimize svg filter turbulence to get better performance - Stack Overflow More results from stackoverflow.com\nThat's it — the <animate> tag makes the noise “breathe” over time, giving you that subtle fog shimmer. No JS needed. Have a good day! Share.",
+    "host_name": "stackoverflow.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]

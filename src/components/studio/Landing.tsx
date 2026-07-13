@@ -9,6 +9,7 @@ import {
   Cpu,
   Code2,
   ArrowRight,
+  Wind,
 } from "lucide-react";
 import { UploadZone } from "./UploadZone";
 import { PRESETS } from "@/lib/presets";
@@ -16,13 +17,18 @@ import { PRESETS } from "@/lib/presets";
 const FEATURES = [
   {
     icon: ScanSearch,
-    title: "Análisis VLM",
-    desc: "Un modelo de visión entiende la escena: sujeto, planos, paleta y mood.",
+    title: "Análisis VLM profundo",
+    desc: "La IA identifica 6-8 capas semánticas con su profundidad, paleta y mood.",
   },
   {
     icon: Layers,
-    title: "Desacople en capas",
-    desc: "Genera fondo inpaintado, mapa de profundidad y plano frontal con IA.",
+    title: "Editor de capas visual",
+    desc: "Arrastra, reordena, bloquea, duplica y transforma cada capa en el canvas.",
+  },
+  {
+    icon: MousePointer2,
+    title: "Extracción con IA",
+    desc: "Nombra cualquier elemento ('el perro') y la IA lo aísla como capa nueva.",
   },
   {
     icon: Cpu,
@@ -31,18 +37,23 @@ const FEATURES = [
   },
   {
     icon: Droplets,
-    title: "Líquido SVG",
-    desc: "feTurbulence + feDisplacementMap animado para distorsión orgánica.",
+    title: "12 efectos orgánicos",
+    desc: "Respira, balancea, twist, flota, onda, jitter, glow, hue, focus, sombra…",
   },
   {
-    icon: MousePointer2,
-    title: "Parallax con mouse",
-    desc: "Cada plano se mueve a su ritmo con damping spring suave.",
+    icon: Sparkles,
+    title: "Atmósfera procedural",
+    desc: "Niebla, nieve, lluvia, god rays, bokeh, light leak, grano de película.",
+  },
+  {
+    icon: Wind,
+    title: "Física spring por capa",
+    desc: "Inercia, velocidad del mouse y fase única — cada capa respira a su ritmo.",
   },
   {
     icon: Code2,
     title: "Exporta código",
-    desc: "HTML/CSS/JS autocontenido o componente React con framer-motion.",
+    desc: "HTML/CSS/JS autocontenido o React TSX con framer-motion.",
   },
 ];
 
@@ -147,7 +158,7 @@ export function Landing() {
       <section className="px-4 py-12 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-2 text-center text-2xl font-semibold tracking-tight">
-            8 presets soñadores
+            13 presets soñadores
           </h2>
           <p className="mx-auto mb-8 max-w-md text-center text-sm text-muted-foreground">
             Cada preset combina múltiples animaciones sutiles con duraciones

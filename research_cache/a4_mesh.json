@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://stackoverflow.com/questions/46696561/get-modified-mesh-displaced-by-displacementmap-in-three-js",
+    "name": "Get modified mesh displaced by displacementMap in three.js",
+    "snippet": "I am trying to get back and export the mesh that is being displaced by a displacementMap. The shader is transforming vertexes according to this line. Threejs make a displaced mesh (terrain model) [closed] Uniform vertex displacement for skinned mesh shader (Animated ... More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://discourse.threejs.org/t/discontinuous-normals-on-a-normalized-cube-mesh-with-displacement-texture/53874",
+    "name": "Discontinuous Normals on a Normalized Cube Mesh with",
+    "snippet": "In my project, I have created a normalized cube using six plane meshes. To improve its visual quality, I added a displacement texture and ... MeshPhongMaterial displacementMap / normalMap - three.js forum Using a displacementMap to modify the (top) face of a cube More results from discourse.threejs.org",
+    "host_name": "discourse.threejs.org",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=-U8VoJusPhs",
+    "name": "Threejs TypeScript : DisplacementMap - YouTube",
+    "snippet": "... mesh. The value of each pixel is used to change the position of the vertices of the mesh. #threejsdisplacementmap. Threejs TypeScript ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://sbcode.net/threejs/displacmentmap",
+    "name": "DisplacementMap - Three.js Tutorials",
+    "snippet": "A displacement map is an image that can be used to alter the geometry of a mesh. The value of each pixel is used to change the position of the vertices of the ...",
+    "host_name": "sbcode.net",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2024/11/27/creating-dynamic-terrain-deformation-with-react-three-fiber",
+    "name": "Creating Dynamic Terrain Deformation with React Three Fiber",
+    "snippet": "In this tutorial, we will explore how to dynamically deform terrain, a feature widely used in modern games.",
+    "host_name": "tympanus.net",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/peter3riding/normal-maps-vs-displacement-maps-in-threejs-what-beginners-get-wrong-3nnk",
+    "name": "Normal Maps vs Displacement Maps in Three.js - DEV Community",
+    "snippet": "Displacement maps: Real depth, shadows, and occlusion, but require enough vertices to look good. Low-poly meshes will appear blocky. More ...",
+    "host_name": "dev.to",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=UaAX2_EToqk",
+    "name": "DepthTexture for Geometry with Three.js #49 - YouTube",
+    "snippet": "Learning how https://voiceofracism.co.nz/ was made. Skip middle to not see stressed developer =) 00:00 starting 29:00 made a mistake, ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://catlikecoding.com/unity/tutorials/advanced-rendering/surface-displacement",
+    "name": "Surface Displacement - Catlike Coding",
+    "snippet": "This tutorial follow Tessellation and combines it with vertex displacement to add more detail to geometry, on top of normal mapping.",
+    "host_name": "catlikecoding.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

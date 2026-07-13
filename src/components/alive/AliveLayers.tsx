@@ -299,10 +299,25 @@ function LayerPlane({
 
   const useLiquid =
     layerAnim.liquid && config.liquidEnabled && liquidFilterId;
-  const layerBlur = t.blur + layerAnim.blur;
+
+  // === 2.5D DOF: organic focus pull based on layer depth ===
+  // blur = aperture * |layer.depth - focusDepth| * maxBlur
+  // This emulates a real lens: layers far from focal plane get more blur
+  let dofBlur = 0;
+  if (config.dofEnabled && !config.reducedMotion) {
+    const focusDepth = config.focusMode === "object" && config.focusLayerId
+      ? (config.layers[config.focusLayerId] ? layer.depth : config.focusDepth)
+      : config.focusDepth;
+    const dist = Math.abs(layer.depth - focusDepth);
+    dofBlur = dist * config.aperture * 20; // max 20px blur at aperture=1
+  }
+
+  const layerBlur = t.blur + layerAnim.blur + dofBlur;
   ampVars["--layer-blur"] = `${layerBlur}px`;
 
-  const overscale = 1.08 + layer.depth * 0.04;
+  // === Scale-with-depth: layers auto-scale based on Z (Disguise "Scale with depth") ===
+  const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
+  const overscale = (1.08 + layer.depth * 0.04) * depthScale;
   const userScale = t.scale * overscale;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 

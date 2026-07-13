@@ -13,6 +13,7 @@ import { ControlPanel } from "./ControlPanel";
 import { EffectsPanel } from "./EffectsPanel";
 import { ExportPanel } from "./ExportPanel";
 import { HeroPanel } from "./HeroPanel";
+import { Pipeline25DPanel } from "./Pipeline25DPanel";
 import {
   Loader2,
   AlertCircle,
@@ -222,6 +223,7 @@ function RightPanelTabs({
         <>
           <PresetPicker />
           <ControlPanel />
+          <Pipeline25DPanel />
         </>
       )}
       {tab === "atmosphere" && <EffectsPanel />}

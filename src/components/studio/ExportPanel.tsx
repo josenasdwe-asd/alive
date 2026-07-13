@@ -5,30 +5,39 @@ import { Code2, Copy, Check, Download } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { generateHtml, generateReact, type ExportFormat } from "@/lib/export-code";
+import { generateHtml, generateReact, generate2p5d, type ExportFormat } from "@/lib/export-code";
 import { PRESET_MAP } from "@/lib/presets";
 
 export function ExportPanel() {
   const [format, setFormat] = useState<ExportFormat>("html");
   const [copied, setCopied] = useState(false);
 
-  const state = useAliveStore();
+  const animation = useAliveStore((s) => s.animation);
+  const layers = useAliveStore((s) => s.layers);
+  const originalUrl = useAliveStore((s) => s.originalUrl);
+  const backgroundUrl = useAliveStore((s) => s.backgroundUrl);
+  const depthMapUrl = useAliveStore((s) => s.depthMapUrl);
+  const width = useAliveStore((s) => s.width);
+  const height = useAliveStore((s) => s.height);
 
   const code = useMemo(() => {
-    if (!state.originalUrl) return "";
+    if (!originalUrl) return "";
     const params = {
-      config: state.animation,
-      layers: state.layers,
-      originalUrl: state.originalUrl,
-      backgroundUrl: state.backgroundUrl,
-      depthUrl: state.depthMapUrl,
-      foregroundUrl: state.layers.find((l) => l.role === "foreground")?.url,
-      width: state.width || 1024,
-      height: state.height || 640,
+      config: animation,
+      layers,
+      originalUrl,
+      backgroundUrl,
+      depthUrl: depthMapUrl,
+      foregroundUrl: layers.find((l) => l.role === "foreground")?.url,
+      width: width || 1024,
+      height: height || 640,
     };
-    return format === "html" ? generateHtml(params) : generateReact(params);
-  }, [format, state]);
+    return format === "html"
+      ? generateHtml(params)
+      : format === "react"
+        ? generateReact(params)
+        : generate2p5d(params); // json
+  }, [format, animation, layers, originalUrl, backgroundUrl, depthMapUrl, width, height]);
 
   const handleCopy = async () => {
     try {
@@ -42,19 +51,19 @@ export function ExportPanel() {
   };
 
   const handleDownload = () => {
-    const ext = format === "html" ? "html" : "tsx";
-    const mime = format === "html" ? "text/html" : "text/plain";
+    const ext = format === "html" ? "html" : format === "react" ? "tsx" : "json";
+    const mime = format === "html" ? "text/html" : "application/json";
     const blob = new Blob([code], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `alive-${state.animation.preset}.${ext}`;
+    a.download = `alive-${animation.preset}.${ext}`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Descargado alive-${state.animation.preset}.${ext}`);
+    toast.success(`Descargado alive-${animation.preset}.${ext}`);
   };
 
-  const presetName = PRESET_MAP[state.animation.preset]?.name ?? "";
+  const presetName = PRESET_MAP[animation.preset]?.name ?? "";
 
   return (
     <section className="glass rounded-xl p-4">
@@ -91,31 +100,47 @@ export function ExportPanel() {
         </div>
       </header>
 
-      <Tabs value={format} onValueChange={(v) => setFormat(v as ExportFormat)}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="html" className="text-xs">
-            HTML/CSS/JS
-          </TabsTrigger>
-          <TabsTrigger value="react" className="text-xs">
-            React (TSX)
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value={format} className="mt-3">
-          <div className="relative">
-            <div className="absolute right-2 top-2 z-10 rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] text-muted-foreground backdrop-blur">
-              {presetName} · {format === "html" ? "self-contained" : "framer-motion"}
-            </div>
-            <pre className="scroll-thin max-h-72 overflow-auto rounded-lg border border-white/5 bg-black/40 p-3 text-[11px] leading-relaxed">
-              <code className="font-mono text-foreground/90">{code}</code>
-            </pre>
-          </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            Reemplaza las URLs de las imágenes con tus assets en producción.
-            {format === "react" &&
-              " Requiere framer-motion instalado."}
-          </p>
-        </TabsContent>
-      </Tabs>
+      <div className="mb-3 grid w-full grid-cols-3 gap-1 rounded-lg border border-white/5 bg-white/[0.02] p-1">
+        <button
+          onClick={() => setFormat("html")}
+          className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+            format === "html" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          HTML
+        </button>
+        <button
+          onClick={() => setFormat("react")}
+          className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+            format === "react" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          React
+        </button>
+        <button
+          onClick={() => setFormat("json")}
+          className={`rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+            format === "json" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          .2p5d
+        </button>
+      </div>
+      <div className="relative">
+        <div className="absolute right-2 top-2 z-10 rounded-md bg-black/40 px-1.5 py-0.5 text-[10px] text-muted-foreground backdrop-blur">
+          {presetName} · {format === "html" ? "self-contained" : format === "react" ? "framer-motion" : "Disguise container"}
+        </div>
+        <pre className="scroll-thin max-h-72 overflow-auto rounded-lg border border-white/5 bg-black/40 p-3 text-[11px] leading-relaxed">
+          <code className="font-mono text-foreground/90">{code}</code>
+        </pre>
+      </div>
+      <p className="mt-2 text-[11px] text-muted-foreground">
+        {format === "json"
+          ? "Contenedor .2p5d (Disguise r26.3+). Importa en objects/2p5DFile y asigna a MR set backplate."
+          : "Reemplaza las URLs de las imágenes con tus assets en producción."}
+        {format === "react" &&
+          " Requiere framer-motion instalado."}
+      </p>
     </section>
   );
 }

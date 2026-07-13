@@ -543,6 +543,11 @@ export function buildAnimationFromPreset(
     colorGrade: "none",
     letterbox: false,
     gateWeave: false,
+    dofEnabled: false,
+    focusDepth: 0.5,
+    aperture: 0.3,
+    focusMode: "manual",
+    scaleWithDepth: true,
     layers,
     effects,
   };

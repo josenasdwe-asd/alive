@@ -1,7 +1,7 @@
-import type { AnimationConfig, ImageLayer } from "./types";
+import type { AnimationConfig, ImageLayer, P2_5DAsset } from "./types";
 import { PRESET_MAP } from "./presets";
 
-export type ExportFormat = "html" | "react";
+export type ExportFormat = "html" | "react" | "json";
 
 interface ExportParams {
   config: AnimationConfig;
@@ -352,4 +352,38 @@ function AlivePlane({
     </motion.div>
   );
 }`;
+}
+
+/**
+ * Generate a .2p5d container (Disguise-compatible JSON format).
+ * Encapsulates plates (color + depth), camera settings, and metadata.
+ */
+export function generate2p5d(params: ExportParams): string {
+  const { config, layers, originalUrl, backgroundUrl, depthUrl } = params;
+
+  const plates = layers.map((l, i) => ({
+    name: l.name,
+    colorUrl: l.url || originalUrl,
+    depthUrl: depthUrl,
+    depth: l.depth,
+    z: (l.depth - 0.5) * 800, // Z in px (-400..+400)
+    scale: config.scaleWithDepth ? 1 + l.depth * 0.15 : 1,
+    visible: l.transform.visible,
+    locked: l.transform.locked,
+  }));
+
+  const asset: P2_5DAsset = {
+    version: "1.0",
+    origin: { x: 0, y: 0, z: 0 },
+    fov: 45,
+    plates,
+    camera: {
+      fov: 45,
+      focusMode: config.focusMode,
+      focusDepth: config.focusDepth,
+      aperture: config.aperture,
+    },
+  };
+
+  return JSON.stringify(asset, null, 2);
 }

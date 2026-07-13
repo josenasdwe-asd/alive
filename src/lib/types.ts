@@ -202,6 +202,43 @@ export interface AnimationConfig {
   letterbox: boolean;
   /** gate weave (sub-pixel film jitter) */
   gateWeave: boolean;
+
+  // === 2.5D pipeline (Disguise-style) ===
+  /** DOF: organic focus pull based on layer depth (not baked blur) */
+  dofEnabled: boolean;
+  /** focus depth 0..1 (where the focal plane is in Z) */
+  focusDepth: number;
+  /** aperture 0..1 (higher = more bokeh/falloff) */
+  aperture: number;
+  /** focus mode: 'manual' = slider, 'object' = track a layer */
+  focusMode: "manual" | "object";
+  /** layer ID to track when focusMode = 'object' */
+  focusLayerId?: string;
+  /** scale-with-depth: layers auto-scale based on Z position */
+  scaleWithDepth: boolean;
+}
+
+/** .2p5d export format (Disguise-compatible container) */
+export interface P2_5DAsset {
+  version: string;
+  origin: { x: number; y: number; z: number };
+  fov: number;
+  plates: Array<{
+    name: string;
+    colorUrl: string;
+    depthUrl?: string;
+    depth: number;
+    z: number;
+    scale: number;
+    visible: boolean;
+    locked: boolean;
+  }>;
+  camera: {
+    fov: number;
+    focusMode: "manual" | "object";
+    focusDepth: number;
+    aperture: number;
+  };
 }
 
 export type ColorGrade =

@@ -85,6 +85,11 @@ const emptyAnim: AnimationConfig = {
   colorGrade: "none",
   letterbox: false,
   gateWeave: false,
+  dofEnabled: false,
+  focusDepth: 0.5,
+  aperture: 0.3,
+  focusMode: "manual",
+  scaleWithDepth: true,
 };
 
 const initialState: ProjectState = {

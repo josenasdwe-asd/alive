@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useAliveStore } from "@/lib/store";
 import { AliveLayers } from "./AliveLayers";
 import { AliveCSS3D } from "./AliveCSS3D";
+import { AliveKenBurns3D } from "./AliveKenBurns3D";
 import { LiquidFilter } from "./LiquidFilter";
 import { EffectOverlays } from "./EffectOverlays";
 import { ParticleCanvas } from "./ParticleCanvas";
@@ -31,29 +32,40 @@ export function HeroMode({ onExit }: HeroModeProps) {
     layers,
     animation: config,
     originalUrl,
+    backgroundUrl,
     depthMapUrl,
     textOverlay,
-    selectLayer,
-    updateLayerTransform,
   } = useAliveStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const liquidId = useId().replace(/:/g, "");
   const liquidFilterId = `liquid-${liquidId}`;
 
-  // scroll progress 0..1 over the hero's scroll range
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
+  // track scroll progress with MotionValue (more reliable than useScroll with target)
+  const scrollMV = useMotionValue(0);
+  const scrollNumRef = useRef(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      const clamped = Math.max(0, Math.min(1, progress));
+      scrollMV.set(clamped);
+      scrollNumRef.current = clamped;
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [scrollMV]);
 
-  // hero stays sticky for 1.5 viewport heights of scroll
-  const stageScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-  const stageOpacity = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1, 0.3]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
-  const textY = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const stageScale = useTransform(scrollMV, [0, 1], [1, 1.3]);
+  const stageOpacity = useTransform(scrollMV, [0, 0.7, 1], [1, 0.8, 0.2]);
+  const textOpacity = useTransform(scrollMV, [0, 0.3], [1, 0]);
+  const textY = useTransform(scrollMV, [0, 1], [0, -200]);
 
   const canWebGL = config.renderMode === "webgl" && !!depthMapUrl;
+  const canKenBurns3D = config.renderMode === "kenburns3d" && !!depthMapUrl;
+  // in hero mode, prefer KenBurns3D whenever a depth map is available
+  const useKenBurnsInHero = !!depthMapUrl;
   const hasCanvasParticles =
     config.effects.smoke || config.effects.fire || config.effects.embers;
 
@@ -83,10 +95,19 @@ export function HeroMode({ onExit }: HeroModeProps) {
           className="absolute inset-0"
           style={{ scale: stageScale, opacity: stageOpacity }}
         >
-          {canWebGL ? (
-            <div className="flex h-full w-full items-center justify-center bg-black text-white/40">
-              WebGL hero mode próximamente — usa CSS o 3D
-            </div>
+          {canKenBurns3D || useKenBurnsInHero ? (
+            <AliveKenBurns3D
+              imageUrl={originalUrl}
+              depthUrl={depthMapUrl!}
+              backgroundUrl={backgroundUrl}
+              intensity={config.intensity}
+              speed={config.speed}
+              chromaticAberration={config.chromaticAberration}
+              vignette={config.vignette}
+              parallaxEnabled={config.parallaxEnabled}
+              reducedMotion={config.reducedMotion}
+              scrollProgress={scrollMV}
+            />
           ) : config.renderMode === "css3d" ? (
             <AliveCSS3D
               layers={layers}

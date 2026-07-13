@@ -6,6 +6,7 @@ import type { AnimationConfig, ImageLayer } from "@/lib/types";
 import { AliveLayers } from "./AliveLayers";
 import { AliveCSS3D } from "./AliveCSS3D";
 import { AliveWebGL } from "./AliveWebGL";
+import { AliveKenBurns3D } from "./AliveKenBurns3D";
 import { LiquidFilter } from "./LiquidFilter";
 import { Particles } from "./Particles";
 import { ShimmerOverlay } from "./ShimmerOverlay";
@@ -17,6 +18,7 @@ interface AliveStageProps {
   layers: ImageLayer[];
   config: AnimationConfig;
   originalUrl: string;
+  backgroundUrl?: string;
   depthUrl?: string;
   framed?: boolean;
   aspectClass?: string;
@@ -33,6 +35,7 @@ export function AliveStage({
   layers,
   config,
   originalUrl,
+  backgroundUrl,
   depthUrl,
   framed = false,
   aspectClass = "aspect-[16/10]",
@@ -55,6 +58,7 @@ export function AliveStage({
   );
 
   const canWebGL = config.renderMode === "webgl" && !!depthUrl;
+  const canKenBurns3D = config.renderMode === "kenburns3d" && !!depthUrl;
 
   const hasCanvasParticles =
     config.effects.smoke || config.effects.fire || config.effects.embers;
@@ -80,7 +84,19 @@ export function AliveStage({
             : { duration: 0.3 }
         }
       >
-        {canWebGL ? (
+        {canKenBurns3D ? (
+          <AliveKenBurns3D
+            imageUrl={originalUrl}
+            depthUrl={depthUrl!}
+            backgroundUrl={backgroundUrl}
+            intensity={config.intensity}
+            speed={config.speed}
+            chromaticAberration={config.chromaticAberration}
+            vignette={config.vignette}
+            parallaxEnabled={config.parallaxEnabled}
+            reducedMotion={config.reducedMotion}
+          />
+        ) : canWebGL ? (
           <AliveWebGL
             imageUrl={originalUrl}
             depthUrl={depthUrl!}

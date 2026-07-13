@@ -35,6 +35,7 @@ export function Studio() {
     animation,
     originalUrl,
     originalDataUrl,
+    backgroundUrl,
     depthMapUrl,
     error,
     selectedLayerId,
@@ -77,6 +78,7 @@ export function Studio() {
                     layers={layers}
                     config={animation}
                     originalUrl={originalUrl}
+                    backgroundUrl={backgroundUrl}
                     depthUrl={depthMapUrl}
                     framed
                     aspectClass="aspect-[16/10]"

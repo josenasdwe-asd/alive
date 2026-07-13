@@ -184,6 +184,9 @@ export function AnalysisPanel() {
     setProgress(70);
     try {
       if (!analysis) throw new Error("No analysis");
+
+      // PRO MODE: 2 AI calls (depth + bg) then mathematical K-means slice
+      // instead of 5+ individual extractions that fail with 429
       const res = await fetchWithRetry("/api/separate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -191,32 +194,35 @@ export function AnalysisPanel() {
           url: originalUrl,
           subject: analysis.subject,
           layers: analysis.layers,
+          baseOnly: true, // only bg + depth, no per-element extraction
         }),
       });
-      setProgress(90);
+      setProgress(85);
       if (res.background) setBackground(res.background.url);
       if (res.depth) setDepthMap(res.depth.url);
 
-      const currentLayers = useAliveStore.getState().layers;
-      const extractedMap = new Map<string, string>();
-      for (const ex of res.extracted ?? []) extractedMap.set(ex.layerName, ex.url);
+      const depthUrl = useAliveStore.getState().depthMapUrl;
+      if (!depthUrl) throw new Error("No depth map available");
 
-      const updatedLayers = currentLayers.map((l) => {
-        if (l.role === "background" && res.background)
-          return { ...l, url: res.background.url, transform: { ...l.transform, visible: true } };
-        const exUrl = extractedMap.get(l.name);
-        if (exUrl)
-          return { ...l, url: exUrl, transform: { ...l.transform, visible: true } };
-        // no extraction for this layer — hide it (we don't have its real image)
-        return { ...l, url: "", transform: { ...l.transform, visible: false } };
+      // slice with AI-generated depth map (better quality than deterministic)
+      setProgress(92);
+      const sliceRes = await fetch("/api/slice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          originalUrl,
+          depthUrl,
+          k: 6,
+        }),
       });
-      setLayers(updatedLayers);
+      const sliceData = await sliceRes.json();
+      if (!sliceRes.ok) throw new Error(sliceData.error || "Slice failed");
 
-      setStage("ready");
-      setStatus("ready");
-      setPipelineStep("animate");
+      setSlicedLayers(sliceData.layers);
       setProgress(100);
-      toast.success(`¡${updatedLayers.length} capas extraídas con IA!`);
+      setStage("ready");
+      setPipelineStep("animate");
+      toast.success(`¡${sliceData.layers.length} capas PRO generadas!`);
       const preset = useAliveStore.getState().analysis?.recommendedPreset;
       if (preset) applyPreset(preset as any);
     } catch (err: any) {
@@ -329,9 +335,9 @@ export function AnalysisPanel() {
                 active={false}
                 onClick={runDepthSlice}
                 icon={<Cpu className="h-4 w-4" />}
-                title="Depth Slice"
-                badge="⚡ Rápido · 3s"
-                desc="K-means 1D sobre el mapa de profundidad + dilatación morfológica. Matemática pura, determinístico."
+                title="Quick Mode"
+                badge="⚡ Validación · 3s"
+                desc="Depth map determinístico (luminancia + gradiente) + K-means 1D. Para previz y bloqueo rápido de animación."
                 extra={
                   <div className="flex items-center gap-2 pt-1">
                     <span className="text-[10px] text-muted-foreground">
@@ -357,9 +363,9 @@ export function AnalysisPanel() {
                 active={false}
                 onClick={runAiExtract}
                 icon={<Sparkles className="h-4 w-4" />}
-                title="AI Extract"
-                badge="🎯 Profundo · 40s"
-                desc="Cada elemento semántico se aísla con IA. Más preciso semánticamente, más lento."
+                title="PRO Mode"
+                badge="🎯 Producción · 15s"
+                desc="Depth map IA + K-means con conciencia semántica. Separación limpia para rigging y sprites. Bordes refinados."
               />
             </div>
           </div>

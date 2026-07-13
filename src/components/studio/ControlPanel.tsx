@@ -108,7 +108,7 @@ export function ControlPanel() {
             <Cpu className="h-3.5 w-3.5" />
             Modo de render
           </Label>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-4 gap-1">
             <ModeButton
               active={config.renderMode === "css"}
               onClick={() => updateAnimation({ renderMode: "css" })}
@@ -119,13 +119,20 @@ export function ControlPanel() {
               active={config.renderMode === "css3d"}
               onClick={() => updateAnimation({ renderMode: "css3d" })}
               label="3D"
-              hint="Perspectiva Z"
+              hint="Perspectiva"
             />
             <ModeButton
               active={config.renderMode === "webgl"}
               onClick={() => updateAnimation({ renderMode: "webgl" })}
-              label="WebGL"
-              hint="Depth shader"
+              label="Depth"
+              hint="Shader"
+              disabled={!useAliveStore.getState().depthMapUrl}
+            />
+            <ModeButton
+              active={config.renderMode === "kenburns3d"}
+              onClick={() => updateAnimation({ renderMode: "kenburns3d" })}
+              label="3D KB"
+              hint="Point cloud"
               disabled={!useAliveStore.getState().depthMapUrl}
             />
           </div>

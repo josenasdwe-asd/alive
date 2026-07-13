@@ -179,8 +179,8 @@ export interface AnimationConfig {
   chromaticAberration: number;
   vignette: number;
   reducedMotion: boolean;
-  /** render mode: 'css' = Framer+SVG, 'css3d' = true 3D perspective, 'webgl' = depth shader */
-  renderMode: "css" | "css3d" | "webgl";
+  /** render mode: 'css' = Framer+SVG, 'css3d' = true 3D perspective, 'webgl' = depth shader, 'kenburns3d' = point cloud */
+  renderMode: "css" | "css3d" | "webgl" | "kenburns3d";
   /** global mouse smoothing */
   mouseSmoothing: number; // 0.01..0.3
   /** 3D perspective strength (for css3d mode) in px */

@@ -4,11 +4,13 @@ import { useId, useMemo } from "react";
 import { motion } from "framer-motion";
 import type { AnimationConfig, ImageLayer } from "@/lib/types";
 import { AliveLayers } from "./AliveLayers";
+import { AliveCSS3D } from "./AliveCSS3D";
 import { AliveWebGL } from "./AliveWebGL";
 import { LiquidFilter } from "./LiquidFilter";
 import { Particles } from "./Particles";
 import { ShimmerOverlay } from "./ShimmerOverlay";
 import { EffectOverlays } from "./EffectOverlays";
+import { ParticleCanvas } from "./ParticleCanvas";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -16,11 +18,8 @@ interface AliveStageProps {
   originalUrl: string;
   backgroundUrl?: string;
   depthUrl?: string;
-  /** show a thin frame around the stage (studio mode) */
   framed?: boolean;
-  /** aspect ratio class */
   aspectClass?: string;
-  /** editor mode enables layer selection + transform handles */
   editorMode?: boolean;
   selectedLayerId?: string;
   onSelectLayer?: (id: string) => void;
@@ -61,6 +60,10 @@ export function AliveStage({
     (l) => l.role === "foreground" && l.url
   )?.url;
 
+  // Determine if any canvas-particle effects are active
+  const hasCanvasParticles =
+    config.effects.smoke || config.effects.fire || config.effects.embers;
+
   return (
     <div
       className={`relative w-full ${aspectClass} overflow-hidden rounded-xl bg-black ${
@@ -93,6 +96,19 @@ export function AliveStage({
             parallaxEnabled={config.parallaxEnabled}
             reducedMotion={config.reducedMotion}
           />
+        ) : config.renderMode === "css3d" ? (
+          <AliveCSS3D
+            layers={layers}
+            config={config}
+            backgroundUrl={backgroundUrl}
+            originalUrl={originalUrl}
+            foregroundUrl={foregroundUrl}
+            liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
+            editorMode={editorMode}
+            selectedLayerId={selectedLayerId}
+            onSelectLayer={onSelectLayer}
+            onLayerTransform={onLayerTransform}
+          />
         ) : (
           <AliveLayers
             layers={layers}
@@ -117,10 +133,28 @@ export function AliveStage({
         />
       )}
 
-      {config.particlesEnabled && !config.reducedMotion && (
+      {/* CSS-based particles (dust motes) */}
+      {config.particlesEnabled && !config.reducedMotion && !hasCanvasParticles && (
         <Particles
           count={config.preset === "dream" ? 20 : 14}
           speed={config.speed}
+        />
+      )}
+
+      {/* Canvas 2D particle systems (Nivel 4) */}
+      {hasCanvasParticles && !config.reducedMotion && (
+        <ParticleCanvas
+          systems={{
+            smoke: config.effects.smoke,
+            fire: config.effects.fire,
+            embers: config.effects.embers,
+            dust: config.effects.dust,
+            snow: config.effects.snow,
+            rain: config.effects.rain,
+          }}
+          intensity={config.intensity}
+          speed={config.speed}
+          spawnPoint={{ x: 0.5, y: 0.85 }}
         />
       )}
 
@@ -130,7 +164,7 @@ export function AliveStage({
         intensity={config.intensity}
       />
 
-      {/* Effect overlays (fog, snow, rain, godrays, bokeh, etc) */}
+      {/* CSS-based effect overlays (fog, godrays, bokeh, etc) */}
       <EffectOverlays effects={config.effects} speed={config.speed} />
 
       <div
@@ -139,11 +173,11 @@ export function AliveStage({
         style={vignetteStyle}
       />
 
-      {/* chromatic aberration overlay (radial RGB split) */}
+      {/* chromatic aberration overlay */}
       {config.chromaticAberration > 0 && !canWebGL && (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 mix-blend-screen opacity-30"
+          className="pointer-events-none absolute inset-0 mix-blend-screen"
           style={{
             background:
               "radial-gradient(circle at center, transparent 30%, rgba(255,0,80,0.15) 70%, rgba(0,80,255,0.15) 100%)",

@@ -69,6 +69,8 @@ const emptyAnim: AnimationConfig = {
   reducedMotion: false,
   renderMode: "css",
   mouseSmoothing: 0.06,
+  perspective: 1000,
+  rotate3dStrength: 8,
   layers: {},
   effects: emptyEffects,
 };

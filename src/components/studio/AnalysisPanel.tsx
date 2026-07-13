@@ -57,26 +57,51 @@ export function AnalysisPanel() {
     setStatus("analyzing");
     setProgress(15);
     try {
-      const res = await fetch("/api/analyze", {
+      const data = await fetchWithRetry("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: originalUrl }),
       });
       setProgress(45);
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || "Analysis failed");
       setAnalysis(data.analysis);
       setStage("analyzed");
       setStatus("analyzed");
       setProgress(60);
       toast.success("Análisis completo — generando capas…");
-      // auto-run separation
       void runSeparate(data.analysis.subject, data.analysis.layers);
     } catch (err: any) {
       setStage("error");
       setStatus("error", err?.message);
       toast.error(err?.message ?? "Error en el análisis");
     }
+  }
+
+  /** fetch with retry + exponential backoff for 502/timeout resilience */
+  async function fetchWithRetry(
+    url: string,
+    opts: RequestInit,
+    maxRetries = 3
+  ): Promise<any> {
+    let lastErr: any;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const res = await fetch(url, opts);
+        if (res.status === 502 || res.status === 504 || res.status === 429) {
+          throw new Error(`Gateway ${res.status} — reintentando…`);
+        }
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || "Request failed");
+        return data;
+      } catch (err: any) {
+        lastErr = err;
+        if (attempt < maxRetries) {
+          const delay = (attempt + 1) * 3000 + Math.random() * 2000;
+          setProgress((p) => Math.max(p, 15 + attempt * 10));
+          await new Promise((r) => setTimeout(r, delay));
+        }
+      }
+    }
+    throw lastErr ?? new Error("Request failed after retries");
   }
 
   async function runSeparate(

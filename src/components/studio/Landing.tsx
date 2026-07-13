@@ -10,6 +10,7 @@ import {
   Code2,
   ArrowRight,
   Wind,
+  Flame,
 } from "lucide-react";
 import { UploadZone } from "./UploadZone";
 import { PRESETS } from "@/lib/presets";
@@ -27,13 +28,18 @@ const FEATURES = [
   },
   {
     icon: MousePointer2,
-    title: "Extracción con IA",
-    desc: "Nombra cualquier elemento ('el perro') y la IA lo aísla como capa nueva.",
+    title: "3 modos de render",
+    desc: "CSS multiplane · CSS 3D estereoscópico (translateZ real) · WebGL2 shader.",
   },
   {
     icon: Cpu,
     title: "WebGL2 depth shader",
     desc: "Parallax píxel-a-píxel con el mapa de profundidad. Calidad Immersity.",
+  },
+  {
+    icon: Flame,
+    title: "Partículas Canvas con física",
+    desc: "Humo, fuego y brasas reales con turbulencia simplex noise y mouse interactivo.",
   },
   {
     icon: Droplets,
@@ -49,11 +55,6 @@ const FEATURES = [
     icon: Wind,
     title: "Física spring por capa",
     desc: "Inercia, velocidad del mouse y fase única — cada capa respira a su ritmo.",
-  },
-  {
-    icon: Code2,
-    title: "Exporta código",
-    desc: "HTML/CSS/JS autocontenido o React TSX con framer-motion.",
   },
 ];
 

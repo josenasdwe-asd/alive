@@ -32,36 +32,9 @@ export async function imageToDataUrl(filePath: string): Promise<string> {
 export async function analyzeImage(dataUrl: string): Promise<SceneAnalysis> {
   const zai = await getZai();
 
-  const prompt = `You are a visual depth & composition expert. Analyze this image and decompose it into MANY semantic depth layers for a high-quality parallax animation.
-
-Return ONLY a valid JSON object (no markdown, no prose) with this exact schema:
-{
-  "sceneDescription": "one vivid sentence describing the scene",
-  "subject": "the main subject (the most important foreground element a viewer focuses on)",
-  "mood": "the emotional mood in 1-3 words",
-  "palette": ["#hex1", "#hex2", "#hex3", "#hex4"],
-  "layers": [
-    {
-      "name": "short layer name (e.g. Distant Sky, Clouds, Far Mountains, Near Hills, Trees, Subject, Foreground Grass)",
-      "role": "background | midground | subject | foreground",
-      "depth": <number 0..1, 0=farthest from camera, 1=closest>,
-      "description": "one short phrase describing this layer",
-      "extractPrompt": "a precise visual description of this element to isolate it (e.g. 'the snow-capped mountain peaks in the center', 'the person's face and torso', 'the green leaves in the bottom right')"
-    }
-  ],
-  "recommendedPreset": "dream | float | pulse | liquid | cinematic3d | shimmer | boil | kenburns | aurora | underwater | ethereal | noir | cosmic"
-}
-
-Rules:
-- Provide between 6 and 8 layers, ordered from farthest (background) to closest (foreground).
-- Be GRANULAR: split scenes into as many distinct depth planes as possible. For a landscape: distant sky, clouds, far mountains, mid hills, near trees, subject, foreground ground, etc.
-- Exactly one layer must have role "subject" — the main focal element.
-- The "subject" layer should have a high depth (0.6-0.9).
-- "background" = sky, far landscape, walls, distant elements. "midground" = mid-distance elements (hills, mid trees, furniture). "subject" = the focal subject. "foreground" = anything closer than the subject (foreground props, ground, plants, hands).
-- Depth values must be strictly increasing from first to last layer.
-- The extractPrompt for each non-background layer must be a precise description so an image-editing AI can isolate that element onto a transparent / flat background.
-- Choose recommendedPreset based on scene type: landscapes → cinematic3d or aurora, portraits → ethereal or float, products → shimmer, illustrations → boil, underwater/ocean → underwater, night/cosmic → cosmic, moody/dark → noir, abstract → liquid, dreamy → dream.
-- Respond with raw JSON only.`;
+  const prompt = `Decompose this image into 6-8 semantic depth layers for parallax animation. Return ONLY raw JSON (no markdown, no prose):
+{"sceneDescription":"one sentence","subject":"main focal subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"short name","role":"background|midground|subject|foreground","depth":0..1,"description":"short phrase","extractPrompt":"precise visual description to isolate this element"}],"recommendedPreset":"dream|float|pulse|liquid|cinematic3d|shimmer|boil|kenburns|aurora|underwater|ethereal|noir|cosmic"}
+Rules: 6-8 layers ordered far→near. Exactly one "subject" (depth 0.6-0.9). Depth strictly increasing. extractPrompt for each non-background layer must precisely describe that element for isolation. Preset: landscapes→cinematic3d/aurora, portraits→ethereal/float, night→cosmic, dark→noir, ocean→underwater, dreamy→dream.`;
 
   const response = await zai.chat.completions.createVision({
     messages: [

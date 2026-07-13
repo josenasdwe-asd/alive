@@ -1810,3 +1810,45 @@ Stage Summary:
 - Nueva feature: extracción de elemento custom con IA ("/api/extract-element" — el usuario nombra "el perro" y la IA lo aísla como capa).
 - 8 capas de atmósfera procedural (fog, snow, rain, god rays, bokeh, dust, light leak, grain).
 - Física spring por capa + mouse velocity influence + inertia + phase offset prima.
+
+---
+Task ID: v3 (Niveles 2 + 4)
+Agent: Main Builder v3 (Z.ai Code)
+Task: Subir a Nivel 2 (CSS 3D estereoscópico) y Nivel 4 (Canvas 2D partículas con física) + fix 502
+
+Work Log:
+- Fix 502 en /api/analyze: el gateway corta la conexión a ~30s pero el VLM tarda 30-40s. Solución: prompt VLM más conciso (de 30 líneas a 8) + retry en el cliente con backoff exponencial (3 reintentos, 3-5s entre cada) en fetchWithRetry que detecta 502/504/429.
+- Nivel 2 — CSS 3D estereoscópico (AliveCSS3D.tsx):
+  * Container con `perspective: Npx` + `transform-style: preserve-3d`
+  * Cada capa posicionada con `translateZ((depth-0.5) * 800px)` — Z real negativo/positivo
+  * Mouse rota el container: `rotateY(mouseX * rotate3dStrength) rotateX(-mouseY * rotate3dStrength)` con useSpring
+  * El navegador calcula la perspectiva matemáticamente correcta — parallax estereoscópico real
+  * Sliders de perspective (400-2000px) y rotación 3D (0-25°) en el ControlPanel
+  * Nuevo renderMode "css3d" en el selector (3 opciones: CSS / 3D / WebGL)
+- Nivel 4 — Canvas 2D con partículas y física real (ParticleCanvas.tsx):
+  * 6 tipos de partícula: smoke, fire, embers, dust, snow, rain
+  * Física con simplex noise 3D para turbulencia orgánica (createNoise3D de simplex-noise)
+  * Cada partícula tiene posición, velocidad, vida, tamaño, hue, alpha
+  * Smoke: sube con buoyancy, expande, se desvanece — gradiente radial gris
+  * Fire: sube rápido con screen blend, gradiente radial naranja-rojo, se encoge
+  * Embers: pequeñas chispas brillantes con shadowBlur, flotan con gravedad ligera
+  * Mouse influence: las partículas se alejan del cursor (radio 100px, fuerza proporcional)
+  * Spawn rate dinámico (120 * intensity * speed por segundo)
+  * Spawn disperso para fire/embers (campfire line effect, spread 0.3 en X)
+  * Canvas con z-index 100 para estar encima de las capas
+- Types expandido: EffectType ahora incluye smoke/fire/embers (canvas-based). AnimationConfig con perspective y rotate3dStrength.
+- EffectsPanel reorganizado: sección CSS (8 atmósferas) + sección "Partículas Canvas" (humo/fuego/brasas) con separador.
+- AliveStage actualizado: selecciona entre AliveLayers (CSS) / AliveCSS3D (3D) / AliveWebGL (WebGL) según renderMode. ParticleCanvas se activa cuando hay efectos smoke/fire/embers.
+- Landing actualizado: features mencionan "3 modos de render" y "Partículas Canvas con física".
+- Verificación Agent Browser:
+  * Paisaje montañoso: 6 capas analizadas, pipeline completó con retry ✓
+  * Modo 3D: controles de Perspectiva y Rotación 3D visibles, parallax estereoscópico al mover mouse ✓
+  * Partículas Canvas: Fuego + Brasas activados → 15-25 partículas visibles dispersas con brasas subiendo ✓
+  * 3 modos de render en selector (CSS Multiplane / 3D Perspectiva Z / WebGL Depth shader) ✓
+  * 0 errores, lint limpio ✓
+
+Stage Summary:
+- Fix 502: retry con backoff exponencial + prompt VLM más conciso.
+- Nivel 2 implementado: CSS 3D estereoscópico con translateZ real + preserve-3d + rotación del mouse. Parallax matemáticamente correcto.
+- Nivel 4 implementado: Canvas 2D con sistema de partículas (humo, fuego, brasas) con física simplex noise + mouse interactivo.
+- 3 modos de render seleccionables: CSS multiplane (Nivel 1) / CSS 3D (Nivel 2) / WebGL2 shader (Nivel 5).

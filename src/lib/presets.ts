@@ -26,7 +26,10 @@ export interface PresetMeta {
     | "vignette"
     | "renderMode"
     | "mouseSmoothing"
-  >;
+  > & {
+    perspective?: number;
+    rotate3dStrength?: number;
+  };
   effects?: Partial<Record<EffectType, boolean>>;
   /** whether this preset is "advanced" (v2) */
   v2?: boolean;
@@ -533,6 +536,8 @@ export function buildAnimationFromPreset(
     reducedMotion: false,
     renderMode: preset.base.renderMode,
     mouseSmoothing: preset.base.mouseSmoothing,
+    perspective: preset.base.perspective ?? 1000,
+    rotate3dStrength: preset.base.rotate3dStrength ?? 8,
     layers,
     effects,
   };

@@ -23,7 +23,11 @@ export type EffectType =
   | "bokeh"
   | "dust"
   | "lightleak"
-  | "grain";
+  | "grain"
+  // canvas-based particle effects (Nivel 4)
+  | "smoke"
+  | "fire"
+  | "embers";
 
 export type BlendMode =
   | "normal"
@@ -165,9 +169,14 @@ export interface AnimationConfig {
   chromaticAberration: number;
   vignette: number;
   reducedMotion: boolean;
-  renderMode: "css" | "webgl";
+  /** render mode: 'css' = Framer+SVG, 'css3d' = true 3D perspective, 'webgl' = depth shader */
+  renderMode: "css" | "css3d" | "webgl";
   /** global mouse smoothing */
   mouseSmoothing: number; // 0.01..0.3
+  /** 3D perspective strength (for css3d mode) in px */
+  perspective: number; // 600..2000
+  /** 3D rotation amount (for css3d mode) in deg */
+  rotate3dStrength: number; // 2..20
   layers: Record<string, LayerAnimationConfig>;
   /** effect-layer config (which procedural overlays are active) */
   effects: Record<EffectType, boolean>;
@@ -260,4 +269,7 @@ export const ALL_EFFECTS: EffectType[] = [
   "dust",
   "lightleak",
   "grain",
+  "smoke",
+  "fire",
+  "embers",
 ];

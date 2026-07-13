@@ -10,6 +10,7 @@ import {
   Gauge,
   Cpu,
   Accessibility,
+  RotateCw,
 } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { Label } from "@/components/ui/label";
@@ -107,21 +108,55 @@ export function ControlPanel() {
             <Cpu className="h-3.5 w-3.5" />
             Modo de render
           </Label>
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-3 gap-1.5">
             <ModeButton
               active={config.renderMode === "css"}
               onClick={() => updateAnimation({ renderMode: "css" })}
-              label="CSS + SVG"
-              hint="Framer + líquido"
+              label="CSS"
+              hint="Multiplane"
+            />
+            <ModeButton
+              active={config.renderMode === "css3d"}
+              onClick={() => updateAnimation({ renderMode: "css3d" })}
+              label="3D"
+              hint="Perspectiva Z"
             />
             <ModeButton
               active={config.renderMode === "webgl"}
               onClick={() => updateAnimation({ renderMode: "webgl" })}
-              label="WebGL2"
+              label="WebGL"
               hint="Depth shader"
-              disabled={!useAliveStore.getState().depthUrl}
+              disabled={!useAliveStore.getState().depthMapUrl}
             />
           </div>
+
+          {/* 3D controls (only for css3d mode) */}
+          {config.renderMode === "css3d" && (
+            <div className="space-y-2 rounded-lg border border-white/5 bg-white/[0.02] p-2.5">
+              <SliderRow
+                compact
+                icon={<Aperture className="h-3 w-3" />}
+                label="Perspectiva"
+                value={config.perspective}
+                min={400}
+                max={2000}
+                step={50}
+                format={(v) => `${v.toFixed(0)}px`}
+                onChange={(v) => updateAnimation({ perspective: v })}
+              />
+              <SliderRow
+                compact
+                icon={<RotateCw className="h-3 w-3" />}
+                label="Rotación 3D"
+                value={config.rotate3dStrength}
+                min={0}
+                max={25}
+                step={0.5}
+                format={(v) => `${v.toFixed(1)}°`}
+                onChange={(v) => updateAnimation({ rotate3dStrength: v })}
+              />
+            </div>
+          )}
         </div>
 
         {/* Reduced motion */}

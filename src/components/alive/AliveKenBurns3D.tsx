@@ -13,8 +13,8 @@ interface AliveKenBurns3DProps {
   vignette: number;
   parallaxEnabled: boolean;
   reducedMotion: boolean;
-  /** scroll progress 0..1 for scroll-driven camera dolly (MotionValue) */
-  scrollProgress?: MotionValue<number>;
+  /** scroll progress 0..1 for scroll-driven camera dolly (MotionValue or number) */
+  scrollProgress?: MotionValue<number> | number;
 }
 
 const GRID_SIZE = 128; // 128x128 = 16K vertices, manageable
@@ -303,8 +303,13 @@ export function AliveKenBurns3D({
       mouse.x += (mouse.tx - mouse.x) * 0.05;
       mouse.y += (mouse.ty - mouse.y) * 0.05;
 
-      // read scroll progress from MotionValue
-      const scrollVal = scrollProgress?.get() ?? 0;
+      // read scroll progress from MotionValue (defensive — may be undefined or a number)
+      const scrollVal =
+        scrollProgress && typeof scrollProgress.get === "function"
+          ? scrollProgress.get()
+          : typeof scrollProgress === "number"
+            ? scrollProgress
+            : 0;
 
       // view matrix: camera at Z = 1.5, looking at origin
       // scroll dolly moves camera forward

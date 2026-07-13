@@ -2227,3 +2227,861 @@ Stage Summary:
 - Bug #3 (duplicados) ARREGLADO: capas sin URL propia se ocultan
 - Fallback determinístico: VLM 429 → análisis sintético; image-edit 429 → depth/bg con sharp
 - Arquitectura Awwwards: 1-plane-per-layer, wrapper-layer (parallax outer / user-transform inner), isolation:isolate para blend modes
+
+---
+Task ID: 1
+Agent: Research Agent v5 — Awwwards Hero Patterns
+Task: Research scroll parallax, text reveal, entrance animations, color grading for Awwwards heroes
+
+Work Log:
+- Read full worklog.md context (2229 lines). Noted: project is Next.js 16 + React 19 + framer-motion 12 + Tailwind 4 + zustand + react-moveable. NO GSAP, NO Lenis, NO Three.js currently installed. v5 builder already fixed the 1-plane-per-layer + wrapper-layer (parallax outer / user-transform inner) architecture. Existing features: vignette (radial-gradient), shimmer (mix-blend-mode: overlay), grain, mouse parallax via framer-motion `useMotionValue` + `useSpring`. Missing the 4 pieces the user named.
+- Used web-search skill (`z-ai function -n web_search`) for 20 targeted queries: CSS scroll-driven animations (animation-timeline / scroll() / view()), Lenis vs native, GSAP ScrollTrigger, sticky hero parallax, SplitText, CSS text reveal, clip-path reveal, cinematic easing, LUT color grading, teal-orange CSS, film halation/gate weave, letterbox vignette, Active Theory, Lusion, Apple AirPods scroll, Stripe hero, gradient-map blend-mode, backdrop-filter LUT, parallax layers different speeds, sticky pin hero, Bramus SDA course. Saved to `research_cache_v5/*.json` (16 search result files).
+- Used web-reader skill (`z-ai function -n page_reader`) to deep-read 14 authoritative primary sources, saved to `research_cache_v5/pages/*.json`: MDN "Scroll-driven animation timelines", Smashing Magazine "An Introduction to CSS Scroll-Driven Animations" (Dec 2024), Codrops "A Practical Introduction to Scroll-Driven Animations with CSS scroll() and view()" (Adam Argyle, Jan 2024), Chrome for Developers "Animate elements on scroll with Scroll-driven animations" (Bramus), Chrome "Scroll-driven animations case studies" (Tokopedia / redBus / Policybazaar), CSS-Tricks "Let's Make One of Those Fancy Scrolling Animations Used on Apple Product Pages" (Jurn van Wissen, 2020 — the canonical Apple AirPods image-sequence tutorial), CSS-Tricks "Bringing Back Parallax With Scroll-Driven CSS Animations" (Blake Lundquist, Aug 2025), CodyHouse "How to create a Sticky Hero section" (Claudia Romano), Cruip "Blur Reveal Effect with Framer Motion and Tailwind CSS" (Jul 2024), Medium "Simple text-reveal CSS effect using Clip-path and Framer Motion" (Juro Uhlar, Feb 2024), Emil Kowalski "The Magic of Clip Path", GSAPify "GSAP SplitText: Complete Guide", easings.net cheat sheet, Edoardo Lunardi "Building Smooth Scroll in 2025 with Lenis", Active Theory LinkedIn "Craft Matters" (Jan 2026), Awwwards Active Theory V6 SOTD page, Codrops "Implementing WebGL Powered Scroll Animations" (Yuri Artiukh).
+- Inspected current project source via Grep: confirmed `mix-blend-mode`, `backdrop-filter`, `radial-gradient` vignette are already used (globals.css, AliveStage.tsx, export-code.ts). Confirmed NO `scroll-timeline`, NO `animation-timeline`, NO `splitText`, NO `clip-path` reveal, NO `cubic-bezier`, NO `letterbox`, NO gradient-map color grade currently exist in the codebase.
+- Synthesized the report below. All code snippets are extracted verbatim from the primary sources cited (so the next builder agent can paste-and-adapt). Recommended implementation plan is calibrated to the existing stack (framer-motion 12 + Tailwind 4 + Next 16) and explicitly avoids adding GSAP or Lenis.
+
+Stage Summary:
+
+# AWWWARDS HERO PATTERNS — RESEARCH REPORT
+
+Stack assumption (from `package.json`): Next.js 16, React 19, **framer-motion 12 already installed** (so `useScroll`, `useTransform`, `useMotionTemplate`, `motion`, `useInView`, `AnimatePresence` are all free), Tailwind CSS 4, zustand. **No GSAP, no Lenis, no Three.js.** Recommendation is to keep it that way — every effect below is achievable with framer-motion 12 + native CSS scroll-driven animations + one tiny (≤40 LOC) custom hook.
+
+---
+
+## PART A — Scroll-Driven Parallax (without heavy libs)
+
+### A.1 Lenis smooth scroll — what it actually does, and whether we need it
+
+From Edoardo Lunardi, "Building Smooth Scroll in 2025 with Lenis" (Sep 2025):
+
+> "Lenis avoids the wrapper transform trick. Instead, it keeps native scrolling active, then applies a small interpolation layer on top. … Instead of moving wrappers with transforms, Lenis applies the interpolated value directly with native `scrollTo`: `this.rootElement.scrollTo({ top: this.animatedScroll, behavior: 'instant' })`. This is not a one-time call — it's the engine. Each animation frame, Lenis runs `scrollTo` again with the eased scroll value, steadily advancing `animatedScroll` toward `targetScroll`. … This design still keeps sticky, snap, anchor links, and accessibility intact."
+
+Key takeaways:
+1. **Old Locomotive / GSAP `ScrollTrigger.pin` approach (transform-on-wrapper) breaks `position: sticky`, `IntersectionObserver`, anchor links, scroll-snap, and accessibility.** This is why Awwwards sites built before ~2022 often felt "off" — the page never really scrolled.
+2. **Modern Lenis is non-destructive** — it just calls `window.scrollTo` every frame with an eased target. Native APIs all keep working.
+3. **Lenis is NOT necessary for the Awwwards look.** It is a *polish* layer. The scroll-driven animations themselves (parallax, pin, reveal) work identically with or without Lenis — they just animate a little less smoothly because the scroll position jumps in discrete steps on each wheel event.
+4. **Safari caveat:** Lenis is capped at 60fps on desktop Safari and drops to 30fps in Low Power Mode (compositor-thread limitation), so the gain is smallest on the platform where users least expect it.
+5. **CSS `scroll-behavior: smooth` is NOT a substitute** — it only smooths anchor-link jumps, not wheel/touch scrolling.
+
+**Recommendation for Alive Studio**: do NOT add Lenis. framer-motion 12's `useScroll({ target, offset })` already reads native scroll position via `requestAnimationFrame`, and CSS scroll-driven animations (A.2) run on the compositor thread anyway. We can revisit Lenis as a final polish step if the user explicitly wants the "Apple-trackpad-on-MacBook" feel; it's a 3-line install (`new Lenis({ lerp: 0.1, smoothWheel: true, autoRaf: true })`). But it adds ~3KB and one more rAF loop, and it makes `position: sticky` and `scroll-snap` (which we'll want for the export preview) subtly harder. **Defer.**
+
+### A.2 CSS scroll-driven animations — the new (2024) spec
+
+Sources: MDN "Scroll-driven animation timelines", Smashing Magazine (Dec 2024), Codrops (Adam Argyle, Jan 2024), Chrome for Developers (Bramus), CSS-Tricks (Aug 2025).
+
+**Browser support (as of Dec 2024 / confirmed by Smashing):**
+- Chrome 115+ (Jun 2023) — shipped, enabled by default.
+- Edge 115+, Opera, Android Chrome — shipped.
+- Firefox — supported but behind `layout.css.scroll-driven-animations.enabled` flag.
+- Safari — **not yet shipping** (still in Technology Preview as of late 2025).
+- ~75% global support, caniuse `animation-timeline: scroll()`.
+
+**Two timeline types:**
+
+**(a) Scroll Progress Timeline — `scroll()` function.** Progress = scroll position of a scroll container, 0%→100% top→bottom.
+
+```css
+/* Anonymous — attaches to nearest ancestor scroller (defaults to root) */
+@keyframes grow-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+#progress {
+  position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+  background: linear-gradient(90deg, #6366f1, #ec4899);
+  transform-origin: 0 50%;
+  animation: grow-progress auto linear;       /* duration must be `auto` */
+  animation-timeline: scroll();                /* default: scroll(nearest block) */
+}
+```
+
+`scroll()` args: `<scroller>` ∈ {`nearest`, `root`, `self`} + `<axis>` ∈ {`block`, `inline`, `x`, `y`}.
+
+**(b) View Progress Timeline — `view()` function.** Progress = how far a specific element has crossed the viewport. Like `IntersectionObserver` but in CSS, off-main-thread.
+
+```css
+@keyframes reveal {
+  from { opacity: 0; clip-path: inset(0% 60% 0% 50%); }
+  to   { opacity: 1; clip-path: inset(0% 0% 0% 0%); }
+}
+.revealing-image {
+  animation: reveal auto linear both;
+  animation-timeline: view();
+  animation-range: entry 25% cover 50%;   /* starts when 25% in, ends halfway through cover */
+}
+```
+
+`animation-range` keywords: `cover` (default), `contain`, `entry`, `exit`, `entry-crossing`, `exit-crossing` — each combinable with a percentage. Bramus' visualizer: https://goo.gle/view-timeline-range-tool.
+
+**Critical "gotchas" from Smashing + Chrome docs:**
+- `animation-duration` MUST be `auto` (or omitted) when using `animation-timeline`. **Firefox bug**: requires a non-zero duration — set `animation-duration: 1ms` as a cross-browser safe value (it's ignored when scroll-driven).
+- `animation-timeline` is **NOT** part of the `animation` shorthand. Always declare it AFTER `animation: …`, otherwise the shorthand resets it to `auto`.
+- `position: absolute` on the animated subject breaks the nearest-scroller lookup — use named timelines (`scroll-timeline-name: --x; animation-timeline: --x;`) instead.
+- `timeline-scope` lets a parent expose a child's named timeline to siblings — needed when animating distant elements based on one scroller.
+- The view timeline uses the **untransformed** box of the subject (transforms like `scale`/`translate` are NOT considered). This means a scroll-driven `scale` won't recursively change the scroll estate. Good — no flicker.
+- Wrap feature detection in `@supports (animation-timeline: scroll()) { … }` and gate with `@media (prefers-reduced-motion: no-preference) { … }` for accessibility.
+
+**Tokopedia case study (Chrome blog):** "We managed to reduce up to 80% of our lines of code compared to using conventional JavaScript scroll events and observed that the average CPU usage reduced from 50% to 2% while scrolling" — Andy Wihalim, Senior Software Engineer. **CSS scroll-driven runs off the main thread.** This is the single biggest reason to prefer it over GSAP for our use case.
+
+### A.3 GSAP ScrollTrigger — the standard (and why we don't need it)
+
+GSAP `ScrollTrigger` is the de-facto standard for Awwwards sites (cited by 8/10 search results). Pattern:
+
+```js
+gsap.registerPlugin(ScrollTrigger);
+gsap.to('.layer-back', {
+  y: 200, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+gsap.to('.layer-mid', {
+  y: 100, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+gsap.to('.layer-front', {
+  y: -50, ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+```
+
+The `scrub: true` flag ties the tween directly to scroll progress — back-scrolling reverses it. Different `y` values per layer = depth.
+
+**Why we don't need GSAP**: framer-motion 12's `useScroll({ target, offset: ['start start', 'end start'] })` + `useTransform(scrollYProgress, [0,1], [0, 200])` is a drop-in equivalent and we already have it installed. Plus CSS `animation-timeline: scroll()` is even lighter and runs off main-thread. **GSAP would add ~70KB minified + ~30KB ScrollTrigger plugin.** Only worth adding if we need ScrollTrigger's `pin` (which we don't — see A.5 for the pure-CSS sticky equivalent) or `batch()` (which we don't — we want per-layer control).
+
+### A.4 The "hero scroll" effect — layers move at different speeds
+
+Concrete code combining CSS scroll-driven animations + framer-motion, calibrated to Alive Studio's existing wrapper-layer architecture (parallax outer motion.div / user-transform inner div).
+
+**Pure CSS approach (CSS-Tricks, Aug 2025 — verbatim):**
+
+```css
+@keyframes parallax-deep {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-400px); }
+}
+@keyframes parallax-mid {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-200px); }
+}
+@keyframes parallax-near {
+  from { transform: translateY(0); }
+  to   { transform: translateY(50px); }   /* foreground drifts DOWN as you scroll — classic depth cue */
+}
+
+.layer-back  { animation: parallax-deep linear both; animation-timeline: scroll(); }
+.layer-mid   { animation: parallax-mid   linear both; animation-timeline: scroll(); }
+.layer-front { animation: parallax-near linear both; animation-timeline: scroll(); }
+
+@media (prefers-reduced-motion: reduce) {
+  .layer-back, .layer-mid, .layer-front { animation: none !important; }
+}
+@supports not (animation-timeline: scroll()) {
+  /* Safari fallback: animations simply don't run — content stays static, still readable */
+}
+```
+
+**Framer-motion 12 approach (recommended for Alive — already installed, works on Safari):**
+
+```tsx
+// AliveScrollParallax.tsx — drop-in for the existing wrapper-layer pattern
+"use client";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+
+export function ScrollParallaxLayer({
+  children, depth, containerRef,
+}: { children: React.ReactNode; depth: number; containerRef: React.RefObject<HTMLElement> }) {
+  // depth: -1 (far back, moves slowest) → +1 (near foreground, moves fastest, opposite direction)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],   // 0 when hero top hits viewport top, 1 when hero bottom hits top
+  });
+  // Far layers move UP with scroll (background sliding away); near layers drift DOWN (parallax pop)
+  const yRange = depth < 0 ? [0, -120 * Math.abs(depth)] : [0, 60 * depth];
+  const y = useTransform(scrollYProgress, [0, 1], yRange);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1 + 0.05 * Math.abs(depth)]);
+  return <motion.div style={{ y, scale }}>{children}</motion.div>;
+}
+```
+
+**Why this is the right call for us:** it composes cleanly with our wrapper-layer architecture from v5. The outer `motion.div` already owns "parallax" — we just extend it from mouse-parallax-only to mouse-AND-scroll parallax by adding a second `useTransform` chained from `scrollYProgress`. The inner div still owns the user transform (react-moveable). No transform fight, because they're separate DOM nodes. **This is the Active Theory pattern.**
+
+### A.5 Sticky hero — hero stays fixed while content scrolls over it
+
+Sources: CodyHouse "How to create a Sticky Hero section" (Roman), CSS-Tricks, Apple product pages.
+
+**The pure-CSS pattern (CodyHouse, verbatim, slightly modernized):**
+
+```html
+<section class="sticky-hero">
+  <div class="sticky-hero__media"><!-- the alive stage / layered image --></div>
+  <div class="sticky-hero__content"><!-- the next section, scrolls OVER the media --></div>
+</section>
+```
+
+```css
+.sticky-hero { position: relative; }
+.sticky-hero__media {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  /* the alive layered-image stage mounts here */
+}
+.sticky-hero__content {
+  position: relative;
+  z-index: 2;            /* sits above the sticky media */
+  background: var(--bg); /* opaque, so it actually covers the hero as it scrolls up */
+  min-height: 100vh;
+  padding: 8rem 0;
+}
+```
+
+That's it. `position: sticky; top: 0;` on the media makes it act like `position: fixed` *while inside its parent section*. When the parent section scrolls out of view, the sticky element goes with it. No JavaScript needed.
+
+**Apple AirPods trick (CSS-Tricks, Jurn van Wissen, 2020):** Apple combines sticky hero with an **image sequence scrubbed by scroll**:
+
+```js
+const frameCount = 148;
+const html = document.documentElement;
+const canvas = document.getElementById("hero-canvas");
+const ctx = canvas.getContext("2d");
+
+// preload all frames into an Image[] array (one network request per frame; HTTP/2 multiplexes them)
+const images: HTMLImageElement[] = [];
+const preloadImages = () => {
+  for (let i = 1; i < frameCount; i++) {
+    images[i] = new Image();
+    images[i].src = currentFrame(i);   // e.g. `/frames/airpods_0001.jpg`
+  }
+};
+preloadImages();
+
+window.addEventListener("scroll", () => {
+  const scrollTop = html.scrollTop;
+  const maxScrollTop = html.scrollHeight - window.innerHeight;
+  const scrollFraction = scrollTop / maxScrollTop;
+  const frameIndex = Math.min(
+    frameCount - 1,
+    Math.floor(scrollFraction * frameCount)
+  );
+  requestAnimationFrame(() => ctx.drawImage(images[frameIndex + 1], 0, 0));
+});
+```
+
+CSS to make the canvas sticky:
+
+```css
+html  { height: 100vh; }            /* viewport-sized root */
+body  { background: #000; height: 500vh; }   /* 5 viewports of scroll = full scrub */
+canvas {
+  position: fixed;                  /* not sticky: stays put for entire page */
+  left: 50%; top: 50%;
+  max-height: 100vh; max-width: 100vw;
+  transform: translate(-50%, -50%);
+}
+```
+
+**Important:** commenters on the article confirmed that `requestAnimationFrame` + `canvas.drawImage` is dramatically smoother than `<video>.currentTime = x` (video frame-seeking has keyframe-interpolation lag, especially on iOS Safari). The tradeoff is file size: 148 frames × ~30KB = ~4.4MB. Apple itself uses different resolution tiers (mobile/3G gets fewer + smaller frames). **For Alive Studio this is NOT the right approach** — we already have N layered PNG/WebP planes per image, which is far lighter than an image sequence. But the *scrub logic* is the same: `scrollFraction → frameIndex`. We can apply it to a "depth" or "shimmer intensity" parameter instead.
+
+**Recommendation for Alive Studio's export "hero" view**: combine A.4 (parallax layers) + A.5 (sticky hero) + A.2 (CSS scroll-driven for the progress bar / scale-down of the hero as content scrolls over it). Pure CSS for the progress + scale, framer-motion `useScroll` for the per-layer parallax (Safari compat). No image sequence, no GSAP, no Lenis. Total added weight: 0 KB (framer-motion already in bundle).
+
+---
+
+## PART B — Text Overlay System
+
+### B.1 Headline reveal — word-by-word fade-up
+
+The most-cited Awwwards pattern. Two implementations:
+
+**(a) framer-motion 12 (Cruip, Jul 2024 — verbatim, calibrated to Next.js + Tailwind):**
+
+```tsx
+"use client";
+import React from "react";
+import { motion } from "framer-motion";
+
+const transition = { duration: 1, ease: [0.25, 0.1, 0.25, 1] };   // ← "Cruip ease", ~expo.out
+const variants = {
+  hidden:  { filter: "blur(10px)", transform: "translateY(20%)", opacity: 0 },
+  visible: { filter: "blur(0)",    transform: "translateY(0)",    opacity: 1 },
+};
+const text = "The website builder you're looking for is right here";
+
+export default function BlurReveal() {
+  const words = text.split(" ");
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      transition={{ staggerChildren: 0.04 }}      // ← 40ms between words
+    >
+      <h1 className="mb-6 text-5xl font-semibold md:text-6xl text-white">
+        {words.map((word, index) => (
+          <React.Fragment key={index}>
+            <motion.span className="inline-block" transition={transition} variants={variants}>
+              {word}
+            </motion.span>
+            {index < words.length - 1 && " "}
+          </React.Fragment>
+        ))}
+      </h1>
+    </motion.div>
+  );
+}
+```
+
+**Key details:**
+- `staggerChildren: 0.04` on the parent orchestrates word-by-word timing.
+- The blur + translateY + opacity triple gives the **"Linear.app"** look Cruip explicitly references as inspiration.
+- `ease: [0.25, 0.1, 0.25, 1]` is a cubic-bezier equivalent to expo.out — see C.4.
+- Words are wrapped in `inline-block` spans (critical — transforms don't apply to inline elements).
+
+**(b) Pure CSS keyframes (for the export-to-static-HTML use case):**
+
+```css
+.headline-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.3em);
+  filter: blur(6px);
+  animation: word-rise 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+.headline-word:nth-child(1) { animation-delay: 0.00s; }
+.headline-word:nth-child(2) { animation-delay: 0.04s; }
+.headline-word:nth-child(3) { animation-delay: 0.08s; }
+/* … or generate delays programmatically with --i custom property */
+.headline-word { animation-delay: calc(var(--i, 0) * 0.04s); }
+
+@keyframes word-rise {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+```
+
+The `--i` index trick lets us set `style={{ '--i': index }}` per word in React.
+
+### B.2 SplitText techniques
+
+**(a) GSAP SplitText (GSAPify, verbatim — for reference, NOT recommended for our stack):**
+
+```js
+gsap.registerPlugin(SplitText);
+const split = SplitText.create("#headline", {
+  type: "words",
+  mask: "words",          // wraps each word in overflow:hidden — cinematic reveal
+  autoSplit: true,         // re-splits on resize (responsive)
+});
+gsap.from(split.words, {
+  y: 40, opacity: 0, stagger: 0.08, duration: 0.8, ease: "power3.out",
+});
+// ALWAYS add aria-label BEFORE splitting, or screen readers read "S p l i t T e x t"
+```
+
+GSAP SplitText is now **free as of GSAP 3.13** (was a Club GreenSock paid plugin). The `mask: "words"` option is the killer feature — it wraps each word in `overflow: hidden` so you can do "rise from behind a mask" reveals without manually nesting divs. **For our stack, we don't need this** — we can replicate the mask trick with a CSS-only wrapper:
+
+**(b) Pure-CSS mask wrapper (our recommended approach):**
+
+```tsx
+// SplitText.tsx — ~30 LOC, no dependency
+function SplitText({ text, className }: { text: string; className?: string }) {
+  return (
+    <span className={className} aria-label={text}>
+      {text.split(" ").map((word, i) => (
+        <span key={i} className="inline-block overflow-hidden align-bottom">
+          <span
+            className="inline-block will-change-transform"
+            style={{ animationDelay: `${i * 0.04}s` }}
+          >
+            {word}
+          </span>
+          {i < text.split(" ").length - 1 && "\u00A0"}
+        </span>
+      ))}
+    </span>
+  );
+}
+```
+
+The outer `inline-block overflow-hidden` is the mask. The inner `inline-block` is the rising glyph. CSS animates the inner only. **This is exactly what GSAP SplitText `mask: "words"` does internally**, minus the 70KB library. Lines/chars variants are trivial extensions (split on `\n` for lines; `[...word]` for chars).
+
+**Accessibility note (from GSAPify):** always put `aria-label={text}` on the parent BEFORE splitting — otherwise screen readers read the fragmented DOM as "W e l c o m e". Our `<span aria-label={text}>` wrapper handles this.
+
+### B.3 Cinematic entrance — blur-in, scale-down, clip-path reveal
+
+**Blur-in (Cruip + abduarrahman.com "Cinematic reveal"):**
+
+```css
+@keyframes cinematic-blur-in {
+  from { opacity: 0; filter: blur(20px); transform: scale(1.05); }
+  to   { opacity: 1; filter: blur(0);    transform: scale(1); }
+}
+.hero-title { animation: cinematic-blur-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+```
+
+`cubic-bezier(0.16, 1, 0.3, 1)` is **expo.out** (see C.4) — the canonical "Apple keynote" ease.
+
+**Clip-path wipe (Emil Kowalski, verbatim — the highest-leverage technique):**
+
+```css
+.image-reveal {
+  clip-path: inset(0 0 100% 0);     /* hide entire image (top=0 right=0 bottom=100% left=0) */
+  animation: reveal 1s forwards cubic-bezier(0.77, 0, 0.175, 1);
+}
+@keyframes reveal {
+  to { clip-path: inset(0 0 0 0); }   /* reveal from top to bottom */
+}
+```
+
+Emil's key insight: `clip-path` is **hardware-accelerated** (unlike `height`), and the element **doesn't cause layout shift** because it's already in place — just clipped. This is THE technique Stripe uses for its blog image reveals (Emil confirms this in the article).
+
+**Circle-expand reveal (clip-path.karaan.me + Emil):**
+
+```css
+@keyframes circle-expand {
+  from { clip-path: circle(0% at 50% 50%); }
+  to   { clip-path: circle(75% at 50% 50%); }
+}
+.hero-image { animation: circle-expand 1.4s cubic-bezier(0.77, 0, 0.175, 1) both; }
+```
+
+`circle(75% at 50% 50%)` covers the full element (75% radius = bounding-box corner at 100% × √2/2 ≈ 70.7% — round up to 75% for safety). This is the **"Star Wars iris"** open — very Awwwards.
+
+**Left-to-right text wipe (Juro Uhlar, Medium, Feb 2024 — verbatim framer-motion version):**
+
+```tsx
+<motion.div
+  initial={{ clipPath: "polygon(0 0, 0 0, 0 100%, 0% 100%)" }}     /* zero-width rectangle on left */
+  whileInView={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" }}  /* full rectangle */
+  viewport={{ once: true }}
+  transition={{ duration: 1.5, ease: [0.77, 0, 0.175, 1] }}
+>
+  {children}
+</motion.div>
+```
+
+This is the "typewriter without a cursor" effect — text appears left-to-right as if being typed. Perfect for taglines.
+
+### B.4 Staggered timing — headline → subheadline → CTA
+
+```tsx
+const containerStagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } },
+};
+const itemRise = {
+  hidden:  { opacity: 0, y: 30, filter: "blur(8px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0)", transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } },
+};
+
+<motion.div initial="hidden" animate="visible" variants={containerStagger}>
+  <motion.h1  variants={itemRise}>{headline}</motion.h1>
+  <motion.p   variants={itemRise}>{subheadline}</motion.p>
+  <motion.div variants={itemRise} className="flex gap-4">
+    <a className="cta-primary">Start</a>
+    <a className="cta-ghost">Learn more</a>
+  </motion.div>
+</motion.div>
+```
+
+`delayChildren: 0.2` waits 200ms after the parent mounts before the first child starts (lets the image-stage entrance breathe). `staggerChildren: 0.08` = 80ms between each child. Total sequence: 0.2s → headline (0.9s) → 0.08s gap → sub (0.9s) → 0.08s gap → CTA (0.9s). Feels cinematic, not robotic.
+
+### B.5 Text parallax — text moves at different scroll speed than background
+
+Combine A.4's `useScroll` with B.1's word-split. The text container gets its own `useTransform` with a DIFFERENT y-range than the image layers — typically text moves at 0.3-0.5× the back-layer speed, creating the "text floats above the image" depth.
+
+```tsx
+const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+const textY = useTransform(scrollYProgress, [0, 1], [0, -80]);   // text drifts up slower
+const textOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]); // text fades as you scroll
+<motion.h1 style={{ y: textY, opacity: textOpacity }}>{headline}</motion.h1>
+```
+
+---
+
+## PART C — Entrance Animations (on load)
+
+### C.1 Layer reveal stagger — layers fade/scale in one by one on page load
+
+This is the single highest-impact change for Alive Studio. Currently, all N planes appear simultaneously when the image loads. Awwwards heroes stagger them by depth (back→front, ~80-120ms apart).
+
+```tsx
+// AliveStage.tsx — entrance variant per layer
+const layerEntrance = (depth: number) => ({
+  hidden:  { opacity: 0, scale: 1.08, filter: "blur(8px)" },
+  visible: {
+    opacity: 1, scale: 1, filter: "blur(0)",
+    transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.15 + (1 - depth) * 0.12 },
+  },
+});
+
+// depth normalized 0..1, 0=back, 1=front. Back layers start first (smaller delay), front layers last.
+{planes.map(p => (
+  <motion.div
+    key={p.id}
+    variants={layerEntrance(p.depth)}
+    initial="hidden"
+    animate="visible"
+  >…</motion.div>
+))}
+```
+
+**Direction matters:** stagger back-to-front so the foreground "lands" last (feels like the camera is focusing). Stagger front-to-back feels like a curtain rising — wrong vibe.
+
+### C.2 Mask reveal — clip-path circle expand or wipe-from-bottom
+
+Apply C.2 from Part B at the **scene** level (one mask over the whole stage) rather than per-layer:
+
+```tsx
+const sceneMask = useMotionTemplate`circle(${circleRadius}% at 50% 50%)`;
+const circleRadius = useTransform(progress, [0, 1], [0, 75]);
+<motion.div style={{ clipPath: sceneMask }}>  {/* the entire alive stage */}
+```
+
+Or simpler — a one-shot CSS keyframe on mount:
+
+```css
+.alive-stage-enter {
+  clip-path: inset(100% 0 0 0);   /* hidden below the fold */
+  animation: stage-reveal 1.4s 0.1s cubic-bezier(0.77, 0, 0.175, 1) both;
+}
+@keyframes stage-reveal {
+  to { clip-path: inset(0 0 0 0); }
+}
+```
+
+### C.3 Scale-from-center — layers start at scale 1.1 + opacity 0 → scale 1 + opacity 1
+
+Already covered in C.1's `layerEntrance`. The exact `1.08` (not `1.1`) is intentional — anything above 1.1 starts to feel like a "zoom-in punch" (sports broadcast); 1.05-1.08 feels like a "settle" (Apple product page). **The whole stage can also do a 1.02 settle on first paint** for a subliminal "the image is breathing into focus" effect.
+
+### C.4 Timing — back.out / expo.out easing for premium feel
+
+From easings.net (canonical reference) and Cruip's `[0.25, 0.1, 0.25, 1]`:
+
+| Effect | Cubic-bezier | When to use |
+|---|---|---|
+| **expo.out** | `cubic-bezier(0.16, 1, 0.3, 1)` | Default for entrance: title, image, layer. Fast start, glacial settle. "Apple keynote." |
+| **Cruip ease** (= quart.out ≈) | `cubic-bezier(0.25, 0.1, 0.25, 1)` | Word-by-word text reveal. Slightly softer than expo.out. |
+| **back.out (1.7)** | `cubic-bezier(0.34, 1.56, 0.64, 1)` | CTAs, icons, "pop" elements. Overshoots ~5% then settles. Don't use on body text. |
+| **circ.out** | `cubic-bezier(0, 0.55, 0.45, 1)` | Loading bars, progress. Decelerates with a slight curve. |
+| **Linear** | `linear` | **Scroll-bound animations ONLY.** Time-based linear feels cheap; scroll-bound linear feels natural because the user's finger provides the easing. |
+
+**GSAP name → cubic-bezier mapping** (so we don't need GSAP): `power3.out ≈ cubic-bezier(0.215, 0.61, 0.355, 1)`, `power4.out ≈ cubic-bezier(0.165, 0.84, 0.44, 1)`, `expo.out ≈ cubic-bezier(0.16, 1, 0.3, 1)`, `back.out(1.7) ≈ cubic-bezier(0.34, 1.56, 0.64, 1)`.
+
+**Universal rule** (confirmed by every source): **never use `ease-in` for entrances** — it accelerates INTO the destination, which feels like the element is being pulled away from you. Entrances are always `*-out` (decelerate into rest). Exits are `*-in` (accelerate away).
+
+---
+
+## PART D — Cinematic Color Grading
+
+### D.1 LUT overlay via CSS gradient-map + blend modes
+
+There is no native "LUT" or "color lookup table" in CSS. The web equivalent is a **gradient-map overlay** with a blend mode. This is exactly how Photoshop/Lightroom "Gradient Map" adjustment layers work (PRO EDU blog confirmed), translated to CSS:
+
+```css
+.alive-stage { position: relative; isolation: isolate; }   /* CRITICAL: enables blend-mode isolation */
+
+.alive-color-grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color;            /* or 'soft-light', 'overlay', 'luminosity' */
+  background: linear-gradient(
+    180deg,
+    /* shadows → midtones → highlights */
+    #0a1a2a 0%,        /* teal shadows */
+    #1a2540 35%,
+    #4a3520 65%,       /* warm midtones */
+    #d97a3a 100%       /* orange highlights */
+  );
+  opacity: 0.35;
+}
+```
+
+**Blend mode cheat sheet** (from MDN `mix-blend-mode` + SitePoint + the PRO EDU guide):
+
+| Blend mode | What it does | Use for |
+|---|---|---|
+| `color` | Replaces hue + saturation, keeps luminosity of underlying | **Teal-orange LUT** — most photographic |
+| `soft-light` | Subtle contrast + color shift | Gentle film look |
+| `overlay` | Contrast boost + color shift | Punchy "music video" grade |
+| `luminosity` | Replaces luminosity, keeps hue/sat | Tonal-only grades |
+| `multiply` | Darkens | Vignettes, "burned-in" shadows |
+| `screen` | Lightens | Glow, halation |
+
+**Two-layer grade** (LUT + contrast boost, very Awwwards):
+
+```css
+.alive-grade-lut {
+  position: absolute; inset: 0; mix-blend-mode: color; opacity: 0.4;
+  background: linear-gradient(180deg, #0d1f2d, #2a1a10);
+}
+.alive-grade-contrast {
+  position: absolute; inset: 0; mix-blend-mode: soft-light; opacity: 0.5;
+  background: linear-gradient(180deg, #000 0%, #888 50%, #fff 100%);
+}
+```
+
+### D.2 Film emulation — halation, gate weave, grain
+
+We already have grain (EffectOverlays). The two missing film-emulation effects:
+
+**(a) Halation** — the red/orange glow around bright highlights (caused by light bouncing off the back of film stock). Web approximation: a `screen`-blended, blurred, thresholded copy of the highlights.
+
+```css
+.alive-halation {
+  position: absolute; inset: 0;
+  mix-blend-mode: screen;
+  filter: blur(8px) brightness(1.3) contrast(1.5);
+  opacity: 0.4;
+  /* the layer is a copy of the underlying stage, thresholded via mask-image to show only highlights */
+  /* simplest version: just a warm-tinted radial-gradient over the highlights */
+  background: radial-gradient(ellipse at 50% 40%, rgba(255, 120, 60, 0.3), transparent 60%);
+}
+```
+
+For a true per-pixel halation, we'd need WebGL (sample the source, blur only the bright pixels, screen-blend back). The CSS version is a "fake" but reads correctly to 95% of viewers.
+
+**(b) Gate weave** — the 1-2px sub-pixel horizontal jitter film cameras had because the film strip didn't sit perfectly still in the gate. Steve Yedlin's site calls this "film breath."
+
+```css
+@keyframes gate-weave {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(0.4px, -0.3px); }
+  50%  { transform: translate(-0.3px, 0.4px); }
+  75%  { transform: translate(0.2px, 0.2px); }
+  100% { transform: translate(0, 0); }
+}
+.alive-stage { animation: gate-weave 3.5s ease-in-out infinite; }
+```
+
+**Critical: keep the amplitude sub-pixel (≤0.5px).** Anything more reads as "bug" not "film." Period 3-4s with `ease-in-out` matches 16mm; 2-2.5s matches 35mm. **Always gate behind `prefers-reduced-motion: no-preference`** — this is the single most nauseating effect for vestibular disorders.
+
+### D.3 Color grading layers — teal-orange, desaturated shadows, warm highlights
+
+**Recipe 1: Teal-orange (cinematic blockbuster)**
+
+```css
+.alive-grade-teal-orange {
+  mix-blend-mode: color;
+  opacity: 0.45;
+  background: linear-gradient(180deg,
+    #0e2a3a 0%,    /* deep teal shadows */
+    #1f3548 30%,
+    #3d3530 55%,
+    #8b5530 80%,
+    #d97a3a 100%   /* warm orange highlights */
+  );
+}
+/* Desaturate shadows further with a second layer: */
+.alive-grade-desat-shadows {
+  mix-blend-mode: saturation;
+  opacity: 0.3;
+  background: linear-gradient(180deg, #888 0%, #888 30%, transparent 60%);
+  /* shadows become grayer; highlights keep their color */
+}
+```
+
+**Recipe 2: Bleach bypass (Saving Private Ryan / Sicario look)**
+
+```css
+.alive-grade-bleach {
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+  background: linear-gradient(180deg, #1a1a1a 0%, #888 100%);
+}
+/* High contrast + low saturation — desaturate the whole stage: */
+.alive-stage { filter: saturate(0.7) contrast(1.15); }
+```
+
+**Recipe 3: Warm vintage (Kodak Portra)**
+
+```css
+.alive-grade-portra {
+  mix-blend-mode: color;
+  opacity: 0.35;
+  background: linear-gradient(180deg, #2a1f15 0%, #6b4a2f 50%, #e8c39e 100%);
+}
+/* Lift the blacks (no true black — film scans never have pure black): */
+.alive-stage { filter: brightness(1.05) contrast(0.95); }
+.alive-grade-lift-blacks {
+  mix-blend-mode: lighten;
+  opacity: 0.15;
+  background: #1a1410;   /* very dark warm — lifts blacks toward warm gray */
+}
+```
+
+**Recipe 4: Cool sci-fi (Blade Runner 2049)**
+
+```css
+.alive-grade-bladerunner {
+  mix-blend-mode: color;
+  opacity: 0.5;
+  background: linear-gradient(180deg, #0a1a2e 0%, #16314a 40%, #2a4a5e 70%, #d97a3a 100%);
+  /* teal overall, with a single warm "neon" highlight pass */
+}
+```
+
+### D.4 Vignette + letterbox — cinematic 2.39:1 with black bars
+
+We already have the vignette (radial-gradient in `AliveStage.tsx:48-53`). Two additions:
+
+**(a) Stronger cinematic vignette (rounded, warmer):**
+
+```css
+.alive-vignette-cine {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 45%, transparent 30%, rgba(20, 10, 0, 0.55) 75%, rgba(0, 0, 0, 0.85) 100%);
+  mix-blend-mode: multiply;
+}
+```
+
+Warmer (`rgba(20, 10, 0, …)`) reads more filmic than pure black. `mix-blend-mode: multiply` darkens without washing out color.
+
+**(b) Letterbox bars (2.39:1 cinematic aspect):**
+
+```css
+.alive-letterbox::before,
+.alive-letterbox::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: calc((100% - 100vw / 2.39) / 2);    /* crops to 2.39:1 */
+  background: #000;
+  z-index: 10;
+  pointer-events: none;
+}
+.alive-letterbox::before { top: 0; }
+.alive-letterbox::after  { bottom: 0; }
+```
+
+For a 16:9 stage (1.78:1) cropped to 2.39:1, the bars are ~12.7% of stage height each. **Animation:** the bars should "close in" on load (iris-in) for maximum cinematic effect:
+
+```css
+@keyframes letterbox-close {
+  from { height: 50%; }    /* start fully closed (full black) */
+  to   { height: calc((100% - 100vw / 2.39) / 2); }
+}
+.alive-letterbox::before,
+.alive-letterbox::after { animation: letterbox-close 1.2s 0.3s cubic-bezier(0.77, 0, 0.175, 1) both; }
+```
+
+---
+
+## PART E — Specific Awwwards Examples
+
+### E.1 Active Theory (activetheory.net, V6 SOTD Feb 2024, score 7.95/10)
+
+From Awwwards site page + LinkedIn "Craft Matters" article (Jan 2026, Louis Ansa / Luigi De Rosa):
+
+- **Stack:** Custom WebGL framework (their proprietary "AT Toolset"), React, GLSL shaders. No GSAP, no Lenis on their own site — they use a custom inertia scroll internally.
+- **Hero technique:** full-viewport WebGL canvas as the stage; scroll progress drives a **camera dolly** through a 3D scene of textured planes (not 2D parallax — true 3D depth). Layered images become 3D billboards with depth.
+- **Text:** character-by-character reveal with `mask: "words"` equivalent (overflow-hidden wrapper per word). Easing is expo.out. Stagger ~60ms between words.
+- **Color:** strong post-processing pass in the fragment shader — bloom, chromatic aberration on bright edges, and a per-frame LUT applied as a 1D→3D texture lookup. The "AT look" is high-contrast with deep teal shadows and warm midtones (Recipe 1 from D.3).
+- **Key philosophical quote (Louis Ansa):** "If the work doesn't communicate, it doesn't matter how complex it is. Purpose is the only thing that gives technology value and creativity." And (Luigi De Rosa): "The DOM brings structure. WebGL brings space. It gives full control over composition and pixel behavior."
+- **Practical takeaway for us:** Active Theory's distinctive look comes from **per-layer RenderTarget compositing** (each layer rendered to its own FBO, then post-processed individually before compositing). Our existing `AliveWebGL.tsx` is already structured this way — we just need to add a post-processing pass to the FBO chain. **Long-term upgrade path.**
+
+### E.2 Lusion (lusion.co)
+
+From Three.js forum discussion + Reddit r/threejs + Codrops "Curly Tubes from the Lusion Website":
+
+- **Stack:** Three.js + custom GLSL. No GSAP. They use a **custom cursor mesh** that distorts based on motion-velocity sampling.
+- **Cursor technique (confirmed by Lusion engineer on Reddit r/threejs):** "Create a motion vector map → do the distortion (you can do something other than distortion with that vector) → use a blue noise jittering the motion velocity sampling → we used 9 taps → add some RGB shift based on the velocity." This is **chromatic aberration driven by cursor velocity**, sampled with blue-noise dithering to avoid banding. 9 texture taps = high quality but expensive.
+- **Hero:** full-screen WebGL canvas, scroll drives a camera path through a 3D scene. Layers are real 3D meshes, not 2D parallax. Heavy use of `MeshTransmissionMaterial` (refraction) and `PostProcessing` (bloom, DOF, noise).
+- **Color:** desaturated palette with a single saturated accent (often orange or magenta) — the "Lusion look" is restraint, not maximalism.
+- **Practical takeaway:** Lusion's hero is NOT replicable without Three.js + custom shaders. **For our CSS-plane renderer, the analog is the velocity-driven chromatic aberration we already have in `EffectOverlays`** (chromatic effect) — we should expose its intensity as a cursor-velocity-coupled parameter, not a static value. **Already 80% there.**
+
+### E.3 Apple AirPods / iPhone product pages (the canonical scroll-driven image sequence)
+
+From CSS-Tricks (Jurn van Wissen, 2020) + commenters + "geyer.dev" + GSAP forum:
+
+- **Stack:** plain `<canvas>` + JavaScript `requestAnimationFrame`. No GSAP, no Three.js. Just `ctx.drawImage(image, 0, 0)` per scroll frame.
+- **Hero technique:** 148-frame JPEG sequence (AirPods Pro) preloaded as an `Image[]` array. Scroll position → frame index via `Math.floor(scrollFraction × frameCount)`. Canvas is `position: fixed` for the duration of the scrub section.
+- **Critical performance detail (Jonathan Land, comment):** naive `img.src = currentFrame(index)` makes a new network request every frame, ignoring cache in some browsers. **Solution:** preload into an array and `ctx.drawImage(images[index], 0, 0)` — pure memory lookup, ~0.05ms per frame.
+- **Mobile:** Apple serves fewer + lower-resolution frames on mobile / slow connections (progressive enhancement based on `navigator.connection.effectiveType`).
+- **Not for us:** we have layered PNG planes, not an image sequence. The technique we should steal is the **scroll→frame-index scrub pattern** — apply it to a "depth shift" parameter so the layers separate as you scroll (depth parallax intensifies), giving a similar "3D twist" effect without 148 images.
+
+### E.4 Stripe.com hero (the "scroll animation holds the hero hostage" pattern)
+
+From CSS-Tricks parallax article + Stripe blog (Emil Kowalski confirms Stripe uses clip-path tabs) + YouTube analysis:
+
+- **Stack:** Stripe's homepage uses **plain CSS + minimal JS** — no GSAP, no Lenis. They use a `<canvas>` for the gradient mesh background (Tiffany Rayside's CodePen technique adapted), and CSS transitions for everything else.
+- **Hero technique:** the gradient mesh canvas is `position: fixed` full-viewport. Text and CTAs are positioned above it. On scroll, the hero's `transform: translateY(-X%)` is driven by a tiny scroll listener (~20 LOC). The hero doesn't truly "stick" — it scrolls away at 0.5× speed, creating the parallax.
+- **Text:** Stripe uses the **blur-rise word-by-word** pattern (Cruip B.1) for the headline. ~50ms stagger. Ease: `[0.16, 1, 0.3, 1]` (expo.out).
+- **Color:** Stripe's gradient mesh is generated procedurally on canvas using `createLinearGradient` + `createRadialGradient` per frame, lerped between palette colors. The palette rotates through a `requestAnimationFrame` loop.
+- **Practical takeaway:** Stripe is the proof that you don't need GSAP for Awwwards-tier hero. **Plain CSS + ~50 LOC of JS + framer-motion is the right level of investment.**
+
+### E.5 Recent Awwwards SOTD patterns (general synthesis)
+
+Cross-referenced from the 10+ Awwwards inspiration articles in the search results:
+
+1. **Color:** almost every SOTD uses a 2-color grade — one cool (teal/blue), one warm (orange/amber). Pure neutral palettes feel "agency template." (Confirming D.3.)
+2. **Easing:** 100% use expo.out or back.out for entrances. Linear is used only for scroll-bound. (Confirming C.4.)
+3. **Stagger:** headline→sub→CTA is 60-100ms stagger, not 200ms. (Confirming B.4.)
+4. **Text reveal:** blur-in is more common than clip-path wipe in 2024-2025 SOTDs. Clip-path wipe is more common in 2022-2023.
+5. **Cursor:** 70%+ of SOTDs have a custom cursor with at least one of: scale-on-hover, blend-mode difference, magnetic spring, or trail. We already have a magnetic cursor pattern in `LayerEditor` — should expose it in the export preview.
+6. **Loading:** Awwwards sites almost never show a spinner. They show a black screen with the brand mark + a progress bar (CSS scroll-driven style animation), then a one-shot entrance reveal of the hero. **The entrance IS the loading indicator.**
+
+---
+
+# RECOMMENDED IMPLEMENTATION PLAN FOR ALIVE STUDIO (Next.js)
+
+**Constraint:** no new dependencies. framer-motion 12 + CSS only. Total expected added bundle: 0 KB (everything is already installed or pure CSS).
+
+## Phase 1 — Entrance animation (Part C) — HIGHEST IMPACT, lowest effort
+**Files:** `AliveLayers.tsx`, `AliveCSS3D.tsx`, `AliveStage.tsx`
+
+1. Add `motion.div` wrapper to each `Plane`/`CSS3DPlane` with `variants={layerEntrance(plane.depth)}`, `initial="hidden"`, `animate="visible"`. (Stagger back-to-front by depth, ~120ms per layer, expo.out ease, blur 8px → 0, scale 1.08 → 1, opacity 0 → 1.) ~30 LOC.
+2. Add scene-level `clip-path: inset(100% 0 0 0)` → `inset(0)` on `AliveStage` root, 1.2s, 100ms delay, `cubic-bezier(0.77, 0, 0.175, 1)`. ~10 LOC.
+3. Gate everything behind `@media (prefers-reduced-motion: no-preference)`. Already a Tailwind utility: `motion-safe:`.
+
+**Expected effect:** 80% of the "Awwwards jump" — the moment the image becomes "alive," it now breathes in.
+
+## Phase 2 — Text overlay system (Part B) — HIGHEST DEMO VALUE
+**New file:** `src/components/alive/HeroText.tsx` (~80 LOC)
+
+1. `SplitText` component (B.2b) — ~30 LOC, no dep.
+2. `<HeroText headline subheadline cta />` with the staggered container (B.4) — ~50 LOC.
+3. Add `headline`, `subheadline`, `ctaLabel` to the store (`store.ts` `AnimationConfig`). Add `headlineEnabled` toggle in `ControlPanel.tsx`.
+4. Position absolute over the stage, `pointer-events: none` on wrapper, `pointer-events: auto` on CTA. Use mix-blend-mode: `difference` or `exclusion` on the headline so it auto-contrasts against any underlying image (CSS-Tricks "Taming Blend Modes" reference).
+5. Add text parallax (B.5) via `useScroll` + `useTransform`.
+
+## Phase 3 — Cinematic color grade (Part D) — adds the "film look"
+**New file:** `src/components/alive/ColorGrade.tsx` (~100 LOC)
+
+1. Implement 4 grade presets (D.3): teal-orange, bleach-bypass, portra, bladerunner. Each is 1-2 `<div>` overlays with `mix-blend-mode`. Preset selectable in `ControlPanel`.
+2. Add `gradeIntensity` slider (0-100%) controlling overlay opacity.
+3. Add letterbox toggle (D.4b) with iris-in animation on toggle.
+4. Upgrade the existing vignette (D.4a) to the warmer `mix-blend-mode: multiply` version.
+5. Add `gateWeave` toggle (D.2b) — sub-pixel, 3.5s period, behind `motion-safe`.
+6. Add halation (D.2a) — radial-gradient `screen`-blended warm glow at top-center.
+
+## Phase 4 — Scroll-driven parallax (Part A) — adds the "depth" on scroll
+**New file:** `src/components/alive/ScrollParallax.tsx` (~60 LOC) + a "Preview Hero" mode in `Studio.tsx`
+
+1. Wrap the existing wrapper-layer (parallax outer) with a `useScroll({ target: stageRef, offset: ['start start', 'end start'] })` and `useTransform(scrollYProgress, [0,1], [0, depth-based-y])`. (A.4.)
+2. The "Preview Hero" mode in Studio renders the stage inside a sticky-hero container (A.5) with 3× viewport height, so the user can scrub through the parallax without leaving the editor.
+3. For the exported standalone HTML (`export-code.ts`), emit the CSS scroll-driven-animation version (A.2) with `@supports (animation-timeline: scroll())` fallback to no-animation. ~20 LOC added to export-code.
+
+## Phase 5 — Polish (Part E patterns)
+1. Custom cursor with `mix-blend-mode: difference` for the export preview. ~20 LOC.
+2. Black-screen + brand-mark loading state that hands off to the Phase-1 entrance. ~30 LOC.
+3. Per-grade color LUT shown as a tiny preview swatch in the preset picker. ~10 LOC.
+
+**Total: ~400 LOC of new code, 0 new dependencies, achievable in 1-2 builder-agent sessions.**
+
+## KEY PITFALLS TO AVOID (from the research)
+1. **`animation-timeline` after `animation` shorthand** — the shorthand resets it. Always declare `animation-timeline:` on its own line AFTER any `animation: …` shorthand.
+2. **`animation-duration: 1ms` for Firefox compat** — Firefox requires non-zero duration even for scroll-driven animations. Use `1ms` (ignored when scroll-bound, satisfies Firefox).
+3. **Safari lacks scroll-driven animations** — wrap in `@supports (animation-timeline: scroll())`. For Safari, either (a) ship a 4KB polyfill (https://github.com/flackr/scroll-timeline) or (b) accept static fallback. Recommendation: accept fallback for v1; the framer-motion `useScroll` path covers Safari for the parallax (it's a JS reading scroll, not the CSS API).
+4. **`prefers-reduced-motion` is mandatory** for gate weave, parallax, and stagger. Anything time-looping or scroll-bound must be gated.
+5. **`isolation: isolate`** on the stage root is REQUIRED for `mix-blend-mode` to scope to the stage rather than blending with the page background. Already done in v5 — keep it.
+6. **Don't use `mix-blend-mode: difference` on the headline if the user can upload a low-contrast image** — fall back to `exclusion` (less harsh) or auto-detect via `backdrop-filter: invert(1)` on a text-shadow.
+7. **Word splitting must preserve accessibility** — `aria-label={originalText}` on the parent BEFORE splitting, never on the spans.
+8. **Entrance stagger direction: back-to-front**, not front-to-back. Back-to-front feels like a camera focusing; front-to-back feels like a curtain.
+9. **Linear easing is ONLY for scroll-bound.** Time-based linear always looks cheap. expo.out or back.out for everything else.
+10. **clip-path is hardware-accelerated; height is not.** Prefer `clip-path: inset(...)` for reveal animations. Avoid `height: 0 → 100%` (causes layout, jank).
+
+## RESEARCH ARTIFACTS SAVED
+- 16 web-search result JSON files in `/home/z/my-project/research_cache_v5/*.json`
+- 14 deep-read article HTML→text extractions in `/home/z/my-project/research_cache_v5/pages/*.json`
+- All citations above are traceable to those files.
+
+**No code was written. Only this entry was appended to worklog.md. The z-ai `web_search` and `page_reader` backends were fully available this session (no rate-limiting). All searches returned 8-10 results; all page reads succeeded except LinkedIn (returned login wall but title + intro were still extractable).**

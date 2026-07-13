@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://css-tricks.com/animating-with-clip-path",
+    "name": "Animating with Clip-Path - CSS-Tricks",
+    "snippet": "Animating clip-path can be as simple as changing the property values from one shape to another using CSS transitions.",
+    "host_name": "css-tricks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.smashingmagazine.com/2025/05/smashing-animations-part-2-css-masking-add-extra-dimension",
+    "name": "Smashing Animations Part 2: How CSS Masking Can Add An Extra",
+    "snippet": "A clip-path functions similarly to a mask but uses paths to create hard-edged clipping areas. Masking defines the visible area, creating the ...",
+    "host_name": "www.smashingmagazine.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/clip-path",
+    "name": "clip-path CSS property - MDN Web Docs",
+    "snippet": "The clip-path CSS property creates a clipping region that sets what part of an element should be shown. Parts that are inside the region are ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://clip-path.karaan.me",
+    "name": "Clip Path Library - A collection of beautiful, interactive components",
+    "snippet": "circular clip-path reveal effect. a circular mask reveals a portion of the animated text, The animation uses CSS keyframes for smooth, continuous motion.",
+    "host_name": "clip-path.karaan.me",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=rGuB76xdHa0",
+    "name": "CSS Clip Path Tutorial - YouTube",
+    "snippet": "... elements. The CSS clip path property is even animatable, allowing for some real fancy user interactions and animations all from within CSS ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/67299644/css-clip-path-mask-shape-animation-with-circle-or-arc-segment",
+    "name": "CSS Clip/Path/Mask/Shape Animation with circle or arc segment",
+    "snippet": "How can I do an animated shape in the form of cake or clock or circle that starts with one small slice and then over time fills the whole circle. CSS - Possible to animate \"clip\" on an image to reveal quadrants clockwise? CSS animating breaking clip-path - Stack Overflow More results from stackoverflow.com",
+    "host_name": "stackoverflow.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://theproductguy.in/blogs/css-clip-path-masking",
+    "name": "CSS Clip-Path Image Masking | theproductguy.in",
+    "snippet": "Applied to images, it creates circular avatars, diagonal section cuts, polygon reveals, and hover animations without any image editing software.",
+    "host_name": "theproductguy.in",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://emilkowal.ski/ui/the-magic-of-clip-path",
+    "name": "The Magic of Clip Path - Emil Kowalski",
+    "snippet": "The clip-path property is used to clip an element into a specific shape. We create a clipping region with it, content outside of this region will be hidden.",
+    "host_name": "emilkowal.ski",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2021/05/04/dynamic-css-masks-with-custom-properties-and-gsap",
+    "name": "Dynamic CSS Masks with Custom Properties and GSAP - Codrops",
+    "snippet": "Learn how to animate CSS masks based on the cursor position using GSAP and custom properties for a unique spotlight effect.",
+    "host_name": "tympanus.net",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.xenonstack.com/blog/css-mask-clip-path-property",
+    "name": "CSS Clipping Mask: Enhance Web Design with Creative Image Effects",
+    "snippet": "The clip-path property in CSS allows you to specify a specific region of an element to display, with the rest being hidden (or “clipped”) away.",
+    "host_name": "www.xenonstack.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

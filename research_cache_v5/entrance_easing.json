@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=BNe5s9MlCYU",
+    "name": "React Native Screen Transitions for Beginners - YouTube",
+    "snippet": "Hello everyone , In this video we will add premium screen transitions and animations to a React Native app using Expo Router and ...\n... animations to a React Native app using Expo Router and react-native-screen-transitions. We'll upgrade a MotionFlix movie app with smooth ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DSC7PP2iIZF",
+    "name": "Need stunning animations for your React Native apps? This open",
+    "snippet": "Motion is what makes interfaces feel polished. Here are 5 animation libraries every frontend developer should know in 2026: 1. Framer Motion ( ...",
+    "host_name": "www.instagram.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://easings.net",
+    "name": "Easing Functions Cheat Sheet",
+    "snippet": "Make animations more realistic by picking the right easing function. Easing functions specify the rate of change of a parameter over time. This page helps you ...\nMake animations more realistic by picking the right easing function. asing functions specify the rate of change of a parameter over time. This page helps you ...",
+    "host_name": "easings.net",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DHsxLwtAsMv",
+    "name": "Angel Villanueva ⚡️ | Want to create an interactive navbar that",
+    "snippet": "This tutorial breaks down exactly how to build a basic show/hide navbar animation in @webflow Perfect for portfolios, landing pages, and modern websites!",
+    "host_name": "www.instagram.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=ghhjMAomiHQ",
+    "name": "After Effects Easing Explained (Make Motion Feel Real) - YouTube",
+    "snippet": "Slow In and Slow Out is the notion that acceleration and deceleration play a role in making believable movements within animation.",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/posts/betomoedano_new-video-i-tested-react-native-ease-activity-7438329889654554624-jf3T",
+    "name": "New video: I tested React Native Ease by App&Flow, animations that",
+    "snippet": "Hey, if you knew here I'm Beto. I spent years building mobile applications at Walmart, then at Expo as a Developer Success Engineer where I ...",
+    "host_name": "www.linkedin.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/expo/router/discussions/492",
+    "name": "Adding transition animations when changing screens? · expo router",
+    "snippet": "Is it possible to add/change the transition animations when changing screens? By default, going from one tab screen to another tab screen is no transition ...",
+    "host_name": "github.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/44686-expo-eased-animation-not-triggering-on-page-load",
+    "name": "Expo eased animation not triggering on page load - GSAP",
+    "snippet": "I need some assistance with figuring out what is causing my animation not to be visible or not happening.",
+    "host_name": "gsap.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.easing.dev/out-expo",
+    "name": "Out Expo - Easing Graphs",
+    "snippet": "A curated collection of easing graphs. Out Expo Easing Graphs New Graph Back Out. Built by Alex & Lochie.",
+    "host_name": "www.easing.dev",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://iamshadi.medium.com/re-creating-the-wolts-smooth-page-transition-with-expo-router-in-react-native-0b34541452db",
+    "name": "Re-creating Wolt's Smooth Page Transition with Expo Router in",
+    "snippet": "This tutorial will guide you through the process of implementing fluid transitions that not only try to mimic Wolt's aesthetic appeal but also elevate the ...",
+    "host_name": "iamshadi.medium.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

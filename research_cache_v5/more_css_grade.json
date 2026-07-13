@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mix-blend-mode",
+    "name": "mix-blend-mode CSS property - MDN Web Docs",
+    "snippet": "The mix-blend-mode CSS property sets how an element's content should blend with its backdrop — the content rendered behind the element within ...",
+    "host_name": "developer.mozilla.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=TAA89nkEuhw",
+    "name": "How to use mix-blend-mode, and how to avoid problems with it",
+    "snippet": "... Web/CSS/mix-blend-mode ✓ Ana Tudor CodePen I mentioned: https://codepen.io/thebabydino/pen/dyOvmRY ✓ Ana Tudor's CSS-Tricks article: https://css ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://css-tricks.com/taming-blend-modes-difference-and-exclusion",
+    "name": "Taming Blend Modes: `difference` and `exclusion` - CSS-Tricks",
+    "snippet": "Blending means combining two layers (that are stacked one on top of the other) and getting a single layer.",
+    "host_name": "css-tricks.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/web_design/comments/13uab32/2_css_gradients_and_a_crazy_mixblendmode_gives",
+    "name": "2 CSS Gradients and a crazy mix-blend-mode gives amazing results",
+    "snippet": "2 CSS Gradients and a crazy mix-blend-mode gives amazing results! Do you know you can overlay and blend images with CSS by using background- ...",
+    "host_name": "www.reddit.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/greenshiftwp/posts/1153319652773972",
+    "name": "How to add mix blend mode for image and color overlay - Facebook",
+    "snippet": "Mix blend on overlay will have no effect. So how can I mix blend background image with colour? overlay colour should be mix bled mode too, for ...",
+    "host_name": "www.facebook.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://wpengine.com/blog/css-blend-modes",
+    "name": "How to Use CSS Blend Modes - WP Engine",
+    "snippet": "Blend modes are defined as a value and they specify how to blend or mix the colors of the background image with the color, or other background images, behind it ...",
+    "host_name": "wpengine.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.sitepoint.com/close-up-css-mix-blend-mode-property",
+    "name": "A Close-up Look at the CSS mix-blend-mode Property - SitePoint",
+    "snippet": "The CSS mix-blend-mode property allows for the blending of two or more background colors or images, creating artistic effects directly from your ...",
+    "host_name": "www.sitepoint.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://pawelgrzybek.com/make-some-magic-with-css-blend-modes",
+    "name": "Make some magic with CSS blend modes | pawelgrzybek.com",
+    "snippet": "This set of blend modes calculate the difference or colour inversion between two layers. This produces results where colours are cancelled or ...",
+    "host_name": "pawelgrzybek.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

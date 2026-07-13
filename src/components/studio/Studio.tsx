@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useAliveStore } from "@/lib/store";
 import { AliveStage } from "@/components/alive/AliveStage";
 import { LayerEditor } from "@/components/alive/LayerEditor";
+import { HeroMode } from "@/components/alive/HeroMode";
 import { AnalysisPanel } from "./AnalysisPanel";
 import { LayersPanel } from "./LayersPanel";
 import { LayerInspector } from "./LayerInspector";
@@ -11,6 +12,7 @@ import { PresetPicker } from "./PresetPicker";
 import { ControlPanel } from "./ControlPanel";
 import { EffectsPanel } from "./EffectsPanel";
 import { ExportPanel } from "./ExportPanel";
+import { HeroPanel } from "./HeroPanel";
 import {
   Loader2,
   AlertCircle,
@@ -20,10 +22,11 @@ import {
   SlidersHorizontal,
   Sparkles,
   Code2,
+  Maximize2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type RightTab = "animate" | "atmosphere" | "export";
+type RightTab = "animate" | "atmosphere" | "hero" | "export";
 
 export function Studio() {
   const {
@@ -35,8 +38,10 @@ export function Studio() {
     depthMapUrl,
     error,
     selectedLayerId,
+    heroMode,
     selectLayer,
     updateLayerTransform,
+    setHeroMode,
   } = useAliveStore();
 
   const stageWrapperRef = useRef<HTMLDivElement>(null);
@@ -45,6 +50,11 @@ export function Studio() {
 
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";
+
+  // Hero mode = full-viewport overlay
+  if (heroMode && isReady) {
+    return <HeroMode onExit={() => setHeroMode(false)} />;
+  }
   const showStage = !!previewUrl;
 
   return (
@@ -193,6 +203,12 @@ function RightPanelTabs({
           label="Atmósfera"
         />
         <TabButton
+          active={tab === "hero"}
+          onClick={() => setTab("hero")}
+          icon={<Maximize2 className="h-3.5 w-3.5" />}
+          label="Hero"
+        />
+        <TabButton
           active={tab === "export"}
           onClick={() => setTab("export")}
           icon={<Code2 className="h-3.5 w-3.5" />}
@@ -207,6 +223,7 @@ function RightPanelTabs({
         </>
       )}
       {tab === "atmosphere" && <EffectsPanel />}
+      {tab === "hero" && <HeroPanel />}
       {tab === "export" && isReady && <ExportPanel />}
     </div>
   );

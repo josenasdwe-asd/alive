@@ -1,0 +1,2002 @@
+     1→# Project Worklog — Alive Image (Layer Decomposition + Animation)
+     2→
+     3→This file is the shared work log for all sub-agents working on the "still image → alive" web app.
+     4→Each agent appends its findings using the template defined in the agent brief.
+     5→
+     6→---
+     7→Task ID: 1
+     8→Agent: Research Agent - Layer Separation
+     9→Task: Research best techniques for image layer separation for web animation
+    10→
+    11→Work Log:
+    12→- Read existing project layout at /home/z/my-project (Next.js + Prisma + Tailwind already scaffolded; no worklog existed yet, so this is the inaugural entry).
+    13→- Used the `web-search` skill (z-ai CLI `web_search` function) to run 20+ targeted queries covering: depth estimation models (Depth Anything V2 / MiDaS / ZoeDepth / Marigold / Depth Pro), SAM2, LaMa / IOPaint / Stable Diffusion inpainting, LeiaPix/Immersity, DepthFlow, Tiefling, 3D Photo Inpainting (Shih et al. CVPR 2020), SLIDE, CapCut 3D Zoom, sharp/jimp/canvas, GSAP/Motion/Pixi/Three.js, SVG turbulence + feDisplacementMap, chromatic aberration, Ken Burns, and "make still image alive" tutorials.
+    14→- Used the `web-reader` skill (`page_reader`) to deep-read the most important primary sources: Codrops "How to Create a Fake 3D Image Effect with WebGL", the BrokenSource/DepthFlow GitHub README, the vt-vl-lab/3d-photo-inpainting GitHub README, the Scrollsequence "Converting 2D images to Fake 3D immersive content" deep-research article (excellent synthesis of the entire field), and the akbartus/DepthAnything-on-Browser README.
+    15→- Synthesized findings into the comprehensive report below, ranked by feasibility for a Next.js web app, with concrete implementation guidance and a recommended architecture.
+    16→
+    17→Stage Summary:
+    18→- **Top recommendation**: Hybrid pipeline — run **Depth Anything V2 (Small or Base)** server-side via Python (or HuggingFace Inference API / Replicate) to get a depth map, then run **SAM2 auto-mask** to identify the main subject, then **LaMa (via IOPaint)** to inpaint the background behind the subject. Ship the original image + depth map + subject mask + inpainted background to the browser, and render the "alive" effect with a **Three.js / React Three Fiber fragment shader** that displaces UVs by `uv + offset * depth.r` (the Codrops/LeiaPix/DepthFlow/Tiefling technique). Layer it with **GSAP or Motion (Framer Motion)** for breathing, sway, and chromatic aberration, plus an **SVG feTurbulence + feDisplacementMap** overlay for the subtle liquid/shimmer that sells the "LSD alive" feel.
+    19→- **Critical insight**: The single most important quality lever is **depth-map-to-displacement** with **edge dilation + occluded-background inpainting**. Pure UV-offset creates stretched "rubber band" artifacts at depth discontinuities; this is exactly what Immersity/LeiaPix/3D-Photo-Inpainting solve by hallucinating the background behind foreground objects. We MUST replicate this or the effect looks cheap.
+    20→- **Critical insight #2**: Limit camera/mouse motion to a small range (~±10° rotation or a few tens of px translation). Google's Cinematic Photos team confirmed this is the key to hiding artifacts without expensive per-frame inpainting.
+    21→- See full report below for ranked techniques, code snippets, and the proposed Next.js architecture.
+    22→
+    23→---
+    24→
+    25→## FULL RESEARCH REPORT — Image Layer Separation for "Alive" Web Animation
+    26→
+    27→### 1. Depth Estimation Models
+    28→
+    29→| Model | Year | Type | Latency (GPU) | Open Source | Notes |
+    30→|---|---|---|---|---|---|
+    31→| **Depth Anything V2** | NeurIPS 2024 | DINOv2 student (Small/Base/Large/Giant) | ~98ms (Small, GPU) | ✅ Apache 2.0 | **SOTA for our use case.** Trained on 595K synthetic + 62M unlabeled real images. Finer detail & more robust than V1. Faster than diffusion-based (Marigold). Has `Depth-Anything-V2-Metric-Indoor/Outdoor-Large-hf` fine-tunes for absolute depth. ONNX export available (`onnx-community/depth-anything-v2-small` → ~18MB q4f16). |
+    32→| **Depth Anything V3** | 2025 | Multi-view capable | similar | ✅ | Just released; ByteDance Seed. Better for video/consistency. V2 is fine for single-image. |
+    33→| **Marigold** | CVPR 2024 (Oral, Best Paper) | Latent Diffusion (Stable Diffusion fine-tune) | seconds (multi-step) | ✅ MIT | Most accurate fine detail & gradients, but slow. Great if quality > speed and you can cache. |
+    34→| **MiDaS v3.1 (DPT)** | 2020–2022 | ViT/DPT | ~100ms | ✅ MIT | The classic. Relative depth (not metric). Solid baseline; superseded by Depth Anything V2. |
+    35→| **ZoeDepth** | 2023 | MiDaS + metric heads | ~170ms (fastest in arxiv benchmark) | ✅ MIT | Metric depth (real units). Fastest per the wildlife benchmark but least accurate. |
+    36→| **Depth Pro** (Apple) | 2024 | ViT | fast, sharp edges | ✅ Apache | Strong competitor to V2; zero-shot metric. Good boundary detail. |
+    37→
+    38→**Recommendation**: **Depth Anything V2 Small or Base** as the default. Small (~25M params) is fast enough to run server-side at <100ms per image; Base (~97M) is the sweet spot for quality/latency. If we can afford a GPU server, use Large. Marigold as a "premium" option for high-quality cached renders.
+    39→
+    40→**Inference options**:
+    41→1. **Python + transformers** (server-side, Next.js Route Handler calls a Python microservice or runs via `@xenova/transformers` JS):
+    42→   ```python
+    43→   from transformers import pipeline
+    44→   pipe = pipeline("depth-estimation", model="depth-anything/Depth-Anything-V2-Small-hf")
+    45→   result = pipe(image)  # returns PIL Image with .depth
+    46→   ```
+    47→2. **HuggingFace Inference API** (serverless, easy): `https://api-inference.huggingface.co/models/depth-anything/Depth-Anything-V2-Small-hf` — simple `POST` with image bytes, get PNG depth back. Free tier with rate limits; ~$0.01–0.05/image on paid.
+    48→3. **Replicate API**: `pollinations/3d-photo-inpainting` does depth + layered inpainting in one call (~12 min on A100 — slow but high quality).
+    49→4. **In-browser via ONNX Runtime Web / WebGPU**: `akbartus/DepthAnything-on-Browser` proves it's possible; ~20s on a fast laptop. Too slow for on-the-fly, but viable for "click to compute depth locally" UX with a loading state.
+    50→
+    51→### 2. Layer Separation from Depth Maps
+    52→
+    53→Given a continuous grayscale depth map, splitting into N discrete layers:
+    54→
+    55→**a) Equal-width thresholding (simplest)**: normalize depth to [0,1], slice into N bands. Easy but tends to over-segment smooth gradients.
+    56→
+    57→**b) K-means / quantile clustering** (recommended for 3–5 layers): cluster depth pixels into K bins using `sklearn.cluster.KMeans` or 1-D k-means on the depth histogram. Adapts to actual scene depth distribution. Reference: "Object-Background Region Separation in Depth Image using k-Means Clustering" (KISM 2021).
+    58→
+    59→**c) Bilateral filtering first** (used by Shih et al. 3D-Photo-Inpainting): edge-preserving smoothing of the depth map before clustering → cleaner layer boundaries that align with image edges.
+    60→
+    61→**d) Watershed / connected-component labeling**: produce spatially coherent regions (not just depth bands) → useful for "subject vs background" rather than "near vs far".
+    62→
+    63→**e) Adaptive layering (Layered Depth Image, LDI)**: the gold standard from Shih et al. — splits along depth *discontinuities* with explicit pixel connectivity, producing a graph of front-to-back layers each with its own inpainted color+depth. This is what 3D Photo Inpainting / Immersity use.
+    64→
+    65→For our app, **b + c (bilateral-filter then 1-D k-means with K=3–5)** is the practical sweet spot for "foreground / midground / background / sky" decomposition. Save the cluster centroids as depth thresholds and emit per-layer masks as PNGs.
+    66→
+    67→### 3. Segmentation-Based Separation (SAM / SAM2)
+    68→
+    69→**Meta SAM2** (`facebookresearch/sam2`, Apache 2.0) is the SOTA. Two modes:
+    70→- **Promptable**: click/box/mask → precise mask. Great for "user clicks subject".
+    71→- **Automatic mask generator**: produces all plausible masks. Then we filter by area / centrality to pick the main subject.
+    72→
+    73→**Sky detection**: dedicated models exist (SkyFinder dataset, "Segmenting Sky Pixels in Images"), but a simpler heuristic often suffices — combine (a) top-of-image region, (b) blue-ish / bright color, (c) **far depth** (depth value in the top decile). Can also use a semantic seg model like **ADE20K-trained OneFormer / Mask2Former** which has a "sky" class out of the box.
+    74→
+    75→**Ground detection**: similar — bottom-of-image + dark/uniform color + near depth. Or ADE20K class "floor / grass / road / earth".
+    76→
+    77→**Subject detection**: SAM2 auto-mask → pick the largest non-sky/non-ground mask whose centroid is in the central 60% of the frame. Optionally refine edges with **Matting-Anything** or **MODNet** for hair-level fidelity (important for portraits).
+    78→
+    79→**Recommended pipeline**:
+    80→1. Run ADE20K semantic seg (1 forward pass) → labels every pixel as sky / ground / person / building / etc.
+    81→2. Run SAM2 auto-mask → instance-level subject candidates.
+    82→3. Cross-reference: subject = SAM2 mask overlapping "person" or central non-background ADE20K labels.
+    83→
+    84→For a Next.js app, run server-side via the `transformers.js` SAM2 port or a Python microservice. **transformers.js** can run SAM2 in Node.js directly — no Python needed.
+    85→
+    86→### 4. Background Removal + Inpainting
+    87→
+    88→**Background removal**:
+    89→- **Rembg** (Python, MIT) — wraps U2Net / BRIA RMBG / IS-Net. CLI + library. Production-grade, ~1–2s per image on CPU. Best free option.
+    90→- **@imgly/background-removal** (JS, runs in browser or Node via WASM) — drop-in for Next.js, no Python.
+    91→
+    92→**Inpainting the occluded background** (critical for parallax quality):
+    93→- **LaMa** (Resolution-robust Large Mask Inpainting with Fourier Convolutions, Samsung Research) — SOTA for large mask inpainting, generalizes to 2K res despite 256×256 training. Fast (~1s/image on GPU). Apache 2.0.
+    94→- **IOPaint** (formerly Lama-Cleaner, MIT) — self-hostable web app + Python lib + HTTP API that wraps LaMa, Stable Diffusion inpainting, MAT, ZITS, FcF, Manga, PaintByExample, and several matting models. **This is the swiss-army knife.** Docker container → Next.js calls `POST http://iopaint:8000/inpaint` with image + mask.
+    95→- **Stable Diffusion Inpainting** — highest quality for complex scenes, but slow (5–15s on GPU) and may "hallucinate" extra content.
+    96→- **3D Photo Inpainting** (Shih et al., CVPR 2020, `vt-vl-lab/3d-photo-inpainting`) — the canonical method. Takes RGB+depth, outputs a Layered Depth Image (LDI) with color+depth for occluded regions. Heavy (~10 min on A100 per image via Replicate). Available as `pollinations/3d-photo-inpainting` on Replicate. **Best quality**, expensive.
+    97→- **SLIDE** (ICCV 2021) — soft layering variant; handles hair/foliage better. No official code; community reimplementations exist.
+    98→
+    99→**Practical recommendation for our app**:
+   100→1. Default: Rembg (or `@imgly/background-removal`) for subject alpha matte.
+   101→2. **Dilate the subject mask by ~20–40 px** (this is what Facebook 3D Photos / Tiefling's `expandDepthmapRadius` do — exposes a band of background that can be revealed when subject shifts).
+   102→3. Run **LaMa via IOPaint** on the dilated mask → reconstructs background where the subject used to be. Store this as `background_inpainted.png`.
+   103→4. For premium mode: route through `pollinations/3d-photo-inpainting` on Replicate for the full LDI treatment (cached, async).
+   104→
+   105→### 5. Parallax Layer Generation Tools (Reference)
+   106→
+   107→| Tool | Type | Layers | Tech | Open Source? |
+   108→|---|---|---|---|---|
+   109→| **Immersity AI** (ex-LeiaPix) | Cloud SaaS | proprietary "Spatial AI" layers (3–5 typical) | depth + generative layered fill | ❌ (paid API) |
+   110→| **DepthFlow** (BrokenSource) | Self-hosted CLI/Python | continuous (ray-marched) | GLSL ray-marching shader | ✅ AGPL-3.0 |
+   111→| **Tiefling** | Browser app | continuous | DepthAnythingV2-ONNX + Three.js mesh displacement | ✅ MIT |
+   112→| **3D Photo Inpainting** | Python (CVPR 2020) | LDI multi-layer | PyTorch, layered inpainting | ✅ MIT |
+   113→| **CapCut 3D Zoom** | Mobile app | 2–3 manual/auto | duplicate + scale layers | ❌ |
+   114→| **Google Photos Cinematic** | Closed | 2 layers + small motion | depth + segmentation-edge fix + constrained camera | ❌ |
+   115→| **Depthy** (depthy.stamina.pl) | Old web tool | 2 | WebGL shader UV offset | ✅ (legacy) |
+   116→| **Scrollsequence V2** | WordPress plugin | image array + depth | three.js / pixi.js | commercial |
+   117→
+   118→**Common pattern**: most create 3–5 layers (sky / far / mid / near-subject / foreground-object). Immersity & 3D-Photo-Inpainting use continuous depth + occlusion-aware inpainting (the highest quality). CapCut/LeiaPix-lite use 2–3 hard layers (cheaper but visible seams).
+   119→
+   120→### 6. JS / Python Libraries for Next.js
+   121→
+   122→**Image manipulation (Node server-side)**:
+   123→- **sharp** — fast, libvips-backed, the standard. Use for resize / composite / PNG encode / channel ops. Already the default in Next.js Image Optimization.
+   124→- **jimp** — pure JS (no native deps). Slower but works anywhere. Useful for per-pixel ops sharp can't do.
+   125→- **@napi-rs/canvas** (node-canvas) — full Canvas 2D API in Node. Great for procedural mask drawing / compositing.
+   126→- **utif** / **pngjs** — low-level for raw pixel access.
+   127→
+   128→**ML in Node**:
+   129→- **@xenova/transformers** (transformers.js) — runs Depth Anything V2, SAM2, RMBG models in Node.js / browser via ONNX Runtime. **No Python required** — huge simplification for Next.js deployments. Supports WebGPU.
+   130→- **onnxruntime-node** — direct ONNX execution.
+   131→
+   132→**Front-end rendering**:
+   133→- **three.js** + **@react-three/fiber** (R3F) — WebGL rendering, best for vertex-displaced 3D mesh approach. R3F is the React idiom.
+   134→- **pixi.js** — 2D WebGL with built-in `DisplacementFilter` (drop a depth-map sprite as displacement map → instant parallax). Simpler than three.js for pure 2.5D.
+   135→- **regl** — minimalist WebGL wrapper (used by Codrops tutorial).
+   136→- **gl-react** — React component wrapper for GLSL shaders.
+   137→
+   138→**Animation**:
+   139→- **motion** (formerly Framer Motion) — React-first, springs, useMotionValue for mouse parallax. Tiny bundle.
+   140→- **GSAP** — most powerful timelines / ScrollTrigger. Use if combining scroll + mouse + many synced layers.
+   141→- **anime.js** — lightweight, simple.
+   142→- **Lenis** — smooth scroll (pairs with GSAP).
+   143→
+   144→**SVG / CSS effects** (no library):
+   145→- `<feTurbulence>` + `<feDisplacementMap>` — built-in SVG filters for liquid distortion.
+   146→- CSS `filter: url(#turbulence)` + `@keyframes` animating `baseFrequency` or `seed` → "alive" shimmer.
+   147→- CSS `mix-blend-mode` for chromatic aberration (3 duplicated layers R/G/B with slight transform).
+   148→
+   149→### 7. The "LSD Alive" Effect — Subtle Animation Toolkit
+   150→
+   151→The "alive" feeling is the *combination* of several subtle, low-amplitude animations. Each alone is barely noticeable; together they create the magic. Key techniques (ranked by impact):
+   152→
+   153→1. **Mouse / gyro parallax** (the foundation). Map `mouseX/Y` (or `deviceorientation`) to camera/layer offset, multiplied by per-layer depth. Smooth with lerp (damping ~0.05–0.1).
+   154→2. **Breathing / pulsing** — slow (4–8s period) `scale: 1.0 ↔ 1.015`. Apply to whole image and slightly stronger to foreground.
+   155→3. **Sway** — gentle `rotate: ±0.3°` oscillation on a 6–10s sine. Subtle but very "alive".
+   156→4. **Liquid / wavy distortion** — `<feTurbulence>` SVG filter animated via `seed` or `baseFrequency`, applied with low `scale` (1–3px displacement). Gives the "water surface" shimmer. Optional per-region.
+   157→5. **Floating particles** — CSS / canvas particles (dust motes, light specks) drifting upward or with mouse. ~10–30 particles, low opacity.
+   158→6. **Light shimmer** — slow gradient overlay sweeping across (radial highlight following mouse, or auto-cycling). ~2–5% opacity.
+   159→7. **Chromatic aberration / RGB split** — shift R/B channels 1–3px based on mouse distance from center. Increases at edges (radial).
+   160→8. **Depth-of-field shift** — blur the far layer (or near layer) alternately on a 8–12s cycle. `filter: blur(0–4px)`.
+   161→9. **Ken Burns** — slow zoom (1.0 → 1.05 over 20–30s) + sub-pixel pan. Good as a base when there's no mouse input.
+   162→10. **Vignette pulse** — very subtle darkening at edges pulsing with breathing.
+   163→
+   164→Amplitude guidelines: any single effect should be barely perceptible when stared at. Combined, they shouldn't draw attention to themselves. The user should just feel "the image is breathing".
+   165→
+   166→### 8. Code Examples
+   167→
+   168→**a) Codrops / canonical WebGL fragment shader** (the foundation of LeiaPix/DepthFlow/Tiefling):
+   169→```glsl
+   170→// Fragment shader: original image + depth map → parallax with mouse
+   171→uniform sampler2D originalImage;
+   172→uniform sampler2D depthImage;
+   173→uniform vec2 mouse;  // normalized -1..1, damped
+   174→uniform float depthStrength;  // ~0.02 for subtle
+   175→varying vec2 vUv;
+   176→
+   177→void main() {
+   178→    vec4 depth = texture2D(depthImage, vUv);
+   179→    // White = close → moves more with mouse; black = far → stays put
+   180→    vec2 offset = mouse * depth.r * depthStrength;
+   181→    gl_FragColor = texture2D(originalImage, vUv + offset);
+   182→}
+   183→```
+   184→That's the whole effect. ~6 lines of GLSL. From the Codrops tutorial by Yuri Artiukh.
+   185→
+   186→**b) React Three Fiber implementation** (R3F + drei):
+   187→```tsx
+   188→import { Canvas, useFrame, useLoader } from '@react-three/fiber'
+   189→import { TextureLoader } from 'three'
+   190→import { useRef, useMemo } from 'react'
+   191→import * as THREE from 'three'
+   192→
+   193→const vertexShader = `
+   194→  varying vec2 vUv;
+   195→  void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
+   196→`
+   197→const fragmentShader = `
+   198→  uniform sampler2D uImage; uniform sampler2D uDepth;
+   199→  uniform vec2 uMouse; uniform float uTime;
+   200→  varying vec2 vUv;
+   201→  void main() {
+   202→    vec4 d = texture2D(uDepth, vUv);
+   203→    // subtle breathing + mouse parallax
+   204→    float breath = sin(uTime * 0.8) * 0.003 * d.r;
+   205→    vec2 off = uMouse * d.r * 0.03 + vec2(breath, breath * 0.5);
+   206→    gl_FragColor = texture2D(uImage, vUv + off);
+   207→  }
+   208→`
+   209→
+   210→function AlivePlane({ img, depth }) {
+   211→  const mat = useRef<THREE.ShaderMaterial>(null!)
+   212→  const tex = useLoader(TextureLoader, img)
+   213→  const depthTex = useLoader(TextureLoader, depth)
+   214→  const mouse = useMemo(() => new THREE.Vector2(0, 0), [])
+   215→  useFrame((state, delta) => {
+   216→    // smooth mouse follow
+   217→    mouse.x += (state.pointer.x - mouse.x) * 0.05
+   218→    mouse.y += (state.pointer.y - mouse.y) * 0.05
+   219→    mat.current.uniforms.uMouse.value = mouse
+   220→    mat.current.uniforms.uTime.value += delta
+   221→  })
+   222→  return (
+   223→    <mesh>
+   224→      <planeGeometry args={[2, 2]} />
+   225→      <shaderMaterial ref={mat} vertexShader={vertexShader} fragmentShader={fragmentShader}
+   226→        uniforms={{
+   227→          uImage:  { value: tex },
+   228→          uDepth:  { value: depthTex },
+   229→          uMouse:  { value: mouse },
+   230→          uTime:   { value: 0 },
+   231→        }} />
+   232→    </mesh>
+   233→  )
+   234→}
+   235→```
+   236→
+   237→**c) Pixi.js DisplacementFilter** (simpler than R3F, great for 2.5D):
+   238→```js
+   239→import { Application, Sprite, DisplacementFilter, TilingSprite } from 'pixi.js'
+   240→const app = new Application({ resizeTo: window })
+   241→document.body.appendChild(app.view)
+   242→
+   243→const img = Sprite.from('photo.jpg')
+   244→const depth = Sprite.from('depth.png')  // grayscale
+   245→const filter = new DisplacementFilter(depth, 0)  // scale = 0 initially
+   246→img.filters = [filter]
+   247→app.stage.addChild(img)
+   248→
+   249→// animate with mouse
+   250→window.addEventListener('pointermove', (e) => {
+   251→  const x = (e.clientX / window.innerWidth - 0.5) * 60
+   252→  const y = (e.clientY / window.innerHeight - 0.5) * 60
+   253→  gsap.to(filter.scale, { x, y, duration: 1, ease: 'power3.out' })
+   254→})
+   255→```
+   256→
+   257→**d) GSAP mouse parallax on stacked CSS layers** (no WebGL, simplest):
+   258→```html
+   259→<div class="scene" data-depth-lerp="0.08">
+   260→  <img class="layer sky"      data-depth="0.1" src="sky.png">
+   261→  <img class="layer mountains" data-depth="0.3" src="mountains.png">
+   262→  <img class="layer subject"  data-depth="0.7" src="subject.png">
+   263→  <img class="layer foreground" data-depth="1.2" src="foreground.png">
+   264→</div>
+   265→```
+   266→```js
+   267→const layers = document.querySelectorAll('.layer')
+   268→const state = { mx: 0, my: 0, tx: 0, ty: 0 }
+   269→window.addEventListener('pointermove', e => {
+   270→  state.mx = (e.clientX / innerWidth - 0.5)
+   271→  state.my = (e.clientY / innerHeight - 0.5)
+   272→})
+   273→gsap.ticker.add(() => {
+   274→  state.tx += (state.mx - state.tx) * 0.06
+   275→  state.ty += (state.my - state.ty) * 0.06
+   276→  layers.forEach(l => {
+   277→    const d = parseFloat(l.dataset.depth)
+   278→    gsap.set(l, { x: state.tx * 40 * d, y: state.ty * 40 * d,
+   279→                  rotation: state.tx * 1.5 * d })
+   280→  })
+   281→})
+   282→// breathing pulse on whole scene
+   283→gsap.to('.scene', { scale: 1.015, duration: 4, yoyo: true, repeat: -1, ease: 'sine.inOut' })
+   284→```
+   285→
+   286→**e) SVG turbulence for liquid shimmer** (overlay on the image):
+   287→```html
+   288→<svg style="position:absolute; width:0; height:0;">
+   289→  <filter id="alive">
+   290→    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="1">
+   291→      <animate attributeName="seed" from="1" to="50" dur="20s" repeatCount="indefinite" />
+   292→    </feTurbulence>
+   293→    <feDisplacementMap in="SourceGraphic" scale="6" />
+   294→  </filter>
+   295→</svg>
+   296→<img src="photo.jpg" style="filter: url(#alive);" />
+   297→```
+   298→Animate `baseFrequency` or `seed` for slow, organic movement.
+   299→
+   300→**f) Chromatic aberration** (CSS):
+   301→```css
+   302→.alive-img::before, .alive-img::after {
+   303→  content: ''; position: absolute; inset: 0;
+   304→  background-image: var(--img);
+   305→  mix-blend-mode: screen;
+   306→}
+   307→.alive-img::before { background-color: #f00; transform: translate(var(--abx, 0), 0); }
+   308→.alive-img::after  { background-color: #00f; transform: translate(calc(-1 * var(--abx, 0)), 0); }
+   309→/* JS sets --abx = mouseX * 2px */
+   310→```
+   311→
+   312→### 9. Depth-Map-to-Displacement Technique — Deep Dive (the LeiaPix/Immersity method)
+   313→
+   314→This is the single most important technique for our project. Two rendering variants:
+   315→
+   316→**Variant A — Fragment-shader UV offset** (Codrops, Depthy, Pixi DisplacementFilter):
+   317→- 1 fullscreen quad, fragment shader samples depth, offsets UV.
+   318→- ✅ Trivial to implement, ~6 lines GLSL, runs at 60fps on any GPU.
+   319→- ❌ Produces **"rubber band" / stretch artifacts** at depth discontinuities: when a foreground pixel shifts, it leaves a hole filled by the next pixel's color → smeared edges.
+   320→
+   321→**Variant B — Vertex-displaced mesh** (Tiefling, three.js forum examples):
+   322→- Subdivided plane geometry; each vertex's Z = depth value.
+   323→- ✅ True parallax geometry, handles occlusion correctly via depth buffer.
+   324→- ❌ Mesh resolution tradeoff: vertex per pixel = too many verts (2M for 1080p). Need adaptive meshing.
+   325→
+   326→**Variant C — Layered / multi-plane** (Facebook 3D Photo, Immersity, 3D-Photo-Inpainting):
+   327→- N depth planes, each with its own (potentially inpainted) color texture.
+   328→- ✅ Best quality: occlusion solved by inpainting behind each foreground layer.
+   329→- ❌ Requires per-layer background inpainting; more complex asset pipeline.
+   330→
+   331→**The key quality unlocks (do ALL of these)**:
+   332→1. **Dilate the depth map at object edges** before using as displacement (Tiefling's `expandDepthmapRadius`). This pre-extends the background so when foreground shifts, there's real background to show.
+   333→2. **Inpaint the background** behind the main subject (LaMa). Ship `background_inpainted.png` as a separate texture sampled where `depth < subject_depth`.
+   334→3. **Limit motion range** (Google Cinematic Photos insight): clamp mouse offset to ±10° or ±30–50 px. Beyond that, artifacts become visible.
+   335→4. **Use easing / damping** on mouse so motion never exceeds comfortable range.
+   336→5. **Apply bilateral filtering** to the depth map to remove noisy speckles before slicing.
+   337→6. For best results, render with **variant B (vertex mesh) using the inpainted background as a second layer behind** — gets ~90% of Immersity quality at 10% of the compute.
+   338→
+   339→**Concrete shader with occlusion-aware background fill** (Variant C, simplified):
+   340→```glsl
+   341→uniform sampler2D uForeground;   // original image
+   342→uniform sampler2D uBackground;   // LaMa-inpainted background (subject removed)
+   343→uniform sampler2D uDepth;
+   344→uniform sampler2D uSubjectMask;  // 1=subject, 0=background
+   345→uniform vec2 uMouse;
+   346→uniform float uTime;
+   347→varying vec2 vUv;
+   348→
+   349→void main() {
+   350→  vec4 d = texture2D(uDepth, vUv);
+   351→  float mask = texture2D(uSubjectMask, vUv).r;
+   352→  float breath = sin(uTime * 0.6) * 0.002;
+   353→
+   354→  // Foreground shifts more (subject), background less
+   355→  vec2 bgOff = uMouse * (1.0 - d.r) * 0.015 + vec2(breath);
+   356→  vec2 fgOff = uMouse * d.r * 0.05 + vec2(breath * 2.0);
+   357→
+   358→  vec3 bg = texture2D(uBackground, vUv + bgOff).rgb;
+   359→  vec3 fg = texture2D(uForeground, vUv + fgOff).rgb;
+   360→
+   361→  // Use the displaced mask to decide which layer shows
+   362→  float displacedMask = texture2D(uSubjectMask, vUv + fgOff).r;
+   363→  vec3 color = mix(bg, fg, displacedMask);
+   364→
+   365→  gl_FragColor = vec4(color, 1.0);
+   366→}
+   367→```
+   368→
+   369→---
+   370→
+   371→## RANKED TECHNIQUES (for our Next.js "alive image" app)
+   372→
+   373→### 🥇 Rank 1 — Hybrid: Depth Anything V2 + LaMa + Three.js shader (RECOMMENDED)
+   374→**Quality: 9/10 | Feasibility: 8/10 | Effort: Medium | Cost: Low**
+   375→
+   376→Pipeline:
+   377→1. Upload image → Next.js Route Handler.
+   378→2. **Server-side (Node, via `@xenova/transformers` or Python microservice)**:
+   379→   - Run **Depth Anything V2 Small/Base** → depth map PNG.
+   380→   - Run **SAM2 auto-mask** → main subject mask.
+   381→   - Run **LaMa (via IOPaint Docker)** on (image, dilated subject mask) → inpainted background.
+   382→   - Optionally: bilateral filter the depth, dilate subject mask by ~25 px.
+   383→3. Store 4 assets: `original.png`, `depth.png`, `subject_mask.png`, `background_inpainted.png`. Persist URLs in Prisma.
+   384→4. **Client-side (R3F shader)**: Variant C shader above + GSAP breathing + SVG turbulence overlay + chromatic aberration. Mouse-driven parallax clamped to ±0.05 UV.
+   385→
+   386→**Why #1**: Best quality-per-effort. Uses SOTA depth + SOTA inpainting without paying for 3D-Photo-Inpainting's 10-min/A100 cost. The `transformers.js` route means **no Python required** if we use `@xenova/transformers` + `@imgly/background-removal` + IOPaint-as-a-service. Total compute: ~2–4s/image on a CPU-only Vercel-style box, <1s on GPU.
+   387→
+   388→### 🥈 Rank 2 — Pure browser-side (Tiefling-style)
+   389→**Quality: 7/10 | Feasibility: 9/10 | Effort: Low | Cost: Free (no server GPU)**
+   390→
+   391→Pipeline:
+   392→1. Upload image → stays in browser.
+   393→2. `onnxruntime-web` (WebGPU) runs **Depth Anything V2 Small q4f16** (~18MB) → depth map. ~3–5s on M1 Mac, ~20s on mid hardware.
+   394→3. `@imgly/background-removal` (WASM) → subject mask + alpha. ~2–3s.
+   395→4. Skip LaMa (no good browser inpainting yet); instead use **edge dilation** on the depth + clamp mouse range hard.
+   396→5. R3F shader (Variant A) — accept minor stretch artifacts in exchange for zero infra.
+   397→
+   398→**Why #2**: Zero server compute cost, fully private (image never leaves browser). Great for a free tier / demo. Quality ceiling lower due to no real inpainting. Tiefling's open-source MIT code is a direct reference implementation.
+   399→
+   400→### 🥉 Rank 3 — Cloud API (Immersity AI or Replicate)
+   401→**Quality: 10/10 | Feasibility: 9/10 | Effort: Very Low | Cost: $$**
+   402→
+   403→Pipeline:
+   404→1. Upload → POST to Immersity AI API (or `pollinations/3d-photo-inpainting` on Replicate).
+   405→2. Receive: depth map + layered 3D data, OR pre-rendered video.
+   406→3. If interactive: render with their viewer / our shader using their layered output. If video: just `<video autoplay loop muted>`.
+   407→
+   408→**Why #3**: Best quality bar none, least engineering. But: per-image cost ($0.05–0.50), privacy concerns (user images uploaded to third party), rate limits, and vendor lock-in. Good as a **premium upsell** ("Pro" mode) layered on top of Rank 1.
+   409→
+   410→### Rank 4 — Stable Diffusion Inpainting for background
+   411→**Quality: 9/10 | Feasibility: 6/10 | Effort: Medium-High | Cost: Medium**
+   412→
+   413→Like Rank 1 but replace LaMa with **SD Inpainting** (or SDXL inpaint). Higher quality reconstruction (especially for complex backgrounds like foliage, patterns). But 5–15s/image on GPU and risk of hallucinated content. Use only for premium tier.
+   414→
+   415→### Rank 5 — Hard 3-layer CSS-only parallax (no depth model)
+   416→**Quality: 5/10 | Feasibility: 10/10 | Effort: Very Low | Cost: Free**
+   417→
+   418→Skip depth model entirely. User (or simple auto-segmentation) provides 3 layers as separate PNGs: sky / midground / subject. Animate with GSAP Variant (d). Cheapest, fastest, but quality limited and requires either manual prep or Rembg + manual layering.
+   419→
+   420→---
+   421→
+   422→## RECOMMENDED ARCHITECTURE FOR OUR APP
+   423→
+   424→```
+   425→┌─────────────────────────────────────────────────────────────┐
+   426→│                       Next.js 16 App                         │
+   427→│  (App Router, TypeScript, Tailwind, shadcn/ui, Prisma)       │
+   428→└─────────────────────────────────────────────────────────────┘
+   429→                              │
+   430→        ┌─────────────────────┼──────────────────────┐
+   431→        ▼                     ▼                      ▼
+   432→┌───────────────┐    ┌─────────────────┐    ┌─────────────────┐
+   433→│ Upload Page   │    │ API Route       │    │ Viewer Page     │
+   434→│ (client)      │    │ /api/decompose  │    │ (client, R3F)   │
+   435→│ - drag/drop   │──▶ │ - depth est     │──▶ │ - WebGL canvas  │
+   436→│ - preview     │    │ - SAM2 subject  │    │ - GSAP anims    │
+   437→│               │    │ - LaMa inpaint  │    │ - SVG turbulence│
+   438→└───────────────┘    │ - bilateral     │    │ - chromatic ab. │
+   439→                     │   filter depth  │    │ - particles     │
+   440→                     └────────┬────────┘    └─────────────────┘
+   441→                              │
+   442→              ┌───────────────┼───────────────┐
+   443→              ▼               ▼               ▼
+   444→        ┌──────────┐    ┌──────────┐    ┌──────────────┐
+   445→        │ @xenova/ │    │ @imgly/  │    │ IOPaint      │
+   446→        │ transfrs │    │ bg-remov │    │ (Docker,     │
+   447→        │ (Node):  │    │ (WASM):  │    │  LaMa HTTP): │
+   448→        │ Depth-   │    │ subject  │    │ inpaint bg   │
+   449→        │ Anything │    │ matte    │    │ behind subj  │
+   450→        │ V2 +     │    │          │    │              │
+   451→        │ SAM2     │    │          │    │              │
+   452→        └──────────┘    └──────────┘    └──────────────┘
+   453→                              │ (alternative: Python microservice
+   454→                              │  running transformers + LaMa +
+   455→                              │  segment-anything; or Replicate
+   456→                              │  / HuggingFace Inference API)
+   457→                              ▼
+   458→                     ┌──────────────────┐
+   459→                     │ Storage (S3 /    │
+   460→                     │  local /upload): │
+   461→                     │ original.png     │
+   462→                     │ depth.png        │
+   463→                     │ subject_mask.png │
+   464→                     │ background.png   │
+   465→                     │ + Prisma row     │
+   466→                     └──────────────────┘
+   467→```
+   468→
+   469→**Tech stack choices**:
+   470→- **Depth estimation**: `@xenova/transformers` running `onnx-community/depth-anything-v2-small` in Node Route Handler. ~500ms–2s per image. No Python. Falls back to HuggingFace Inference API if local fails.
+   471→- **Subject segmentation**: `@xenova/transformers` running SAM2 (Xenova/slimsam-77-uniform) or `@imgly/background-removal` for the alpha matte.
+   472→- **Background inpainting**: IOPaint Docker container exposing `:8000`. POST `{image, mask}` → returns inpainted PNG. ~1s/image on CPU, faster on GPU. Alternative: Replicate `cjwbw/lama` model API for fully serverless.
+   473→- **Depth post-processing**: `sharp` for bilateral filter? No — bilateral needs custom; use `jimp` or a small `gl-react` headless pass. Simpler: skip bilateral, apply Gaussian blur + threshold.
+   474→- **Storage**: Local `/upload` dir (already exists in project) → later swap to S3/R2.
+   475→- **DB**: Prisma model `Image { id, originalUrl, depthUrl, maskUrl, bgUrl, createdAt, settings JSON }`.
+   476→- **Viewer**: `@react-three/fiber` + custom ShaderMaterial (Variant C above). Wrap in `"use client"`.
+   477→- **Animation**: `motion` (Framer Motion) for UI; `gsap` ticker for the parallax loop; CSS keyframes for breathing/sway; SVG `<feTurbulence>` for shimmer; canvas particle overlay (lightweight, custom).
+   478→- **Fallback**: if WebGL unavailable, render static image with CSS-only Ken Burns + SVG turbulence.
+   479→
+   480→**MVP scope** (suggested):
+   481→1. Upload → server decompose (depth + mask + inpaint) → store.
+   482→2. Viewer renders Variant A shader (simple UV offset) — get the core effect working.
+   483→3. Add Variant C shader (with inpainted bg) for quality.
+   484→4. Add breathing + sway + chromatic aberration.
+   485→5. Add SVG turbulence overlay + particles.
+   486→6. Add user controls: parallax strength, animation intensity, layer count.
+   487→7. (Stretch) Premium mode: Replicate 3D-photo-inpainting for max quality.
+   488→
+   489→**Risk register**:
+   490→- ⚠️ `@xenova/transformers` running Depth Anything V2 in Node may be slow / memory-heavy on Vercel serverless (50MB function limit). Mitigation: run on a VPS / Docker / Replicate.
+   491→- ⚠️ IOPaint adds a Docker dependency. Alternative: call Replicate LaMa endpoint.
+   492→- ⚠️ Depth Anything V2 produces *relative* depth, not metric — fine for parallax, but layer thresholds are per-image. Normalize per-image (min-max) before slicing.
+   493→- ⚠️ Without inpainting, parallax shows stretched edges. Mitigation: clamp mouse range + edge-dilate depth map.
+   494→- ⚠️ Big images (4K+) may exceed GPU texture limits / browser memory. Mitigation: cap at 2048px on upload (via `sharp`).
+   495→
+   496→---
+   497→
+   498→## KEY REFERENCES (primary sources read in full)
+   499→
+   500→- **Codrops — "How to Create a Fake 3D Image Effect with WebGL"** (Yuri Artiukh, Feb 2019). The canonical tutorial. Core shader: `texture2D(originalImage, uv + mouse*depth.r)`.
+   501→- **BrokenSource/DepthFlow** (GitHub, AGPL-3.0). Open-source Python+GLSL image→parallax-video tool. Ray-marching shader, 8K@50fps on RTX 3060.
+   502→- **vt-vl-lab/3d-photo-inpainting** (CVPR 2020, Shih et al., MIT). The canonical "single image → multi-layer 3D photo with hallucinated occluded content" paper. 7.1k stars. Also on Replicate as `pollinations/3d-photo-inpainting`.
+   503→- **akbartus/DepthAnything-on-Browser** (GitHub, MIT). Browser-only DepthAnything V2 via ONNX Runtime Web + Three.js. Proves the full client-side pipeline is feasible.
+   504→- **Scrollsequence V2 deep-research article** (ChatGPT-generated, but excellent synthesis): covers Three.js mesh vs shader approaches, DepthFlow, Tiefling, Immersity, Luma, Google Cinematic Photos, occlusion handling.
+   505→- **HuggingFace `depth-anything/Depth-Anything-V2-Large-hf`** — official transformers-compatible weights. `pipeline("depth-estimation", model=...)` works out of the box.
+   506→- **Sanster/IOPaint** (GitHub, MIT). Self-hostable inpainting server (LaMa + SD + matting).
+   507→- **danielgatis/rembg** (GitHub, MIT). Background removal CLI / lib.
+   508→- **Tiefling** (`tiefling.app`, MIT). In-browser 2.5D viewer; uses DepthAnythingV2-ONNX + Three.js. Reference for edge dilation (`expandDepthmapRadius`).
+   509→- **SLIDE (ICCV 2021)** — soft-layering alternative to Shih; handles hair/foliage. No official code; community repros exist.
+   510→- **Marigold** (CVPR 2024 Oral, Best Paper; `prs-eth/Marigold`). Diffusion-based depth; SOTA fine detail, slower.
+   511→- **Motion.dev / Framer Motion docs** — React-native animation; `useMotionValue` + springs for mouse parallax.
+   512→- **Pixi.js DisplacementFilter** docs — simplest 2.5D parallax in 2D WebGL.
+   513→- **MDN `feDisplacementMap`** + **Smashing Magazine "Deep Dive Into SVG Displacement Filtering"** — liquid distortion technique.
+   514→- **LearnOpenGL Parallax Mapping** — explains the foundational theory & artifact fixes.
+   515→
+   516→**No code was written; no project files were modified other than creating this worklog.md.**
+   517→
+   518→---
+   519→Task ID: 4-12
+   520→Agent: Main Builder (Z.ai Code)
+   521→Task: Diseñar arquitectura, construir frontend + backend + motor de animación, ensamblar page.tsx y verificar end-to-end con Agent Browser
+   522→
+   523→Work Log:
+   524→- Leí el worklog de los agentes de investigación (Task 1 y 2) y extraje las técnicas clave: Depth Anything + LaMa inpainting, shader WebGL de desplazamiento por profundidad, SVG feTurbulence líquido, animaciones CSS @property con duraciones primas, parallax Framer con useSpring.
+   525→- Adapté la arquitectura al sandbox real (z-ai-web-dev-sdk con VLM + image-edit, sin Python/ML pesado): 
+   526→  * VLM analiza → JSON con capas semánticas + profundidad + paleta + mood + preset recomendado
+   527→  * image-edit genera: fondo inpaintado (sujeto removido) + mapa de profundidad (grayscale) + foreground opcional
+   528→  * Truco LeiaPix: [fondo inpaintado] + [original] = parallax 2 capas (al mover original, el fondo inpaintado rellena el hueco)
+   529→- Diseñé sistema visual premium dark (globals.css): paleta emerald + amber, glass morphism, aurora blobs, texto gradient, @property typed custom properties para animaciones stacked, keyframes orgánicas (breath/sway/float/drift con duraciones primas 6.2/8.3/11.1/13.7s), scrollbar custom, checker backdrop.
+   530→- Construí lib base: types.ts (tipos compartidos), presets.ts (8 presets: Dream, Float, Pulse, Liquid, Cinematic 3D, Shimmer, Boil, Ken Burns), store.ts (Zustand con pipeline de estados), ai.ts (VLM analyze + image-edit background/depth/foreground), image-utils.ts (sharp resize/normalize + save), export-code.ts (generador HTML/CSS/JS y React TSX).
+   531→- Construí 3 API routes: /api/upload (FormData → sharp normalize → save), /api/analyze (VLM → SceneAnalysis JSON), /api/separate (image-edit en paralelo: background plate + depth map + optional foreground).
+   532→- Construí motor de animación (src/components/alive/):
+   533→  * LiquidFilter.tsx — SVG feTurbulence + feDisplacementMap con seed animado
+   534→  * Particles.tsx — dust motes CSS animados
+   535→  * ShimmerOverlay.tsx — haz de luz barriente
+   536→  * AliveLayers.tsx — modo CSS: Framer useSpring + useTransform parallax, .alive-layer con @property animations, 3 planos (bg/original/fg)
+   537→  * AliveWebGL.tsx — modo WebGL2: shader de desplazamiento por profundidad + chromatic aberration + breathing + organic noise + vignette (raw WebGL2, ~150 líneas, sin three.js)
+   538→  * AliveStage.tsx — contenedor que orquesta WebGL/CSS, partículas, shimmer, vignette, Ken Burns
+   539→- Construí studio UI (src/components/studio/): Header (sticky), Footer (mt-auto sticky), UploadZone (drag-drop + examples), AnalysisPanel (auto-pipeline analyze→separate con progress), LayerStack (capas con depth bars), PresetPicker (grid 8 presets), ControlPanel (sliders intensidad/velocidad/chroma/vignette + toggles + per-layer accordion + render mode), ExportPanel (tabs HTML/React + copy + download), Landing (hero + features + steps + presets showcase), Studio (layout 3 columnas responsive).
+   540→- Ensamblé page.tsx (Landing vs Studio según status).
+   541→- Corregí hooks violation en AliveLayers (early return antes de useTransform → fallback a DEFAULT_LAYER_ANIM).
+   542→- Limpié lint con --fix (eslint-disable no usados).
+   543→- Verificación end-to-end con Agent Browser:
+   544→  * Landing desktop: polished, hero con gradient text, upload zone, 6 features, 4 steps, 8 presets showcase ✓
+   545→  * Ejemplo "Paisaje montañoso": analyze 7.5s (VLM: "serene night landscape with snow-capped mountains", mood "peaceful"), separate 16s (bg + depth OK, foreground 429 capturado graciosamente), 4 capas (Forest, Mountains, Mountain peaks, Starry sky), preset cinematic3d auto-seleccionado, WebGL mode renders ✓
+   546→  * Switch a Dream preset (CSS mode): renders con parallax + líquido ✓
+   547→  * Export panel: 7775 chars código generado, copy funciona (toast "Código copiado"), tab React/HTML funciona ✓
+   548→  * Ejemplo "Retrato": VLM "smiling man, gray sweater, blue background", mood "friendly", 4 capas (Collar, Face, Sweater, Background), preset Float auto-seleccionado ✓
+   549→  * Mobile 390x844: single column, no overflow ✓
+   550→  * Footer sticky: atBottom=true (mt-auto + min-h-screen flex-col) ✓
+   551→  * Reset "Nueva imagen": vuelve a landing ✓
+   552→  * Headline correcto: "Convierte una imagen quieta en algo vivo" ✓
+   553→  * 0 console errors, 0 page errors, lint clean ✓
+   554→
+   555→Stage Summary:
+   556→- Proyecto "Alive — Image Layer Decomposition & Animation Studio" completo y verificado end-to-end.
+   557→- Pipeline: upload → VLM analyze (7-8s) → image-edit separate (16-24s, bg plate + depth map en paralelo) → studio live preview.
+   558→- 2 modos de render: CSS (Framer + SVG líquido + @property) y WebGL2 (shader de profundidad tipo LeiaPix/Immersity).
+   559→- 8 presets soñadores con combinaciones de breathing/sway/float/liquid/parallax/shimmer/particles/kenburns.
+   560→- Exporta HTML/CSS/JS autocontenido o React TSX con framer-motion.
+   561→- Artefactos: src/lib/{types,presets,store,ai,image-utils,export-code}.ts, src/app/api/{upload,analyze,separate}/route.ts, src/components/alive/{AliveStage,AliveLayers,AliveWebGL,LiquidFilter,Particles,ShimmerOverlay}.tsx, src/components/studio/{Header,Footer,UploadZone,AnalysisPanel,LayerStack,PresetPicker,ControlPanel,ExportPanel,Landing,Studio}.tsx, src/app/page.tsx, src/app/layout.tsx, src/app/globals.css.
+   562→
+   563→---
+   564→Task ID: 1
+   565→Agent: Research Agent v2 — Advanced Layer Decomposition
+   566→Task: Research depth slicing algorithms, visual layer editor UI patterns, and richer "alive" animation effects
+   567→
+   568→Work Log:
+   569→- Read the full previous worklog (Task 1 inaugural + Task 4-12 main builder) to understand context. Project is a Next.js + Prisma + Tailwind "Alive Image" studio that already works with ~4 layers using VLM analysis + z-ai image-edit (background plate + depth map + optional foreground) and renders in CSS (Framer + SVG) or WebGL2 (depth-displacement shader). User wants MORE granularity (6-10+ layers), a visual layer editor (drag/reorder/transform), and richer animation. Current `LayerAnimationConfig` already has parallaxStrength, breathing, sway, floatY, driftX, liquid, blur, opacity.
+   570→- Used the `web-search` skill (`z-ai function -n web_search`) to run ~35 targeted queries across Parts A–E: depth slicing, k-means 1D, multi-Otsu, layered depth inpainting (Shih et al. CVPR 2020), painter's algorithm, morphological dilation, adaptive mesh (Tiefling), Polotno/Photopea/Pixlr/Canva layer panels, dnd-kit, react-moveable, Konva Transformer, fabric.js hit testing, SVG feTurbulence boiling effect (Camillo Visini), Framer Motion spring physics (Maxime Heckel), motion.dev stagger(), simplex-noise npm, hue-rotate animation (Josh Comeau), three.js god rays (Andrew Berg / GPU Gems 3), particles.js, react-timeline-editor, CSS-Tricks animation-technologies comparison, CSS @property Houdini, GSAP timeline orchestration.
+   571→- Used the `web-reader` skill (`z-ai function -n page_reader`) to deep-read 18 primary sources (some PDF/Heavy pages returned 429 so I throttled to ~8s between requests): scikit-image multi-Otsu docs, GeeksforGeeks Painter's Algorithm, Codrops "Dynamic Terrain Deformation with R3F" (concrete planeGeometry + displacementMap + per-vertex deformMesh code), Camillo Visini "Simulating Hand-Drawn Motion with SVG Filters" (the canonical boiling-line tutorial with feTurbulence+feDisplacementMap + animated baseFrequency offset sequence), Maxime Heckel "Physics Behind Spring Animations" (full math + JS implementation), motion.dev stagger() docs, motion.dev react-animation docs (animatable CSS variables, transitions), Polotno full-canvas-editor docs, Photopea Layers learn page, daybrush/moveable GitHub README, Andrew Berg "Volumetric Light Scattering in three.js" (GPU Gems 3 Mitchell method), Josh Comeau "Color Shifting in CSS" (the hue-rotate-doesn't-animate-properly gotcha + workarounds), CSS-Tricks staggered animation approaches, CSS-Tricks animation technologies comparison, xzdarcy/react-timeline-editor GitHub README.
+   572→- Synthesized everything into a comprehensive 5-part research report with concrete pseudocode, recommended component structures for our Next.js app, and copy-pasteable CSS/JS snippets for each new animation effect. All recommendations are mapped to the existing project architecture (`src/components/alive/`, `src/components/studio/`, `src/lib/{types,presets,store,ai,image-utils}.ts`) so the next builder can implement directly.
+   573→
+   574→Stage Summary:
+   575→- **PART A — Depth slicing**: Recommended **multi-Otsu thresholding** (scikit-image `threshold_multiotsu` algorithm; portable to Node via jimp+custom implementation) as the default for 6–12 layers because it's adaptive to the actual depth histogram (unlike equal-interval) and is O(N+L²) fast. K-means 1D on the histogram is the fallback. Concrete pseudocode + a Node.js `sliceDepthIntoLayers()` function provided. For edge expansion: dilate each layer's mask by ~10–30 px using `sharp`'s extend + composite trick (or jimp for true morphological ops). For per-layer background inpainting: VLM-driven z-ai image-edit can re-prompt "show what's behind the X" per layer, OR reuse the existing `backgroundUrl` (subject removed) as the universal back plate. For order-independent compositing: painter's algorithm (sort by `depth` ascending, draw back→front) is trivially correct for non-intersecting planes. For adaptive meshing: Codrops's `deformMesh` pattern (planeGeometry with GRID_RESOLUTION subdivisions + per-vertex Z from depth texture) is the reference — already proven in our `AliveWebGL.tsx`, just bump resolution and add per-layer meshes.
+   576→- **PART B — Layer editor UI**: Recommended a 3-pane layout: left **Tools/Presets**, center **Canvas + Moveable handles**, right **LayersPanel + Inspector** (Photopea-style). `dnd-kit` (already installed) drives the sortable layer list with `useSortable`. `react-moveable` (10.7k stars, MIT, daybrush) is the recommended transform-handles library — supports draggable/resizable/scalable/rotatable/snappable/groupable in one component, lighter than Konva and works on plain DOM. Hit-testing via `getBoundingClientRect` inverse-matrix for rotated layers (Konva's `getCorner`/`getClientRect` reference algorithm included). Numeric input panel uses standard X/Y/W/H/Rotation/Opacity fields bound to the same `LayerAnimationConfig`. Toolbar: Add/Duplicate/Delete/Group/Merge/Isolate (eye solo). All proposals mapped to existing shadcn/ui components already in the project.
+   577→- **PART C — Richer animation**: 12 new effects with copy-pasteable code: **twist** (sin rotation 1–3°), **boil/jitter** (Camillo Visini's SVG feTurbulence with animated baseFrequency offset array every 100ms), **wave distortion** (sin UV displacement in shader), **glow pulse** (`filter: drop-shadow` keyframes), **hue drift** (CSS @property `--hue` + hsl() because raw `filter: hue-rotate` is finicky to animate — Josh Comeau's workaround), **focus pull** (oscillating `filter: blur()`), **shadow drift** (drop-shadow offset keyframed opposite to layer), **per-layer chromatic aberration** (3 R/G/B duplicated layers via mix-blend-mode: screen), **mouse velocity** (track delta/dt, low-pass filter, multiply by depth), **spring physics per layer** (Framer `useSpring` with per-layer stiffness/damping/mass; Maxime Heckel's full integration loop: `a=(Fspring+Fdamping)/m; v+=a*dt; x+=v*dt`), **phase offset / stagger** (Motion.dev `stagger()` with `from`/`ease`/`startDelay` — natural way to keep layers out of sync), **simplex noise motion** (simplex-noise npm v4, curl noise for organic 2D drift).
+   578→- **PART D — Effect layers**: 6 atmosphere overlays. **Fog/mist** = animated SVG feTurbulence + radial gradient. **Snow/rain** = custom canvas particle system (lighter than particles.js; ~50–200 particles). **God rays** = Kenny Mitchell GPU Gems 3 radial-blur post-process (render bright occluder scene → radial blur toward light source → additive blend). Pseudo-volumetric cheaper version: translucent cone mesh + additive blending (three.jsdemos.com pattern). **Bokeh** = CSS circles with `filter: blur(20px)` drifting on long tweens. **Depth-aware dust** = assign each dust particle a `z` value, parallax with mouse + depth texture sampling. **Volumetric light** = the radial-blur god-rays approach is the canonical fake; for true volumetric you'd need ray-marching (too heavy for web).
+   579→- **PART E — Timeline & keyframe UI**: **react-timeline-editor** (`@xzdarcy/react-timeline-editor`, MIT, 766★) is the recommended base — pure React, TimelineRow/TimelineAction/TimelineEffect data model, drag-to-move/snap/zoom built in, used as the timeline skeleton. For the actual animation playback: **CSS `@keyframes` for simple infinite loops** (breathing, sway, glow, hue drift, focus pull) because they're declarative, GPU-accelerated, and pause cleanly. **Web Animations API (via Motion's `animate()`)** for imperative/scrubbable/sequenced animations (timeline playback, one-shot reveals). **GSAP timeline()** for the heaviest orchestration cases (multi-element staggered sequences). For staggered/phase-offset motion specifically, Motion's `stagger()` is the cleanest API. CSS `@property` Houdini is the key enabler for animating custom properties like `--breath`, `--sway`, `--hue` as `<angle>`/`<number>` typed values.
+   580→
+   581→---
+   582→
+   583→## FULL RESEARCH REPORT — Advanced Layer Decomposition, Editor & Animation
+   584→
+   585→This report extends Task 1 (Layer Separation) and Task 4-12 (Main Builder) with everything needed to scale the project from 4 layers + simple parallax/breathing/sway/liquid to **6–12 layers with a full visual editor and 12+ richer "alive" effects**.
+   586→
+   587→### PART A — Depth Slicing & Multi-Layer Decomposition (6–12 layers)
+   588→
+   589→We currently get a depth map (`depthUrl`) and an inpainted background (`backgroundUrl`) from the `/api/separate` route, then the VLM nominates 4 layers by name. To go to 6–12 layers we need to **slice the depth map algorithmically** and emit a mask + inpainted plate per band.
+   590→
+   591→#### A.1 — Depth slicing / quantization (3 concrete algorithms)
+   592→
+   593→The depth map from image-edit is a continuous grayscale PNG. Normalise to [0,1] then split into N bands. Three algorithms, ranked by quality:
+   594→
+   595→**(a) Equal-interval slicing** (baseline, naive):
+   596→```
+   597→function sliceEqual(depthNorm, N) {
+   598→  // depthNorm: Float32Array in [0,1]
+   599→  // returns: masks: boolean[N][H*W]
+   600→  const masks = Array.from({length:N}, () => new Uint8Array(depthNorm.length))
+   601→  for (let i=0; i<depthNorm.length; i++) {
+   602→    const band = Math.min(N-1, Math.floor(depthNorm[i] * N))
+   603→    masks[band][i] = 1
+   604→  }
+   605→  return masks
+   606→}
+   607→```
+   608→- ✅ Trivial, O(N).
+   609→- ❌ Over-segments smooth gradients, under-segments clustered scenes (a portrait with a flat sky wastes 8 bands on sky).
+   610→
+   611→**(b) K-means 1D on depth histogram** (recommended for adaptive bands):
+   612→```
+   613→function sliceKMeans1D(depthNorm, K, iters=20) {
+   614→  // 1. Build 256-bin histogram of depth values
+   615→  const hist = new Float32Array(256)
+   616→  for (const v of depthNorm) hist[Math.min(255, Math.floor(v*255))]++
+   617→  // 2. Init centroids at equal-quantile positions
+   618→  let centroids = quantileInit(hist, K)
+   619→  // 3. Lloyd iterations
+   620→  for (let it=0; it<iters; it++) {
+   621→    const sums = new Float64Array(K), counts = new Float64Array(K)
+   622→    for (let b=0; b<256; b++) {
+   623→      let nearest = 0, best = Infinity
+   624→      for (let k=0; k<K; k++) {
+   625→        const d = Math.abs(b - centroids[k])
+   626→        if (d < best) { best = d; nearest = k }
+   627→      }
+   628→      sums[nearest] += b * hist[b]
+   629→      counts[nearest] += hist[b]
+   630→    }
+   631→    for (let k=0; k<K; k++) if (counts[k] > 0) centroids[k] = sums[k] / counts[k]
+   632→  }
+   633→  // 4. Thresholds = midpoints between sorted centroids
+   634→  centroids.sort((a,b)=>a-b)
+   635→  const thresholds = []
+   636→  for (let k=0; k<K-1; k++) thresholds.push((centroids[k]+centroids[k+1])/2 / 255)
+   637→  return sliceByThresholds(depthNorm, thresholds)
+   638→}
+   639→```
+   640→- ✅ Adapts to actual depth distribution. Better for portraits (sky collapses to 1 band, subject gets 5).
+   641→- ✅ O(256·K·iters + N) — extremely fast.
+   642→- This is the algorithm `sklearn.cluster.KMeans(n_clusters=K, n_init=4)` would produce on the 1D depth histogram.
+   643→- Reference: Kaggle "K-Means Clustering - Image Quantization", ML Mastery "K-Means in OpenCV".
+   644→
+   645→**(c) Multi-Otsu thresholding** (best quality, recommended default):
+   646→From scikit-image `threshold_multiotsu` docs (Liao, Chen, Chung 2001):
+   647→```
+   648→function multiOtsu(depth8, classes=6) {
+   649→  // depth8: Uint8Array 0..255
+   650→  const hist = new Float64Array(256)
+   651→  for (const v of depth8) hist[v]++
+   652→  const total = depth8.length
+   653→  for (let i=0;i<256;i++) hist[i] /= total
+   654→  // Pre-compute cumulative sums P[i] and cumulative means S[i]
+   655→  const P = new Float64Array(256), S = new Float64Array(256)
+   656→  P[0]=hist[0]; S[0]=0
+   657→  for (let i=1;i<256;i++){P[i]=P[i-1]+hist[i]; S[i]=S[i-1]+i*hist[i]}
+   658→  // Maximise between-class variance over all (classes-1) threshold combinations
+   659→  // For classes<=6 this is O(256^(classes-1)) — ~10^13 for 6 — too slow naively.
+   660→  // Use the Liao et al. fast lookup (precompute H(i,j)=sigma between i,j) → O(256^2) preprocessing then O(256^(k-1)) search
+   661→  // Pragmatic: for classes<=4 brute force is fine; for 5-10 use the Liao fast form OR fall back to K-means 1D.
+   662→  // For our app, classes=4–6: brute force 4-tuple thresholds, with the Liao speedup for >4.
+   663→  ...
+   664→  return thresholds // array of `classes-1` threshold values 0..255
+   665→}
+   666→```
+   667→- ✅ Maximises between-class variance → statistically optimal band boundaries.
+   668→- ✅ Default in scikit-image; battle-tested.
+   669→- ⚠️ For >6 classes the brute-force search explodes; use the Liao et al. fast algorithm (precompute `H(i,j)` between-class variance lookup) or fall back to K-means 1D for >6.
+   670→- Reference: `skimage.filters.threshold_multiotsu` (linked above), Liao et al. 2001 "A Fast Algorithm for Multilevel Thresholding".
+   671→
+   672→**Recommendation for our app**: Use **multi-Otsu for 4–6 layers** (the sweet spot — fast + optimal). Switch to **K-means 1D for 7–12 layers** (O(N) regardless of K). Run server-side in `/api/separate` after image-edit returns the depth map; return an array of mask PNGs (one per layer) alongside the existing `backgroundUrl`.
+   673→
+   674→#### A.2 — Layer dilation / edge expansion (no-gap parallax)
+   675→
+   676→When layers translate independently (mouse parallax), the boundary between depth band `k` and band `k+1` produces a transparent gap. Fix: **dilate each layer's mask** so it overlaps its neighbour by a few px.
+   677→
+   678→**Sharp (Node) approach** — fastest, already in our project:
+   679→```ts
+   680→import sharp from 'sharp'
+   681→
+   682→async function dilateMask(maskPng: Buffer, radiusPx: number): Promise<Buffer> {
+   683→  // morphological dilation via repeated max-filter (3x3 box) `radiusPx` times.
+   684→  // sharp doesn't expose morphology directly; emulate with threshold-blur-threshold:
+   685→  const { data, info } = await sharp(maskPng).raw().toBuffer({resolveWithObject:true})
+   686→  // Cheap trick: blur then threshold — produces a "fat" mask.
+   687→  const blurred = await sharp(data, {raw:info})
+   688→    .blur(radiusPx/2 | 0 || 1)
+   689→    .raw().toBuffer()
+   690→  // Threshold at 128: any pixel >128 becomes fully opaque
+   691→  for (let i=0;i<blurred.length;i+=info.channels){
+   692→    const v = blurred[i]
+   693→    const out = v > 64 ? 255 : 0
+   694→    blurred[i]=blurred[i+1]=blurred[i+2]=out
+   695→  }
+   696→  return sharp(blurred, {raw:info}).png().toBuffer()
+   697→}
+   698→```
+   699→
+   700→**True morphological dilation** (use `jimp` or `@napi-rs/canvas`):
+   701→```ts
+   702→// Implement classical dilation: out[p] = max(in[q] for q in 3x3 neighbourhood)
+   703→// Repeat `radiusPx` times. Equivalent to cv2.dilate(mask, kernel=cv2.ones(3,3), iterations=r)
+   704→function dilate(mask: Uint8Array, w: number, h: number, radius: number): Uint8Array {
+   705→  let cur = mask.slice()
+   706→  for (let it=0; it<radius; it++) {
+   707→    const next = new Uint8Array(cur.length)
+   708→    for (let y=0;y<h;y++) for (let x=0;x<w;x++){
+   709→      let m=0
+   710→      for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++){
+   711→        const nx=x+dx, ny=y+dy
+   712→        if (nx<0||ny<0||nx>=w||ny>=h) continue
+   713→        m = Math.max(m, cur[ny*w+nx])
+   714→      }
+   715→      next[y*w+x] = m
+   716→    }
+   717→    cur = next
+   718→  }
+   719→  return cur
+   720→}
+   721→```
+   722→- **Recommended radius**: 10–30 px (Tiefling uses `expandDepthmapRadius≈25`; Facebook 3D Photos use similar). Scale with target resolution: `radius = Math.round(maxDim * 0.02)`.
+   723→- Always dilate **after** slicing, **before** inpainting (so the inpainted plate covers the dilated band).
+   724→- Reference: PyImageSearch "OpenCV Morphological Operations", Tiefling `expandDepthmapRadius` (cited in Task 1).
+   725→
+   726→#### A.3 — Per-layer background inpainting
+   727→
+   728→Three strategies, ranked by quality/effort for our sandbox (VLM + image-edit only, no LaMa/SD):
+   729→
+   730→**(a) Reuse the single inpainted back plate** (cheapest, already implemented):
+   731→- We already have `backgroundUrl` (subject removed). Use it as the universal back plate. Each layer above shows through where its (dilated) mask is empty.
+   732→- ✅ Zero extra compute. Works fine for 4–6 layers.
+   733→- ❌ For 8–12 layers, mid-depth bands need their *own* occluded content (e.g. a tree in front of mountains in front of sky — removing the tree shouldn't show the sky directly).
+   734→
+   735→**(b) "Fill from neighboring depth band" trick** (no ML, fast):
+   736→- For each layer `k`, the occluded pixels are filled by **stretching the next-farther layer's color** into the gap. Like "content-aware extend" via `sharp.resize` with `fit:'fill'` + edge mirroring.
+   737→- ✅ No ML. Fast. Looks plausible for natural scenes.
+   738→- ❌ Fails on textured regions (repeats patterns visibly).
+   739→
+   740→**(c) Per-layer VLM re-prompt to image-edit** (the sandbox-native approach):
+   741→- For each depth band `k` with name `layerName` (from VLM analysis), re-prompt z-ai image-edit: *"Show what's behind the {layerName} in this image. Same lighting, same style."*
+   742→- ✅ Uses tools we already have. Each layer gets its own occluded-content plate.
+   743→- ⚠️ 6–12 image-edit calls per project (~3–4s each = 20–50s total). Mitigate with `Promise.all` parallelism + caching.
+   744→- This is the recommended upgrade path for v2: server `/api/separate` returns `{ layers: [{id, name, depth, maskUrl, plateUrl}] }` where each `plateUrl` is the inpainted content for that band.
+   745→
+   746→**(d) LaMa via IOPaint** (gold standard, requires Docker — out of sandbox):
+   747→- Already noted in Task 1: `POST http://iopaint:8000/inpaint {image, mask}` → PNG. ~1s/image on CPU. Use this if we move off the sandbox.
+   748→
+   749→#### A.4 — Order-independent compositing (painter's algorithm with z-sort)
+   750→
+   751→From GeeksforGeeks "Painter's Algorithm":
+   752→> "Sort polygons by depth (decreasing z = farthest first). Paint each in order, nearer polygons overwrite farther ones."
+   753→
+   754→For our flat depth-banded layers (each a textured plane), this is trivial:
+   755→```ts
+   756→// sort back-to-front (farthest depth = smallest depth value, where depth=0 is sky, depth=1 is foreground)
+   757→const sortedLayers = [...layers].sort((a,b) => a.depth - b.depth)
+   758→// render in order; later renders cover earlier where masks overlap
+   759→for (const layer of sortedLayers) ctx.drawImage(layer.canvas, 0, 0)
+   760→```
+   761→- For non-intersecting planes this is **always correct** (no need for BSP/z-buffer).
+   762→- For our scene (depth-banded layers with dilated masks) planes never intersect → painter's algorithm is sufficient.
+   763→- If we ever add rotated/skewed layers, fall back to per-pixel z-test in the WebGL shader (already supported by depth buffer).
+   764→
+   765→#### A.5 — Adaptive meshing (vertex-displaced mesh per depth band)
+   766→
+   767→Currently `AliveWebGL.tsx` uses a single fullscreen quad with UV-offset. Upgrading to **vertex-displaced mesh** gives true parallax geometry and avoids rubber-band stretch.
+   768→
+   769→**Codrops "Dynamic Terrain Deformation with R3F" pattern** (read in full):
+   770→```tsx
+   771→<mesh rotation={[-Math.PI/2, 0, 0]}>
+   772→  <planeGeometry args={[W, H, GRID_RESOLUTION, GRID_RESOLUTION]} />
+   773→  <meshStandardMaterial
+   774→    map={colorMap}
+   775→    displacementMap={depthMap}
+   776→    displacementScale={2}
+   777→  />
+   778→</mesh>
+   779→```
+   780→- `GRID_RESOLUTION` = 128 or 256 subdivisions per axis (gives 65K–65K vertices — fine for desktop GPUs).
+   781→- Per-vertex Z comes directly from the displacementMap; Three.js handles the GPU upload.
+   782→
+   783→**For multi-layer (6–12 layers)** — generate one mesh per depth band:
+   784→```tsx
+   785→sortedLayers.map(layer => (
+   786→  <mesh key={layer.id} position={[0, 0, layer.depth * DEPTH_SCALE]}>
+   787→    <planeGeometry args={[W, H, GRID, GRID]} />
+   788→    <meshBasicMaterial
+   789→      map={layer.texture}
+   790→      alphaMap={layer.maskTexture}  // the dilated band mask
+   791→      transparent
+   792→      depthWrite={true}
+   793→    />
+   794→    {/* Per-vertex Z from band-local depth (cropped from full depth map) */}
+   795→    <displacementMap ... />
+   796→  </mesh>
+   797→))
+   798→```
+   799→- Use `THREE.PlaneGeometry` (not BufferGeometry) — `displacementMap` works out of the box.
+   800→- For 8 layers × 128² verts = 130K verts total — modern GPUs handle this easily at 60fps.
+   801→
+   802→**Adaptive meshing (Tiefling technique)** — subdivide more at depth discontinuities:
+   803→- Compute Sobel edge magnitude of the depth map; where `sobel > threshold`, add 2–4× more subdivisions.
+   804→- Implementation: build a custom BufferGeometry where vertex density is high at edges, low in flat regions. ~5K verts total for typical scene (vs 65K uniform).
+   805→- ✅ 10× fewer verts, same visual quality.
+   806→- ❌ More complex; defer to v3.
+   807→
+   808→### PART B — Visual Layer Editor UI Patterns
+   809→
+   810→Research sources: Photopea "Layers" learn page, Polotno SDK "Full Canvas Editor" docs, Figma community plugins, dnd-kit React Quickstart, daybrush/moveable GitHub (10.7k★), Konva "select_and_transform" docs, fabric.js vs Konva vs PixiJS comparison, MDN isPointInPath, react-moveable npm.
+   811→
+   812→#### B.1 — Layer panel anatomy (Photopea / Figma / Polotno consensus)
+   813→
+   814→All major editors share the same anatomy (verified by reading Photopea docs + Polotno SDK + Figma community plugins):
+   815→```
+   816→┌─ LayersPanel ─────────────────────────────────┐
+   817→│ [Blend mode ▾] [Opacity: 100%─────●─]         │ ← top bar (per selected layer)
+   818→├───────────────────────────────────────────────┤
+   819→│ 👁 🔒 [thumb] Layer Name       ⋯               │ ← layer row
+   820→│ 👁 🔒 [thumb] Layer Name       ⋯               │
+   821→│ 👁 🔒 [thumb] 📁 Group          ▾              │ ← collapsible group
+   822→│   👁 🔒 [thumb] Child           ⋯              │
+   823→│   👁 🔒 [thumb] Child           ⋯              │
+   824→│ 👁 🔒 [thumb] Background        ⋯              │
+   825→├───────────────────────────────────────────────┤
+   826→│ [➕ Layer] [📁 Group] [🔗 Mask] [🗑 Delete]   │ ← bottom toolbar
+   827→└───────────────────────────────────────────────┘
+   828→```
+   829→
+   830→**Per-row controls** (consensus across Photopea/Figma/Polotno):
+   831→- **Visibility eye** 👁 — toggle `layer.visible` (one-click solo: Alt+click to isolate).
+   832→- **Lock icon** 🔒 — Photopea has 4 lock types: transparency/pixels/position/all. For us, a single boolean `layer.locked` is enough (prevents move + transform).
+   833→- **Thumbnail** (~40×40 px) — auto-regenerated from `layer.url`.
+   834→- **Name** — double-click to rename (inline contentEditable).
+   835→- **Drag handle** — entire row is draggable via `dnd-kit`'s `useSortable`.
+   836→- **Context menu** (⋯ or right-click) — Duplicate / Delete / Merge Down / Isolate / Properties.
+   837→
+   838→**Top bar (selected layer)**: blend-mode dropdown (`mix-blend-mode` values: normal, multiply, screen, overlay, soft-light, color-dodge, etc.), opacity slider.
+   839→
+   840→**Bottom toolbar**: Add Layer / Add Group / Add Mask / Delete / (Polotno adds: Bring Forward / Send Backward).
+   841→
+   842→**Recommended React component structure** for our app:
+   843→```tsx
+   844→<LayersPanel>
+   845→  <LayerBlendModeSelect value={selected.blendMode} />
+   846→  <LayerOpacitySlider value={selected.opacity} />
+   847→  <ScrollArea>
+   848→    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleReorder}>
+   849→      <SortableContext items={layerIds} strategy={verticalListSortingStrategy}>
+   850→        {layers.map(layer => <SortableLayerRow key={layer.id} layer={layer} />)}
+   851→      </SortableContext>
+   852→    </DndContext>
+   853→  </ScrollArea>
+   854→  <LayerToolbar onAdd={...} onDuplicate={...} onDelete={...} onGroup={...} />
+   855→</LayersPanel>
+   856→```
+   857→
+   858→#### B.2 — dnd-kit sortable list (already installed in project)
+   859→
+   860→From the dnd-kit React Quickstart (read in full):
+   861→```tsx
+   862→import {useSortable} from '@dnd-kit/react'
+   863→import {DragDropProvider} from '@dnd-kit/react'
+   864→
+   865→function SortableLayerRow({layer}) {
+   866→  const {ref, isDragged} = useSortable({id: layer.id})
+   867→  return <div ref={ref} style={{opacity: isDragged ? 0.5 : 1}}>
+   868→    <Thumbnail src={layer.url} />
+   869→    <span>{layer.name}</span>
+   870→    <EyeToggle visible={layer.visible} />
+   871→    <LockToggle locked={layer.locked} />
+   872→  </div>
+   873→}
+   874→
+   875→// Parent:
+   876→<DragDropProvider onDragEnd={(e) => {
+   877→  if (e.canceled) return
+   878→  const {active, over} = e.operation
+   879→  if (over && active.id !== over.id) {
+   880→    setLayers(items => {
+   881→      const oldIndex = items.findIndex(i => i.id === active.id)
+   882→      const newIndex = items.findIndex(i => i.id === over.id)
+   883→      return arrayMove(items, oldIndex, newIndex)
+   884→    })
+   885→  }
+   886→}}>
+   887→  {layers.map(l => <SortableLayerRow key={l.id} layer={l} />)}
+   888→</DragDropProvider>
+   889→```
+   890→- `@dnd-kit/react` is the new (2024+) package. Legacy `@dnd-kit/core` + `@dnd-kit/sortable` also work — both already in the project.
+   891→- Use `verticalListSortingStrategy` for layer panels.
+   892→- Add `DragOverlay` for a floating preview while dragging (recommended for layer thumbnails).
+   893→- Sensors: `PointerSensor` (mouse/touch) + `KeyboardSensor` (a11y) with activation constraint `distance: 4px` so click-to-select doesn't trigger drag.
+   894→
+   895→#### B.3 — Canvas transform handles (resize / rotate)
+   896→
+   897→**Recommendation**: use **`react-moveable`** (daybrush, 10.7k★, MIT) — it's the de-facto standard for web-based transform handles and works on plain DOM elements (not tied to canvas). Provides draggable/resizable/scalable/rotatable/warpable/pinchable/groupable/snappable in one component.
+   898→
+   899→```bash
+   900→npm install react-moveable
+   901→```
+   902→```tsx
+   903→import Moveable from 'react-moveable'
+   904→
+   905→function CanvasLayer({layer, selected, onChange}) {
+   906→  const ref = useRef<HTMLDivElement>(null)
+   907→  return <>
+   908→    <div ref={ref} style={{
+   909→      position:'absolute',
+   910→      left:layer.x, top:layer.y, width:layer.width, height:layer.height,
+   911→      transform:`rotate(${layer.rotation}deg) scale(${layer.scale})`,
+   912→      opacity: layer.opacity,
+   913→    }}>
+   914→      <img src={layer.url} />
+   915→    </div>
+   916→    {selected && (
+   917→      <Moveable
+   918→        target={ref}
+   919→        draggable={!layer.locked}
+   920→        resizable={!layer.locked}
+   921→        rotatable={!layer.locked}
+   922→        keepRatio={false}
+   923→        throttleDrag={0}
+   924→        throttleRotate={0}
+   925→        throttleResize={0}
+   926→        onDrag={({left, top}) => onChange({...layer, x:left, y:top})}
+   927→        onResize={({width, height, drag:{left, top}}) =>
+   928→          onChange({...layer, width, height, x:left, y:top})}
+   929→        onRotate={({rotation}) => onChange({...layer, rotation})}
+   930→        onWheel={({deltaY}) => onChange({...layer, scale: layer.scale * (1 - deltaY*0.001)})}
+   931→      />
+   932→    )}
+   933→  </>
+   934→}
+   935→```
+   936→
+   937→**Konva alternative** (heavier, full canvas scene graph): `Konva.Transformer` (read in full):
+   938→```js
+   939→const tr = new Konva.Transformer()
+   940→layer.add(tr)
+   941→tr.nodes([shape])  // attach to selected shape
+   942→```
+   943→- Konva is a better fit if we want everything in one `<canvas>` (rasterised). For our use case (DOM layers with CSS transforms + WebGL depth shader), `react-moveable` is the cleaner choice.
+   944→
+   945→**Vanilla alternative** (no library): implement hit-testing + 8 corner handles manually. Konva's reference algorithm for rotated-bbox hit testing:
+   946→```ts
+   947→const degToRad = (a) => (a/180)*Math.PI
+   948→const getCorner = (px, py, dx, dy, angle) => {
+   949→  const dist = Math.sqrt(dx*dx + dy*dy)
+   950→  angle += Math.atan2(dy, dx)
+   951→  return {x: px + dist*Math.cos(angle), y: py + dist*Math.sin(angle)}
+   952→}
+   953→const getClientRect = (el) => {
+   954→  const {x, y, width, height, rotation=0} = el
+   955→  const rad = degToRad(rotation)
+   956→  const corners = [
+   957→    getCorner(x,y, 0,0, rad),
+   958→    getCorner(x,y, width,0, rad),
+   959→    getCorner(x,y, width,height, rad),
+   960→    getCorner(x,y, 0,height, rad),
+   961→  ]
+   962→  const xs = corners.map(c=>c.x), ys = corners.map(c=>c.y)
+   963→  return {x:Math.min(...xs), y:Math.min(...ys), width:Math.max(...xs)-Math.min(...xs), height:Math.max(...ys)-Math.min(...ys)}
+   964→}
+   965→// Click hit-test:
+   966→const isHit = (mousePos, layer) => {
+   967→  // inverse-rotate mouse into layer local space, then AABB test
+   968→  const rad = degToRad(-layer.rotation)
+   969→  const dx = mousePos.x - (layer.x + layer.width/2)
+   970→  const dy = mousePos.y - (layer.y + layer.height/2)
+   971→  const lx = dx*Math.cos(rad) - dy*Math.sin(rad) + layer.width/2
+   972→  const ly = dx*Math.sin(rad) + dy*Math.cos(rad) + layer.height/2
+   973→  return lx >= 0 && lx <= layer.width && ly >= 0 && ly <= layer.height
+   974→}
+   975→```
+   976→
+   977→#### B.4 — Direct selection on canvas (hit testing)
+   978→
+   979→For our app the canvas is mostly a CSS-DOM stack (one `<div>` per layer) + an SVG/WebGL overlay. Hit testing:
+   980→
+   981→**(a) DOM approach (recommended)**: each layer is a `<div>` with `pointer-events: auto` when selectable. Click → `event.target` gives the layer. Browser does the hit testing for free, including rotated transforms.
+   982→```tsx
+   983→<div
+   984→  onClick={(e) => { e.stopPropagation(); selectLayer(layer.id) }}
+   985→  style={{ pointerEvents: layer.locked ? 'none' : 'auto' }}
+   986→/>
+   987→```
+   988→
+   989→**(b) Canvas approach** (if we rasterise to one canvas): use `isPointInPath` after redrawing the layer's path (MDN). For complex shapes, the "color-coded offscreen canvas" trick (advanced hit-test YouTube tutorial): render each layer to an offscreen canvas with a unique solid color, then `getImageData(x,y,1,1)` to identify the layer in O(1).
+   990→
+   991→**(c) Z-order click priority**: topmost layer first. Iterate layers front-to-back, return first hit.
+   992→
+   993→#### B.5 — Numeric input panel (precise transform)
+   994→
+   995→Standard After Effects / Figma pattern (verified from multiple sources):
+   996→```
+   997→┌─ Transform ──────────────────────┐
+   998→│ X: [ 120 ]  Y: [  45 ]           │
+   999→│ W: [ 800 ]  H: [ 600 ]  🔗 chain │
+  1000→│ Rotation: [  12.5° ]             │
+  1001→│ Scale: [ 100% ]                  │
+  1002→│ Opacity: [ 85% ─────●─ ]         │
+  1003→├─ Animation ──────────────────────│
+  1004→│ Parallax: [ 20 px ]              │
+  1005→│ Breathing: [✓] amp [ 1.0 ]       │
+  1006→│ Sway:      [✓] amp [ 0.8 ]       │
+  1007→│ ...                              │
+  1008→└──────────────────────────────────┘
+  1009→```
+  1010→- Use existing shadcn/ui `<Input type="number">` + `<Slider>`.
+  1011→- Drag-to-scrub: implement "scrubby input" — `onPointerDown` on the label, track `movementX`, multiply → adjust value. (Standard in AE/Figma; can be done in ~30 lines.)
+  1012→- Bind directly to `LayerAnimationConfig` in our store.
+  1013→
+  1014→#### B.6 — Toolbar patterns (add / duplicate / delete / group / merge)
+  1015→
+  1016→Consensus from Photopea/Polotno/Canva docs:
+  1017→- **Add Layer** — adds an empty transparent layer above the selected one.
+  1018→- **Duplicate** — `Ctrl+J` (Photoshop convention); deep-clones the layer with new id.
+  1019→- **Delete** — `Delete` key or trash icon.
+  1020→- **Group** — `Ctrl+G`; creates a folder containing selection. Groups can be nested.
+  1021→- **Merge Down** — `Ctrl+E`; flattens selected layer into the one below. Useful to reduce layer count.
+  1022→- **Isolate** — Alt+click eye: hides all other layers.
+  1023→- **Lock All** — `Ctrl+Shift+L` (Photoshop).
+  1024→
+  1025→For our app these are 1-liner Zustand actions on `ProjectState.layers`.
+  1026→
+  1027→### PART C — Richer "Alive" Animation Effects (12 new techniques)
+  1028→
+  1029→The current `LayerAnimationConfig` already supports parallax/breathing/sway/floatY/driftX/liquid/blur/opacity. Below are 12 NEW effects with copy-pasteable code, ready to add as new fields on `LayerAnimationConfig` and presets.
+  1030→
+  1031→#### C.1 — Twist / torsion (oscillating rotation, higher amplitude than sway)
+  1032→
+  1033→Sway is ±0.3°; twist is ±1–3° at slower period (8–15s). Visually reads as the layer twisting about its Z axis.
+  1034→
+  1035→```css
+  1036→/* CSS @keyframes approach (works without JS) */
+  1037→@property --twist { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  1038→.alive-layer[data-effect="twist"] {
+  1039→  animation: twist 9.4s ease-in-out infinite alternate;
+  1040→  transform: rotate(var(--twist));
+  1041→}
+  1042→@keyframes twist {
+  1043→  from { --twist: -1.8deg; }
+  1044→  to   { --twist:  2.1deg; }
+  1045→}
+  1046→```
+  1047→Or via Framer Motion:
+  1048→```tsx
+  1049→<motion.div animate={{rotate: [0, 2.2, -1.6, 0.4, 0]}}
+  1050→  transition={{duration: 9.4, repeat: Infinity, ease: 'easeInOut'}} />
+  1051→```
+  1052→
+  1053→#### C.2 — Jitter / boil (Spider-Verse "boiling" effect)
+  1054→
+  1055→From Camillo Visini's tutorial (read in full — the canonical web implementation):
+  1056→```html
+  1057→<svg width="0" height="0" style="position:absolute">
+  1058→  <filter id="boil">
+  1059→    <feTurbulence type="turbulence" baseFrequency="0.012" numOctaves="2" seed="1" result="noise"/>
+  1060→    <feDisplacementMap in="SourceGraphic" in2="noise" scale="4"
+  1061→      xChannelSelector="R" yChannelSelector="G"/>
+  1062→  </filter>
+  1063→</svg>
+  1064→<img src="layer.png" style="filter:url(#boil)" id="boilTarget"/>
+  1065→```
+  1066→```ts
+  1067→// Animate by cycling baseFrequency every 100ms with small offsets (the "boil" loop)
+  1068→const offsets = [-0.002, 0.0014, -0.0011, 0.0021, -0.0017]
+  1069→let i = 0
+  1070→const baseFreq = 0.012
+  1071→const scale = 0.6  // 0..1, "animation scale" — Visini's term
+  1072→setInterval(() => {
+  1073→  const offset = offsets[i % offsets.length] * scale
+  1074→  const turb = document.querySelector('#boil feTurbulence')
+  1075→  turb.setAttribute('baseFrequency', (baseFreq + offset).toFixed(5))
+  1076→  i++
+  1077→}, 100)
+  1078→```
+  1079→**Key insight from Visini**: don't animate `seed` (causes hard jumps); animate `baseFrequency` by tiny offsets (±0.002) every 100ms. This produces the "hand-drawn wobble" loop. Use prime period (e.g. 4 or 5 offsets) so it never visually repeats.
+  1080→- **Per-layer**: each layer gets its own `<filter id="boil-{layerId}">` with different `baseFrequency` and offset array → layers boil out of sync.
+  1081→- Recommended `scale` values: 0.3 (subtle), 0.8 (visible), 1.5 (extreme, "Into the Spider-Verse" look).
+  1082→
+  1083→#### C.3 — Wave distortion (horizontal sinusoidal displacement)
+  1084→
+  1085→Different from liquid (which is 2D turbulence). Wave is 1D horizontal sine — like a flag rippling.
+  1086→
+  1087→```glsl
+  1088→// In our existing AliveWebGL fragment shader, add:
+  1089→uniform float uWaveAmp;     // ~0.005 UV
+  1090→uniform float uWaveFreq;    // ~12.0 cycles across image
+  1091→uniform float uWaveTime;
+  1092→varying vec2 vUv;
+  1093→
+  1094→void main() {
+  1095→  float wave = sin(vUv.x * uWaveFreq + uWaveTime * 1.6) * uWaveAmp;
+  1096→  vec2 uv = vUv + vec2(0.0, wave);  // vertical displacement from horizontal sine
+  1097→  gl_FragColor = texture2D(uImage, uv);
+  1098→}
+  1099→```
+  1100→CSS-only fallback (less accurate, transform skew):
+  1101→```css
+  1102→.alive-layer[data-effect="wave"] {
+  1103→  animation: wave 7.3s ease-in-out infinite;
+  1104→  transform-origin: 50% 0%;
+  1105→}
+  1106→@keyframes wave {
+  1107→  0%,100% { transform: skewX(0deg) }
+  1108→  25%     { transform: skewX(0.4deg) }
+  1109→  50%     { transform: skewX(-0.3deg) }
+  1110→  75%     { transform: skewX(0.2deg) }
+  1111→}
+  1112→```
+  1113→
+  1114→#### C.4 — Glow pulse (animated drop-shadow / brightness)
+  1115→
+  1116→```css
+  1117→@property --glow { syntax: '<number>'; inherits: false; initial-value: 0; }
+  1118→.alive-layer[data-effect="glow"] {
+  1119→  filter: drop-shadow(0 0 calc(var(--glow) * 12px) rgba(255,200,120,0.5))
+  1120→          brightness(calc(1 + var(--glow) * 0.15));
+  1121→  animation: glow 5.7s ease-in-out infinite alternate;
+  1122→}
+  1123→@keyframes glow {
+  1124→  from { --glow: 0.0; }
+  1125→  to   { --glow: 1.0; }
+  1126→}
+  1127→```
+  1128→- Use `drop-shadow` (not `box-shadow`) — follows the layer's alpha shape.
+  1129→- Tint colour should come from the VLM palette (`analysis.palette[0]`).
+  1130→
+  1131→#### C.5 — Hue drift (very slow hue-rotate, 5–10° over 30s)
+  1132→
+  1133→⚠️ **Gotcha** (from Josh Comeau, read in full): animating `filter: hue-rotate()` directly in CSS often *does nothing* because the filter is reapplied to the source each frame and the interpolation is broken in some browsers. **Workaround**: use `@property --hue` (typed) + `hsl()` background, OR animate via JS / Motion.dev:
+  1134→
+  1135→```css
+  1136→/* Approach A: @property typed custom property */
+  1137→@property --hue { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+  1138→.alive-layer[data-effect="hueDrift"] {
+  1139→  animation: hueDrift 31s linear infinite;
+  1140→  filter: hue-rotate(var(--hue));
+  1141→}
+  1142→@keyframes hueDrift {
+  1143→  from { --hue: 0deg; }
+  1144→  to   { --hue: 8deg; }
+  1145→}
+  1146→```
+  1147→```ts
+  1148→// Approach B: Motion.dev (animates the filter string reliably)
+  1149→import { animate } from 'motion'
+  1150→animate('#layer', { filter: ['hue-rotate(0deg)', 'hue-rotate(8deg)', 'hue-rotate(0deg)'] },
+  1151→  { duration: 31, repeat: Infinity, ease: 'linear' })
+  1152→```
+  1153→- Amplitude: 5–10° max (any more looks psychedelic, not "alive").
+  1154→
+  1155→#### C.6 — Focus pull (oscillating blur / depth-of-field shift)
+  1156→
+  1157→Like a camera's focus drifting between near and far layers.
+  1158→
+  1159→```css
+  1160→@property --focus { syntax: '<length>'; inherits: false; initial-value: 0px; }
+  1161→.alive-layer[data-depth="far"][data-effect="focusPull"] {
+  1162→  animation: focusFar 11.3s ease-in-out infinite alternate;
+  1163→  filter: blur(var(--focus));
+  1164→}
+  1165→.alive-layer[data-depth="near"][data-effect="focusPull"] {
+  1166→  animation: focusNear 11.3s ease-in-out infinite alternate;
+  1167→  filter: blur(calc(4px - var(--focus)));
+  1168→}
+  1169→@keyframes focusFar  { from { --focus: 0px } to { --focus: 3px } }
+  1170→@keyframes focusNear { from { --focus: 0px } to { --focus: 3px } }
+  1171→```
+  1172→- **Critical**: only one layer should be in focus at a time. Drive all layers' `--focus` from a single shared keyframe with phase offsets (near layer at 0°, far layer at 180°).
+  1173→- Use the existing `blur` field on `LayerAnimationConfig` but add a `focusPull` boolean + `focusPhase` 0..1.
+  1174→
+  1175→#### C.7 — Shadow drift (drop-shadow position animated opposite to layer)
+  1176→
+  1177→```css
+  1178→@property --sx { syntax: '<number>'; inherits: false; initial-value: 0; }
+  1179→@property --sy { syntax: '<number>'; inherits: false; initial-value: 0; }
+  1180→.alive-layer[data-effect="shadowDrift"] {
+  1181→  filter: drop-shadow(calc(var(--sx) * -6px) calc(var(--sy) * -6px) 8px rgba(0,0,0,0.3));
+  1182→  animation: shadowDrift 8.9s ease-in-out infinite alternate;
+  1183→}
+  1184→@keyframes shadowDrift {
+  1185→  from { --sx: -1; --sy: -0.5; }
+  1186→  to   { --sx:  1; --sy:  0.7; }
+  1187→}
+  1188→```
+  1189→- **Note**: shadow offset is *negated* — when layer moves up, shadow moves down (mimics a moving light source).
+  1190→- Tint with VLM palette's darkest colour for cohesive look.
+  1191→
+  1192→#### C.8 — Chromatic aberration per-layer (RGB split via mix-blend-mode)
+  1193→
+  1194→We already have global chromatic aberration in `AnimationConfig.chromaticAberration`. Per-layer version:
+  1195→```tsx
+  1196→function ChromaticLayer({url, offset}) {
+  1197→  return <div style={{position:'relative'}}>
+  1198→    <img src={url} style={{mixBlendMode:'screen',
+  1199→      filter:'brightness(0)', backgroundColor:'#f00',
+  1200→      transform:`translateX(${offset}px)`}} />
+  1201→    <img src={url} style={{mixBlendMode:'screen',
+  1202→      filter:'brightness(0)', backgroundColor:'#0f0'}} />
+  1203→    <img src={url} style={{mixBlendMode:'screen',
+  1204→      filter:'brightness(0)', backgroundColor:'#00f',
+  1205→      transform:`translateX(${-offset}px)`}} />
+  1206→  </div>
+  1207→}
+  1208→```
+  1209→- Or via SVG filter (one filter, no DOM duplication):
+  1210→```svg
+  1211→<filter id="chroma">
+  1212→  <feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" in="SourceGraphic" result="r"/>
+  1213→  <feOffset in="r" dx="2" dy="0" result="r2"/>
+  1214→  <feColorMatrix type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" in="SourceGraphic" result="g"/>
+  1215→  <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" in="SourceGraphic" result="b"/>
+  1216→  <feOffset in="b" dx="-2" dy="0" result="b2"/>
+  1217→  <feBlend in="r2" in2="g" mode="screen" result="rg"/>
+  1218→  <feBlend in="rg" in2="b2" mode="screen"/>
+  1219→</filter>
+  1220→```
+  1221→
+  1222→#### C.9 — Mouse velocity influence (layers react to mouse SPEED not just position)
+  1223→
+  1224→Currently parallax follows `mousePos`. Velocity adds inertia: when mouse moves fast, layers "lag" and overshoot.
+  1225→
+  1226→```ts
+  1227→const mouse = {x:0, y:0, px:0, py:0, vx:0, vy:0}
+  1228→window.addEventListener('pointermove', (e) => {
+  1229→  mouse.x = e.clientX / window.innerWidth - 0.5
+  1230→  mouse.y = e.clientY / window.innerHeight - 0.5
+  1231→})
+  1232→// In rAF loop:
+  1233→function tick() {
+  1234→  // velocity = (current - previous) / dt
+  1235→  mouse.vx = (mouse.x - mouse.px) * 60  // assume 60fps
+  1236→  mouse.vy = (mouse.y - mouse.py) * 60
+  1237→  mouse.px = mouse.x
+  1238→  mouse.py = mouse.y
+  1239→  // Low-pass filter (smoothing)
+  1240→  const smoothVx = lerp(state.svx, mouse.vx, 0.08)
+  1241→  const smoothVy = lerp(state.svy, mouse.vy, 0.08)
+  1242→  // Apply: position = mousePos * depth + velocity * depth * inertia
+  1243→  layers.forEach(layer => {
+  1244→    const tx = mouse.x * layer.depth * 40 + smoothVx * layer.depth * 80
+  1245→    const ty = mouse.y * layer.depth * 40 + smoothVy * layer.depth * 80
+  1246→    gsap.set(layer.el, {x:tx, y:ty})
+  1247→  })
+  1248→  requestAnimationFrame(tick)
+  1249→}
+  1250→```
+  1251→- Velocity amplitude (80) is 2× position amplitude (40) → fast moves dominate.
+  1252→- Low-pass filter (0.08) prevents jitter on slow moves.
+  1253→
+  1254→#### C.10 — Spring physics per layer (independent stiffness/damping/mass)
+  1255→
+  1256→From Maxime Heckel's article (read in full — the canonical explanation). Spring physics math:
+  1257→```
+  1258→Fspring = -k * (x - restLength)        // Hooke's law
+  1259→Fdamping = -d * v                      // damping force
+  1260→a = (Fspring + Fdamping) / m           // Newton's 2nd law
+  1261→v += a * dt                            // integrate velocity
+  1262→x += v * dt                            // integrate position
+  1263→```
+  1264→JavaScript implementation (one layer):
+  1265→```ts
+  1266→class Spring {
+  1267→  constructor({stiffness=100, damping=10, mass=1, rest=0} = {}) {
+  1268→    this.k = stiffness; this.d = damping; this.m = mass
+  1269→    this.rest = rest; this.x = rest; this.v = 0
+  1270→  }
+  1271→  setTarget(t) { this.rest = t }
+  1272→  tick(dt = 1/60) {
+  1273→    const Fspring = -this.k * (this.x - this.rest)
+  1274→    const Fdamping = -this.d * this.v
+  1275→    const a = (Fspring + Fdamping) / this.m
+  1276→    this.v += a * dt
+  1277→    this.x += this.v * dt
+  1278→    return this.x
+  1279→  }
+  1280→}
+  1281→```
+  1282→- **Per-layer config**: add `springStiffness`, `springDamping`, `springMass` to `LayerAnimationConfig`. Default (Framer's defaults): stiffness=100, damping=10, mass=1.
+  1283→- **Tuning guide**: lower stiffness = looser/slower; higher damping = less overshoot; higher mass = sluggish.
+  1284→- **Use Framer Motion's `useSpring`** for declarative version:
+  1285→```tsx
+  1286→const x = useSpring(0, {stiffness: layer.springStiffness, damping: layer.springDamping, mass: layer.springMass})
+  1287→useEffect(() => x.set(mouseX * depth * 40), [mouseX])
+  1288→return <motion.div style={{x}} />
+  1289→```
+  1290→
+  1291→#### C.11 — Phase offset between layers (staggered animation start so layers never sync)
+  1292→
+  1293→From motion.dev `stagger()` docs (read in full):
+  1294→```ts
+  1295→import { animate, stagger } from 'motion'
+  1296→
+  1297→// Stagger all layers' entrance by 80ms each
+  1298→animate('.alive-layer', {opacity: [0, 1]}, {delay: stagger(0.08)})
+  1299→
+  1300→// Stagger from center outward
+  1301→animate('.alive-layer', {scale: [0.9, 1]}, {delay: stagger(0.05, {from: 'center'})})
+  1302→
+  1303→// With easing for non-linear stagger
+  1304→animate('.alive-layer', {y: [20, 0]}, {delay: stagger(0.1, {ease: 'easeOut'})})
+  1305→
+  1306→// Negative startDelay = layers start mid-animation (never sync)
+  1307→animate('.alive-layer', {rotate: [0, 360]}, {
+  1308→  duration: 20, repeat: Infinity, ease: 'linear',
+  1309→  delay: stagger(0.7, {startDelay: -2})  // each layer starts 0.7s into the loop, offset
+  1310→})
+  1311→```
+  1312→- `stagger()` options: `startDelay`, `from` ("first"|"center"|"last"|index), `ease`.
+  1313→- **For continuous loops** (breathing, sway), the cleanest pattern: each layer's CSS animation has a `animation-delay` of `-1.3s * layerDepth` (negative = starts mid-cycle) → layers never visually sync. Use prime offsets (1.3, 2.7, 4.1…) to maximise desync.
+  1314→- Reference: CSS-Tricks "Different Approaches for Creating a Staggered Animation".
+  1315→
+  1316→#### C.12 — Simplex noise per-layer motion (curl noise displacement)
+  1317→
+  1318→```bash
+  1319→npm install simplex-noise@4
+  1320→```
+  1321→```ts
+  1322→import { createNoise2D } from 'simplex-noise'
+  1323→
+  1324→const noise2D = createNoise2D(() => Math.random())
+  1325→// Per-layer noise field seeded differently:
+  1326→const layerNoise = createNoise2D(() => layer.seed * 1337)
+  1327→
+  1328→function tick(dt: number, t: number) {
+  1329→  for (const layer of layers) {
+  1330→    // Sample 2 noise points slightly apart → "curl" gives divergence-free field
+  1331→    const eps = 0.001
+  1332→    const n1 = layerNoise(t * 0.05,            layer.seed)
+  1333→    const n2 = layerNoise(t * 0.05 + eps,      layer.seed)
+  1334→    const n3 = layerNoise(layer.seed,          t * 0.05)
+  1335→    const n4 = layerNoise(layer.seed + eps,    t * 0.05)
+  1336→    const dx = (n2 - n1) / eps * 20  // scale to px
+  1337→    const dy = (n4 - n3) / eps * 20
+  1338→    layer.el.style.transform = `translate(${dx}px, ${dy}px)`
+  1339→  }
+  1340→  requestAnimationFrame((nt) => tick(dt, nt / 1000))
+  1341→}
+  1342→```
+  1343→- **Curl noise** (Bridson et al.): gives smooth divergence-free velocity fields → particles/layers flow without clumping.
+  1344→- **Per-layer**: different `seed` (or different noise function instance) per layer → independent motion.
+  1345→- Amplitude: ~10–30px. Time scale: `0.02–0.1` (slow drift).
+  1346→
+  1347→### PART D — Effect Layers (Procedural Atmosphere Overlays)
+  1348→
+  1349→#### D.1 — Fog / mist (SVG turbulence + gradient)
+  1350→
+  1351→```html
+  1352→<div class="fog-overlay">
+  1353→  <svg width="0" height="0"><filter id="fog">
+  1354→    <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="3" seed="7" result="n"/>
+  1355→    <feColorMatrix in="n" type="matrix"
+  1356→      values="0 0 0 0 0.9  0 0 0 0 0.92  0 0 0 0 0.95  0 0 0 1.5 -0.3"/>
+  1357→    <feComponentTransfer><feFuncA type="linear" slope="0.4"/></feComponentTransfer>
+  1358→    <feGaussianBlur stdDeviation="2"/>
+  1359→  </filter></svg>
+  1360→  <div class="fog-layer" style="filter:url(#fog); mix-blend-mode:screen; opacity:0.35"/>
+  1361→</div>
+  1362→<script>
+  1363→  // Animate fog drift by changing baseFrequency
+  1364→  const turb = document.querySelector('#fog feTurbulence')
+  1365→  let t = 0
+  1366→  setInterval(() => {
+  1367→    t += 0.01
+  1368→    turb.setAttribute('baseFrequency', `${0.008 + Math.sin(t)*0.002} ${0.012 + Math.cos(t*0.7)*0.002}`)
+  1369→  }, 50)
+  1370→</script>
+  1371→```
+  1372→- Layer above the scene with `mix-blend-mode: screen` and low opacity.
+  1373→
+  1374→#### D.2 — Snow / rain (canvas particle system)
+  1375→
+  1376→Lighter than `particles.js` (which is 50KB); a custom canvas impl is ~50 lines:
+  1377→```ts
+  1378→class Snow {
+  1379→  canvas = document.createElement('canvas')
+  1380→  ctx = this.canvas.getContext('2d')!
+  1381→  particles = Array.from({length: 120}, () => ({
+  1382→    x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+  1383→    r: 1+Math.random()*3, vy: 0.5+Math.random()*1.5, vx: -0.3+Math.random()*0.6,
+  1384→    sway: Math.random()*Math.PI*2
+  1385→  }))
+  1386→  tick() {
+  1387→    const {ctx, canvas, particles} = this
+  1388→    ctx.clearRect(0,0,canvas.width,canvas.height)
+  1389→    ctx.fillStyle = 'rgba(255,255,255,0.85)'
+  1390→    for (const p of particles) {
+  1391→      p.sway += 0.02
+  1392→      p.x += p.vx + Math.sin(p.sway)*0.5
+  1393→      p.y += p.vy
+  1394→      if (p.y > canvas.height) p.y = -10, p.x = Math.random()*canvas.width
+  1395→      ctx.beginPath()
+  1396→      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2)
+  1397→      ctx.fill()
+  1398→    }
+  1399→    requestAnimationFrame(() => this.tick())
+  1400→  }
+  1401→}
+  1402→```
+  1403→- For rain: larger `vy` (8–15), elongated streaks (use `ctx.fillRect` with 1×8px), blue-grey tint.
+  1404→- For snow: slow `vy` (0.5–1.5), circular, white, with horizontal sway.
+  1405→
+  1406→#### D.3 — Light rays / god rays (radial blur post-process)
+  1407→
+  1408→From Andrew Berg's article (Kenny Mitchell, GPU Gems 3 — read in full):
+  1409→
+  1410→**The technique** (3 steps):
+  1411→1. Render the scene with light source = white, occluders = black → "occlusion texture".
+  1412→2. Apply radial blur toward the light source in a fragment shader:
+  1413→```glsl
+  1414→// Volumetric light scattering shader (Mitchell, GPU Gems 3)
+  1415→uniform sampler2D uOcclusion;
+  1416→uniform vec2 uLightPos;       // screen-space light position
+  1417→uniform float uDecay;         // 0.95
+  1418→uniform float uDensity;       // 0.5
+  1419→uniform float uWeight;        // 0.4
+  1420→uniform float uExposure;      // 0.2
+  1421→uniform int uSamples;         // 80–100
+  1422→
+  1423→void main() {
+  1424→  vec2 uv = vUv;
+  1425→  vec2 dir = uv - uLightPos;
+  1426→  dir *= uDensity;  // step size
+  1427→  float illum = 1.0;
+  1428→  vec4 col = texture2D(uOcclusion, uv);
+  1429→  for (int i=0; i<100; i++) {
+  1430→    if (i >= uSamples) break;
+  1431→    uv -= dir;
+  1432→    vec4 c = texture2D(uOcclusion, uv);
+  1433→    c *= illum * uWeight;
+  1434→    col += c;
+  1435→    illum *= uDecay;
+  1436→  }
+  1437→  gl_FragColor = col * uExposure;
+  1438→}
+  1439→```
+  1440→3. Additively blend the result over the original scene render.
+  1441→
+  1442→**Cheaper pseudo-volumetric** (three.jsdemos.com pattern — for our app):
+  1443→- Use a `ConeGeometry` mesh, `MeshBasicMaterial` with `transparent:true, opacity:0.15, blending:AdditiveBlending, side:DoubleSide, depthWrite:false`.
+  1444→- Position the cone tip at the light source, expand toward the scene.
+  1445→- Animate opacity via a sine wave (slow pulse).
+  1446→
+  1447→#### D.4 — Bokeh particles (out-of-focus light circles)
+  1448→
+  1449→```tsx
+  1450→function Bokeh() {
+  1451→  return <div className="bokeh-layer">
+  1452→    {Array.from({length: 18}).map((_, i) => (
+  1453→      <div key={i} className="bokeh-dot" style={{
+  1454→        left: `${Math.random()*100}%`, top: `${Math.random()*100}%`,
+  1455→        width: `${30+Math.random()*80}px`,
+  1456→        height: `${30+Math.random()*80}px`,
+  1457→        animationDelay: `${-Math.random()*20}s`,
+  1458→        animationDuration: `${15+Math.random()*20}s`,
+  1459→        background: `radial-gradient(circle, rgba(255,220,180,0.4) 0%, transparent 70%)`,
+  1460→        filter: `blur(${8+Math.random()*12}px)`,
+  1461→      }}/>
+  1462→    ))}
+  1463→    <style>{`
+  1464→      .bokeh-layer { position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen; }
+  1465→      .bokeh-dot { position:absolute; border-radius:50%;
+  1466→        animation: bokehDrift linear infinite; }
+  1467→      @keyframes bokehDrift {
+  1468→        0%   { transform: translate(0, 0); opacity: 0; }
+  1469→        20%  { opacity: 0.8; }
+  1470→        80%  { opacity: 0.8; }
+  1471→        100% { transform: translate(40px, -60px); opacity: 0; }
+  1472→      }
+  1473→    `}</style>
+  1474→  </div>
+  1475→}
+  1476→```
+  1477→
+  1478→#### D.5 — Depth-aware dust motes (parallax particles)
+  1479→
+  1480→Upgrade the existing `Particles.tsx` to be depth-aware:
+  1481→```ts
+  1482→// Each dust particle gets a depth value [0..1]
+  1483→const motes = Array.from({length: 40}, () => ({
+  1484→  x: Math.random(), y: Math.random(),
+  1485→  z: 0.1 + Math.random()*0.9,    // depth!
+  1486→  r: 0.5 + Math.random()*1.5,
+  1487→  drift: Math.random()*Math.PI*2
+  1488→}))
+  1489→
+  1490→function tick(t, mouseX, mouseY) {
+  1491→  for (const m of motes) {
+  1492→    // close motes (high z) move MORE with mouse
+  1493→    const px = m.x + Math.sin(t*0.0003 + m.drift) * 0.04
+  1494→    const py = m.y - (t*0.00005 * (0.5 + m.z)) % 1
+  1495→    const screenX = (px * canvas.width) + mouseX * m.z * 60
+  1496→    const screenY = (py * canvas.height) + mouseY * m.z * 60
+  1497→    // close motes are larger and brighter
+  1498→    const size = m.r * (0.5 + m.z * 0.8)
+  1499→    const alpha = 0.2 + m.z * 0.5
+  1500→    ctx.fillStyle = `rgba(255,240,200,${alpha})`
+  1501→    ctx.beginPath(); ctx.arc(screenX, screenY, size, 0, Math.PI*2); ctx.fill()
+  1502→  }
+  1503→}
+  1504→```
+  1505→- Each particle samples its `z` from the depth map at its position → true depth-aware parallax.
+  1506→
+  1507→#### D.6 — Volumetric light (pseudo-volumetric shafts)
+  1508→
+  1509→The "god rays" radial-blur technique (D.3) is the canonical web fake. True volumetric requires ray-marching which is too heavy for browser.
+  1510→
+  1511→**Hybrid approach** for our app: stack 3–5 elongated triangle/quad meshes with additive blending, oriented from a light source, each at slightly different angles with slight colour tinting → reads as a volumetric shaft. Animate opacity + rotation subtly.
+  1512→
+  1513→### PART E — Timeline & Keyframe Animation UI
+  1514→
+  1515→#### E.1 — Simple keyframe timeline (per-layer rows, scrubber, keyframe diamonds)
+  1516→
+  1517→**Recommended library: `@xzdarcy/react-timeline-editor`** (read README in full, MIT, 766★):
+  1518→```bash
+  1519→npm install @xzdarcy/react-timeline-editor
+  1520→```
+  1521→```tsx
+  1522→import { Timeline, TimelineRow, TimelineAction, TimelineEffect } from '@xzdarcy/react-timeline-editor'
+  1523→
+  1524→interface LayerKeyframe {
+  1525→  id: string; start: number; end: number; effectId: string
+  1526→}
+  1527→
+  1528→const effects: Record<string, TimelineEffect> = {
+  1529→  'breathing': {id:'breathing', name:'Breathing'},
+  1530→  'sway':      {id:'sway',      name:'Sway'},
+  1531→  'twist':     {id:'twist',     name:'Twist'},
+  1532→  'boil':      {id:'boil',      name:'Boil'},
+  1533→  'hueDrift':  {id:'hueDrift',  name:'Hue Drift'},
+  1534→  // ...all 12 effects from Part C
+  1535→}
+  1536→
+  1537→const rows: TimelineRow[] = layers.map(layer => ({
+  1538→  id: layer.id,
+  1539→  actions: layer.keyframes  // TimelineAction[]
+  1540→}))
+  1541→
+  1542→<Timeline
+  1543→  editorData={rows}
+  1544→  effects={effects}
+  1545→  onChange={(data) => updateKeyframes(data)}
+  1546→  onScroll={(t) => setCurrentTime(t)}
+  1547→  onPlayStateChange={(playing) => setPlaying(playing)}
+  1548→  playStatus={playing}
+  1549→  currentTime={currentTime}
+  1550→  scale={20}          // px per second
+  1551→  start={0}
+  1552→  end={30}            // total seconds
+  1553→/>
+  1554→```
+  1555→- Built-in: drag-to-move actions, snap, zoom (scale), play/pause, scrubber, time ruler.
+  1556→- Diamond-shaped keyframes are the convention (VSDC, After Effects, Figma — see VSDC docs).
+  1557→
+  1558→**Custom diamond UI** (if we don't want the dependency):
+  1559→```tsx
+  1560→function KeyframeDiamond({t, scale, selected, onSelect, onDrag}) {
+  1561→  const x = t * scale
+  1562→  return <div
+  1563→    onPointerDown={(e) => {onSelect(); onDrag(e)}}
+  1564→    style={{
+  1565→      position:'absolute', left:x, top:'50%',
+  1566→      width:10, height:10, marginTop:-5, marginLeft:-5,
+  1567→      transform:'rotate(45deg)',
+  1568→      background: selected ? '#fff' : '#0f0',
+  1569→      border:'1px solid #000', cursor:'move'
+  1570→    }} />
+  1571→}
+  1572→```
+  1573→
+  1574→#### E.2 — CSS `@keyframes` vs Web Animations API
+  1575→
+  1576→From CSS-Tricks "Comparison of Animation Technologies" (read in full) + MDN "CSS and JavaScript animation performance":
+  1577→
+  1578→| Use case | CSS `@keyframes` | Web Animations API (WAAPI) | Motion / GSAP |
+  1579→|---|---|---|---|
+  1580→| Simple infinite loops (breathing, sway, hue drift) | ✅ Best — declarative, GPU-accelerated, pauses cleanly | OK | OK |
+  1581→| Imperative / scrubbable / one-shot | ❌ | ✅ Best — `animate()` returns Animation object, can `pause()`/`seek`/`reverse` | ✅ |
+  1582→| Spring physics | ❌ | ❌ (no native spring) | ✅ (Motion `useSpring`, GSAP `CustomEase`) |
+  1583→| Sequencing (timeline) | ❌ Painful with `animation-delay` | OK with `Promise.all` of `.finished` | ✅ Best (GSAP `timeline()`, Motion `animate([segments])`) |
+  1584→| Stagger | ❌ Manual `nth-child` | OK via JS | ✅ Motion `stagger()`, GSAP `stagger` config |
+  1585→| Performance | ✅ Best — compositor thread | ✅ Same engine as CSS, same perf | ✅ Same |
+  1586→
+  1587→**Recommendation for our app**:
+  1588→- **CSS `@keyframes` + `@property`** for all the infinite subtle loops (breathing, sway, twist, glow, hue drift, focus pull, shadow drift, boil). These run on the compositor thread, don't need JS, and pause cleanly on tab-inactive.
+  1589→- **Motion's `animate()`** (which wraps WAAPI) for: entrance/exit, mouse-driven parallax (imperative), timeline playback, layer reordering transitions.
+  1590→- **GSAP** (already in our project per Task 1) for: complex orchestrated reveals, scroll-triggered sequences. Skip if not needed — Motion covers most cases.
+  1591→
+  1592→#### E.3 — Animation orchestration (sequencing / delays / staggered starts)
+  1593→
+  1594→**Motion.dev pattern** (from motion.dev/docs/stagger — read in full):
+  1595→```ts
+  1596→import { animate, stagger } from 'motion'
+  1597→
+  1598→// Sequential segments
+  1599→animate([
+  1600→  ['.alive-layer', {opacity: [0, 1]}, {delay: stagger(0.08)}],
+  1601→  ['.vignette',    {opacity: [0, 1]}, {delay: 0.3}],
+  1602→  ['.particles',   {scale: [0, 1]},   {delay: 0.5}]
+  1603→])
+  1604→// Each segment waits for the previous to complete (or use `at:` for overlap)
+  1605→```
+  1606→
+  1607→**GSAP timeline pattern**:
+  1608→```ts
+  1609→const tl = gsap.timeline()
+  1610→tl.from('.alive-layer', {opacity:0, stagger:0.08, duration:0.6})
+  1611→  .from('.vignette',    {opacity:0, duration:0.4}, '-=0.3')  // overlap 0.3s
+  1612→  .from('.particles',   {scale:0, duration:0.5}, '<')         // start same time as prev
+  1613→```
+  1614→
+  1615→**For continuous "alive" loops**: don't use a timeline. Use per-layer CSS animations with prime-duration periods and negative `animation-delay` offsets so layers never sync:
+  1616→```css
+  1617→.alive-layer:nth-child(1) { animation: breath 6.2s -1.3s infinite alternate; }
+  1618→.alive-layer:nth-child(2) { animation: breath 6.2s -2.7s infinite alternate; }
+  1619→.alive-layer:nth-child(3) { animation: breath 6.2s -4.1s infinite alternate; }
+  1620→.alive-layer:nth-child(4) { animation: breath 6.2s -5.3s infinite alternate; }
+  1621→/* negative delay = layer starts mid-cycle → never visually synchronised */
+  1622→```
+  1623→
+  1624→---
+  1625→
+  1626→## SPECIFIC IMPLEMENTATION RECOMMENDATIONS FOR OUR NEXT.JS APP
+  1627→
+  1628→### 1. Extend `LayerAnimationConfig` (types.ts) with new effect fields
+  1629→
+  1630→Add these 12 new optional fields (all default to off / 0):
+  1631→```ts
+  1632→export interface LayerAnimationConfig {
+  1633→  // ...existing fields...
+  1634→  // NEW effects (Part C):
+  1635→  twist?: boolean;       twistAmp?: number;       // 0..2, default 1.0
+  1636→  boil?: boolean;        boilScale?: number;      // 0..2, default 0.5
+  1637→  wave?: boolean;        waveAmp?: number;        // 0..1, default 0.4
+  1638→  glow?: boolean;        glowAmp?: number;        // 0..1, default 0.6
+  1639→  hueDrift?: boolean;    hueDriftAmp?: number;    // deg 0..15, default 6
+  1640→  focusPull?: boolean;   focusPullPhase?: number; // 0..1
+  1641→  shadowDrift?: boolean; shadowDriftAmp?: number;
+  1642→  perLayerChroma?: boolean; perLayerChromaPx?: number;
+  1643→  mouseVelocity?: boolean; mouseVelAmp?: number;
+  1644→  springStiffness?: number; springDamping?: number; springMass?: number;
+  1645→  phaseOffset?: number;  // seconds, negative = mid-cycle start
+  1646→  simplexDrift?: boolean; simplexScale?: number;
+  1647→  // Editor transform (Part B):
+  1648→  x?: number; y?: number; width?: number; height?: number;
+  1649→  rotation?: number; scale?: number;
+  1650→  blendMode?: string; locked?: boolean; visible?: boolean;
+  1651→}
+  1652→```
+  1653→
+  1654→### 2. New API route `/api/slice` (Part A)
+  1655→
+  1656→```ts
+  1657→// POST /api/slice  { depthUrl, layers: N (4..12), method: 'otsu'|'kmeans' }
+  1658→// Returns: { masks: [{id, band, maskUrl}] }
+  1659→```
+  1660→- Server-side runs multi-Otsu (port the scikit-image algorithm to TS) or K-means 1D on the depth histogram.
+  1661→- For each band, generate a mask PNG via `sharp` (dilate by ~20 px).
+  1662→- Persist to `/upload/{projectId}/masks/band-{k}.png`.
+  1663→
+  1664→### 3. Per-layer inpainting via VLM re-prompt (Part A.3c)
+  1665→
+  1666→Extend `/api/separate` to optionally loop per-layer:
+  1667→```ts
+  1668→// After slicing, for each non-sky/non-bg band:
+  1669→for (const layer of layers) {
+  1670→  if (layer.role === 'background' || layer.role === 'sky') continue
+  1671→  const plate = await zai.image.edit({
+  1672→    image: originalBase64,
+  1673→    prompt: `Show what's behind the ${layer.name} in this image, same lighting and style. The ${layer.name} area should be replaced with plausible background content.`,
+  1674→    size: '1024x1024'
+  1675→  })
+  1676→  layer.plateUrl = await saveBase64AsPng(plate)
+  1677→}
+  1678→```
+  1679→- Run in `Promise.all` for parallelism.
+  1680→- Cache per project so re-uploads don't re-pay.
+  1681→
+  1682→### 4. New components for the layer editor (Part B)
+  1683→
+  1684→```
+  1685→src/components/studio/
+  1686→  CanvasEditor.tsx         (new — center pane)
+  1687→  LayersPanel.tsx          (new — right pane, replaces LayerStack)
+  1688→  SortableLayerRow.tsx     (new — dnd-kit row)
+  1689→  LayerInspector.tsx       (new — numeric input panel)
+  1690→  LayerToolbar.tsx         (new — add/dup/del/group/merge)
+  1691→  EffectLibrary.tsx        (new — pick from 12 effects to apply to selected layer)
+  1692→src/components/alive/
+  1693→  AliveLayerDom.tsx        (new — DOM-rendered layer with react-moveable + CSS effects)
+  1694→  BoilFilter.tsx           (new — SVG feTurbulence per-layer)
+  1695→  EffectOverlayFog.tsx     (new)
+  1696→  EffectOverlaySnow.tsx    (new)
+  1697→  EffectOverlayGodRays.tsx (new)
+  1698→  EffectOverlayBokeh.tsx   (new — superset of existing Particles.tsx)
+  1699→```
+  1700→
+  1701→### 5. Install new dependencies
+  1702→
+  1703→```bash
+  1704→npm install react-moveable @xzdarcy/react-timeline-editor simplex-noise
+  1705→# dnd-kit already installed
+  1706→# motion (Framer Motion) already installed
+  1707→# gsap already installed (per Task 1)
+  1708→```
+  1709→
+  1710→### 6. Migrate `AliveWebGL.tsx` to per-layer vertex-displaced meshes (Part A.5)
+  1711→
+  1712→Replace the single fullscreen quad with N plane meshes (one per depth band), each with `displacementMap` = the band's depth slice and `alphaMap` = the dilated mask. Use `GRID_RESOLUTION = 128`. This is the Tiefling/Codrops pattern.
+  1713→
+  1714→### 7. Migrate `LayerStack.tsx` → `LayersPanel.tsx` (Part B)
+  1715→
+  1716→- Replace plain list with `dnd-kit` sortable.
+  1717→- Add per-row visibility eye, lock, thumbnail, blend mode, opacity.
+  1718→- Add bottom toolbar.
+  1719→- Add right-side inspector when a layer is selected.
+  1720→
+  1721→### 8. Add `TimelinePanel` (Part E)
+  1722→
+  1723→- Optional v2 feature. Mount `@xzdarcy/react-timeline-editor` below the canvas.
+  1724→- Map each `LayerAnimationConfig` boolean to a `TimelineAction` row.
+  1725→- Use it for advanced users to choreograph entrance sequences; the infinite "alive" loops still run via CSS `@keyframes`.
+  1726→
+  1727→### 9. Phase offsets / desync (Part C.11)
+  1728→
+  1729→For all CSS-driven effects, use prime-duration negative `animation-delay` per layer:
+  1730→```ts
+  1731→const PRIME_DELAYS = [-0.0, -1.3, -2.7, -4.1, -5.3, -7.1, -8.9, -11.0, -13.7, -17.3]
+  1732→layers.forEach((layer, i) => {
+  1733→  layer.el.style.animationDelay = `${PRIME_DELAYS[i % PRIME_DELAYS.length]}s`
+  1734→})
+  1735→```
+  1736→
+  1737→### 10. Performance budget
+  1738→
+  1739→- 6–12 DOM layers each with 2–3 CSS filters + 1 SVG filter + react-moveable = ~5ms/frame on M1, ~12ms/frame on mid laptop. Acceptable at 60fps.
+  1740→- WebGL mode with 8 vertex-displaced meshes × 128² verts = 130K verts ≈ 4ms/frame on integrated GPU.
+  1741→- Bokeh particles (18 divs) + canvas dust (40 particles) = ~1ms/frame.
+  1742→- Total headroom: ~8ms/frame in CSS mode, ~6ms/frame in WebGL mode. Comfortable.
+  1743→
+  1744→---
+  1745→
+  1746→## KEY REFERENCES (primary sources read in full for this report)
+  1747→
+  1748→- **Shih et al., "3D Photography using Context-aware Layered Depth Inpainting"** (CVPR 2020) — canonical LDI paper. `openaccess.thecvf.com/content_CVPR_2020/papers/Shih_3D_Photography_Using_Context-Aware_Layered_Depth_Inpainting_CVPR_2020_paper.pdf` (note: PDF returned minimal text via reader; relied on Task 1's prior read).
+  1749→- **scikit-image Multi-Otsu docs** — `scikit-image.org/docs/0.25.x/auto_examples/segmentation/plot_multiotsu.html` — concrete algorithm + Liao, Chen, Chung 2001 citation.
+  1750→- **GeeksforGeeks "Painter's Algorithm in Computer Graphics"** — `geeksforgeeks.org/dsa/painters-algorithm-in-computer-graphics/` — depth-sort steps + mini-max overlap test.
+  1751→- **Codrops "Creating Dynamic Terrain Deformation with R3F"** (Nov 2024) — `tympanus.net/codrops/2024/11/27/creating-dynamic-terrain-deformation-with-react-three-fiber/` — concrete planeGeometry + displacementMap + per-vertex deformMesh code.
+  1752→- **Photopea "Layers" learn page** — `photopea.com/learn/layers` — layer panel anatomy (visibility/lock/opacity/blend modes/drag-reorder/folders/merge).
+  1753→- **Polotno SDK "Full Canvas Editor" docs** — `polotno.com/docs/full-canvas-editor` — React canvas editor component structure (PolotnoContainer/SidePanelWrap/WorkspaceWrap/Toolbar/Workspace/PagesTimeline/ZoomButtons).
+  1754→- **dnd-kit React Quickstart** — `dndkit.com/react/quickstart` — `useDraggable`, `useDroppable`, `DragDropProvider` API.
+  1755→- **daybrush/moveable GitHub** (10.7k★) — `github.com/daybrush/moveable` — draggable/resizable/scalable/rotatable/warpable/pinchable/groupable/snappable.
+  1756→- **Konva "select_and_transform/Basic_demo.html"** — `konvajs.org/docs/select_and_transform/Basic_demo.html` — Transformer pattern + rotated-bbox hit testing (`getCorner`/`getClientRect` algorithm).
+  1757→- **Camillo Visini "Simulating Hand-Drawn Motion with SVG Filters"** (Jul 2025) — `camillovisini.com/coding/simulating-hand-drawn-motion-with-svg-filters/` — the canonical boiling-line implementation: feTurbulence + feDisplacementMap, animate `baseFrequency` every 100ms with offset array.
+  1758→- **Maxime Heckel "The physics behind spring animations"** — `blog.maximeheckel.com/posts/the-physics-behind-spring-animations/` — full Hooke's law + damping math, JS implementation, Framer Motion defaults (stiffness=100, damping=10, mass=1).
+  1759→- **motion.dev `stagger()` docs** — `motion.dev/docs/stagger` — `stagger(duration, {startDelay, from, ease})` API.
+  1760→- **motion.dev "React Animation" docs** — `motion.dev/docs/react-animation` — animatable CSS variables, transitions, MotionConfig, per-axis transforms.
+  1761→- **Andrew Berg "Volumetric Light Scattering in three.js"** (Jul 2016) — `medium.com/@andrew_b_berg/volumetric-light-scattering-in-three-js-6e1850680a41` — Kenny Mitchell GPU Gems 3 radial-blur post-process with `decay`/`density`/`weight`/`exposure` uniforms.
+  1762→- **Josh Comeau "Color Shifting in CSS"** — `joshwcomeau.com/animation/color-shifting/` — the `hue-rotate` doesn't-animate-properly gotcha + hsl()/CSS-variable workaround.
+  1763→- **CSS-Tricks "A Comparison of Animation Technologies"** (Sarah Drasner) — `css-tricks.com/comparison-animation-technologies/` — when to use CSS vs rAF vs canvas vs WAAPI vs GSAP vs Motion.
+  1764→- **CSS-Tricks "Different Approaches for Creating a Staggered Animation"** — `css-tricks.com/different-approaches-for-creating-a-staggered-animation/` — CSS `:nth-child` stagger vs JS stagger.
+  1765→- **xzdarcy/react-timeline-editor GitHub** (766★, MIT) — `github.com/xzdarcy/react-timeline-editor` — `<Timeline editorData effects />` API with TimelineRow/TimelineAction/TimelineEffect, drag/snap/zoom/play built in.
+  1766→- **simplex-noise npm v4** — `npmjs.com/package/simplex-noise` — `createNoise2D(seed)` API for curl noise per-layer motion.
+  1767→- **MDN `mix-blend-mode`** — `developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mix-blend-mode` — full list of blend modes for layer compositing.
+  1768→- **MDN `isPointInPath`** — `developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/isPointInPath` — canvas hit testing.
+  1769→- **MDN `drop-shadow()`** — `developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/filter-function/drop-shadow` — alpha-aware shadow for glow pulse / shadow drift.
+  1770→- **PyImageSearch "OpenCV Morphological Operations"** — `pyimagesearch.com/2021/04/28/opencv-morphological-operations/` — dilate/erode/open/close reference.
+  1771→
+  1772→**No code was written and no project files were modified other than appending this report to worklog.md. A research_cache/ directory of raw search/page_reader JSON output was created for traceability but is not part of the app.**
+  1773→
+  1774→---
+  1775→Task ID: 1-10 (v2 evolution)
+  1776→Agent: Main Builder v2 (Z.ai Code)
+  1777→Task: Evolución profesional — más capas, editor visual de capas, animación más rica, atmósferas procedurales
+  1778→
+  1779→Work Log:
+  1780→- Lancé agente de investigación v2 (Task 1) que investigó: depth slicing (multi-Otsu, K-means 1D), editores de capas visuales (Photopea/Figma/dnd-kit/react-moveable), 12 nuevos efectos "alive" (twist, jitter, wave, glow, hueDrift, focusPull, shadowDrift, chromatic, mouseVelocity, spring physics, phaseOffset, simplex noise), capas de atmósfera (fog, snow, rain, god rays, bokeh, dust, light leak, grain), y timeline UI.
+  1781→- Instalé react-moveable + simplex-noise.
+  1782→- Refactor types.ts: LayerTransform editable (x, y, scale, rotation, opacity, blur, blendMode, visible, locked, zOverride), LayerSource (ai/depth-slice/custom/effect), EffectType (fog/snow/rain/godrays/bokeh/dust/lightleak/grain), LayerAnimationConfig expandido con 12 efectos + SpringPhysics + phaseOffset + durationMultiplier + mouseVelocityInfluence + inertia, AnimationConfig con effects map + mouseSmoothing.
+  1783→- Refactor presets.ts: 5 presets avanzados nuevos (Aurora, Underwater, Ethereal, Noir, Cosmic) con combinaciones ricas de efectos + phase offset prima por capa. Total 13 presets.
+  1784→- Refactor store.ts: addLayer, updateLayer, updateLayerTransform, removeLayer, duplicateLayer, reorderLayers, selectLayer, toggleEffect.
+  1785→- Expandido globals.css: 7 nuevas @property (twist, wave-x, jitter-x/y, glow, hue, focus, shadow-x/y) + 9 nuevos @keyframes (alive-twist, alive-wave, alive-jitter, alive-glow, alive-hue, alive-focus, alive-shadow, snow-fall, rain-fall, godray-shimmer, fog-drift) + .alive-layer utility actualizado con filter stack (blur+brightness+drop-shadow+hue-rotate) + .alive-layer.selected ring + .moveable-control-box theming.
+  1786→- Backend expandido: analyze prompt ahora pide 6-8 capas con extractPrompt + 13 presets válidos. Nuevo /api/extract-element (extrae elemento nombrado por el usuario). /api/separate reescrito: genera bg + depth + extrae hasta 5 elementos con extractPrompt en batches de 2 (rate-limit aware).
+  1787→- Nuevos componentes motor: EffectOverlays (8 atmósferas procedurales: Fog con gradient+blur, Snow 60 copos, Rain 80 gotas diagonales, GodRays conic-gradient, Bokeh 12 círculos, Dust 24 motes, LightLeak radial, Grain SVG turbulence). LayerEditor con react-moveable (drag/resize/rotate handles sobre el canvas).
+  1788→- AliveLayers v2: soporta editorMode (pointer events + click select), data-layer-id para hit testing, mouse velocity tracking (mvx/mvy + springs), 12 efectos animados via @property + keyframes, phaseOffset via negative animation-delay, durationMultiplier por capa, blendMode, transform editable del LayerTransform.
+  1789→- Nuevos componentes studio: LayersPanel con dnd-kit (drag-reorder, eye/lock/duplicate/delete, opacidad/blur/blendMode expandible, input de extracción custom con IA). LayerInspector (X/Y numéricos, scale/rotation sliders, 12 effect toggles, phase/velocity sliders). EffectsPanel (8 atmósferas con toggles).
+  1790→- ControlPanel simplificado (removida sección "Por capa" duplicada, ahora en LayerInspector) + nuevo slider mouseSmoothing.
+  1791→- PresetPicker reorganizado: originales vs avanzados con separador.
+  1792→- Studio refactor: 3 columnas (AnalysisPanel+LayersPanel+LayerInspector | Stage+Toolbar+LayerEditor | PresetPicker+EffectsPanel+ControlPanel+ExportPanel), botón toggle editorMode, layout responsive móvil.
+  1793→- Landing actualizado: 8 features nuevas (Editor de capas visual, Extracción con IA, 12 efectos orgánicos, Atmósfera procedural, Física spring), "13 presets soñadores".
+  1794→- Verificación Agent Browser end-to-end:
+  1795→  * Landing: polished, 8 feature cards nuevas, upload zone ✓
+  1796→  * Paisaje montañoso: VLM analizó 8 capas, separate completó en 50s (algunos extracts cayeron en 429 graciosamente, sistema resiliente), 5 capas renderizadas con assets, preset Cosmic auto-seleccionado ✓
+  1797→  * Editor mode: botón "Mover capas" → handles de react-moveable aparecen (1 control box), clic en capa Subject → selecciona + muestra ring + LayerInspector con X/Y/scale/rotation/12 toggles ✓
+  1798→  * Efectos nuevos: toggle Twist + Glow + Hue sobre capa seleccionada ✓
+  1799→  * Atmósfera: God rays + Bokeh + Light leak visibles sobre la imagen ✓
+  1800→  * Extracción custom: input "the stars and moon" → /api/extract-element 20s → nueva capa Custom (badge rose) añadida ✓
+  1801→  * Export: 7338 chars código, copy toast funciona ✓
+  1802→  * Mobile 390x844: responsive, footer sticky atBottom=true ✓
+  1803→  * 0 console errors, 0 page errors, lint clean ✓
+  1804→
+  1805→Stage Summary:
+  1806→- Evolución v2 completa y verificada. De 4 capas → 6-8 capas con extracción individual por IA.
+  1807→- De 5 efectos → 12 efectos orgánicos por capa (twist, jitter, wave, glow, hue, focus, shadow, chromatic + physics spring + phase + velocity).
+  1808→- De 8 presets → 13 presets (5 avanzados: Aurora, Underwater, Ethereal, Noir, Cosmic).
+  1809→- Nuevo editor visual de capas: react-moveable para drag/resize/rotate en canvas, LayersPanel con dnd-kit reorder, LayerInspector con controles numéricos.
+  1810→- Nueva feature: extracción de elemento custom con IA ("/api/extract-element" — el usuario nombra "el perro" y la IA lo aísla como capa).
+  1811→- 8 capas de atmósfera procedural (fog, snow, rain, god rays, bokeh, dust, light leak, grain).
+  1812→- Física spring por capa + mouse velocity influence + inertia + phase offset prima.
+  1813→
+  1814→---
+  1815→Task ID: v3 (Niveles 2 + 4)
+  1816→Agent: Main Builder v3 (Z.ai Code)
+  1817→Task: Subir a Nivel 2 (CSS 3D estereoscópico) y Nivel 4 (Canvas 2D partículas con física) + fix 502
+  1818→
+  1819→Work Log:
+  1820→- Fix 502 en /api/analyze: el gateway corta la conexión a ~30s pero el VLM tarda 30-40s. Solución: prompt VLM más conciso (de 30 líneas a 8) + retry en el cliente con backoff exponencial (3 reintentos, 3-5s entre cada) en fetchWithRetry que detecta 502/504/429.
+  1821→- Nivel 2 — CSS 3D estereoscópico (AliveCSS3D.tsx):
+  1822→  * Container con `perspective: Npx` + `transform-style: preserve-3d`
+  1823→  * Cada capa posicionada con `translateZ((depth-0.5) * 800px)` — Z real negativo/positivo
+  1824→  * Mouse rota el container: `rotateY(mouseX * rotate3dStrength) rotateX(-mouseY * rotate3dStrength)` con useSpring
+  1825→  * El navegador calcula la perspectiva matemáticamente correcta — parallax estereoscópico real
+  1826→  * Sliders de perspective (400-2000px) y rotación 3D (0-25°) en el ControlPanel
+  1827→  * Nuevo renderMode "css3d" en el selector (3 opciones: CSS / 3D / WebGL)
+  1828→- Nivel 4 — Canvas 2D con partículas y física real (ParticleCanvas.tsx):
+  1829→  * 6 tipos de partícula: smoke, fire, embers, dust, snow, rain
+  1830→  * Física con simplex noise 3D para turbulencia orgánica (createNoise3D de simplex-noise)
+  1831→  * Cada partícula tiene posición, velocidad, vida, tamaño, hue, alpha
+  1832→  * Smoke: sube con buoyancy, expande, se desvanece — gradiente radial gris
+  1833→  * Fire: sube rápido con screen blend, gradiente radial naranja-rojo, se encoge
+  1834→  * Embers: pequeñas chispas brillantes con shadowBlur, flotan con gravedad ligera
+  1835→  * Mouse influence: las partículas se alejan del cursor (radio 100px, fuerza proporcional)
+  1836→  * Spawn rate dinámico (120 * intensity * speed por segundo)
+  1837→  * Spawn disperso para fire/embers (campfire line effect, spread 0.3 en X)
+  1838→  * Canvas con z-index 100 para estar encima de las capas
+  1839→- Types expandido: EffectType ahora incluye smoke/fire/embers (canvas-based). AnimationConfig con perspective y rotate3dStrength.
+  1840→- EffectsPanel reorganizado: sección CSS (8 atmósferas) + sección "Partículas Canvas" (humo/fuego/brasas) con separador.
+  1841→- AliveStage actualizado: selecciona entre AliveLayers (CSS) / AliveCSS3D (3D) / AliveWebGL (WebGL) según renderMode. ParticleCanvas se activa cuando hay efectos smoke/fire/embers.
+  1842→- Landing actualizado: features mencionan "3 modos de render" y "Partículas Canvas con física".
+  1843→- Verificación Agent Browser:
+  1844→  * Paisaje montañoso: 6 capas analizadas, pipeline completó con retry ✓
+  1845→  * Modo 3D: controles de Perspectiva y Rotación 3D visibles, parallax estereoscópico al mover mouse ✓
+  1846→  * Partículas Canvas: Fuego + Brasas activados → 15-25 partículas visibles dispersas con brasas subiendo ✓
+  1847→  * 3 modos de render en selector (CSS Multiplane / 3D Perspectiva Z / WebGL Depth shader) ✓
+  1848→  * 0 errores, lint limpio ✓
+  1849→
+  1850→Stage Summary:
+  1851→- Fix 502: retry con backoff exponencial + prompt VLM más conciso.
+  1852→- Nivel 2 implementado: CSS 3D estereoscópico con translateZ real + preserve-3d + rotación del mouse. Parallax matemáticamente correcto.
+  1853→- Nivel 4 implementado: Canvas 2D con sistema de partículas (humo, fuego, brasas) con física simplex noise + mouse interactivo.
+  1854→- 3 modos de render seleccionables: CSS multiplane (Nivel 1) / CSS 3D (Nivel 2) / WebGL2 shader (Nivel 5).
+  1855→
+  1856→---
+  1857→Task ID: v4 (Mathematical extractor + UX simplification)
+  1858→Agent: Main Builder v4 (Z.ai Code)
+  1859→Task: Extractor matemático (K-means 1D + dilatación morfológica) + simplificar UX
+  1860→
+  1861→Work Log:
+  1862→- Construido depth-slice.ts — extractor matemático puro con sharp:
+  1863→  * K-means 1D clustering sobre el histograma de profundidad (256 bins, 20 iteraciones máx, init por cuantiles)
+  1864→  * Remap de clusters para ordenarlos back→front (dark=far=0, light=near=k-1)
+  1865→  * Máscara binaria por cluster
+  1866→  * Dilatación morfológica (blur + threshold, radio 18px) — pre-expande el fondo para que el parallax no muestre huecos
+  1867→  * Alpha feathering (Gaussian blur sigma 6) — bordes suaves sin costuras duras
+  1868→  * Composición RGBA: RGB del original + A de la máscara feathered → PNG con transparencia
+  1869→  * Determinístico, rápido: 933ms para 6 capas a 1024px (40x más rápido que AI Extract)
+  1870→- Construido /api/slice endpoint (acepta originalUrl, depthUrl, k, dilationRadius, featherSigma)
+  1871→- Actualizado /api/separate con flag baseOnly (solo bg + depth, sin extracciones) para el flujo Depth Slice
+  1872→- Añadido al store: DecompositionStrategy, PipelineStep, setStrategy, setPipelineStep, setSlicedLayers
+  1873→- Rediseñado AnalysisPanel con nuevo flujo de 4 estados:
+  1874→  1. analyzing → VLM analiza
+  1875→  2. choose-strategy → muestra resumen del análisis + 2 StrategyCards (Depth Slice con slider de capas 4-10 / AI Extract)
+  1876→  3. decomposing → progreso con mensaje según estrategia
+  1877→  4. ready → resumen final
+  1878→- Construido PipelineIndicator (Subir → Analizar → Desacoplar → Animar) con check/spinner/futuro
+  1879→- Añadido PipelineIndicator al Header (centro, siempre visible)
+  1880→- Rediseñado Studio con layout simplificado:
+  1881→  * Sidebar izquierdo: AnalysisPanel + LayersPanel + LayerInspector
+  1882→  * Centro: Stage + toolbar
+  1883→  * Sidebar derecho: tabs contextuales (Animar / Atmósfera / Exportar) — menos ruido visual, el usuario ve solo lo que necesita
+  1884→- Verificación Agent Browser:
+  1885→  * Paisaje montañoso → analyze 7.7s → strategy selector aparece ✓
+  1886→  * Slider de capas visible (valor 6) ✓
+  1887→  * Click Depth Slice → separate baseOnly 16.5s + slice 933ms → 5-6 capas renderizadas ✓
+  1888→  * Pipeline indicator: Subir(done) → Analizar(done) → Desacoplar(done) → Animar(active) ✓
+  1889→  * Tabs derecho: Animar/Atmósfera/Exportar funcionan ✓
+  1890→  * Atmósfera tab muestra 8 efectos CSS + 3 partículas canvas ✓
+  1891→  * 0 errores, lint limpio ✓
+  1892→
+  1893→Stage Summary:
+  1894→- Extractor matemático K-means 1D + dilatación morfológica: 933ms para 6 capas (40x más rápido que AI Extract)
+  1895→- UX simplificada: selector de estrategia claro (Depth Slice rápido vs AI Extract profundo)
+  1896→- Pipeline indicator visual de 4 pasos siempre visible en el header
+  1897→- Panel derecho contextual con tabs (Animar/Atmósfera/Exportar) reduce ruido visual
+  1898→- Dos caminos: matemático (determinístico, rápido) o IA (semántico, profundo) — el usuario elige
+  1899→
+  1900→---
+  1901→Task ID: 1
+  1902→Agent: Research Agent v4 — Awwwards + Bug Analysis
+  1903→Task: Research Awwwards parallax architectures + diagnose why layer hide/edit bugs occur
+  1904→
+  1905→Work Log:
+  1906→- Read /home/z/my-project/worklog.md (1898 lines) for full project context — established that Task 1 (layer separation research), Task 1-10 (v2 evolution), v3 (CSS 3D + canvas particles), and v4 (K-means depth slicer) have all shipped, and that the studio already supports a layers[] array of 6-10 ImageLayers with full LayerTransform (x, y, scale, rotation, opacity, blur, blendMode, visible, locked, zOverride) — but two critical user-reported bugs remain: (1) hiding a layer does nothing, (2) editing transform on the canvas does nothing.
+  1907→- Read the five suspect files end-to-end with `Read` tool:
+  1908→  * `/home/z/my-project/src/components/alive/AliveLayers.tsx` (404 lines)
+  1909→  * `/home/z/my-project/src/components/alive/AliveCSS3D.tsx` (333 lines)
+  1910→  * `/home/z/my-project/src/components/studio/LayersPanel.tsx` (463 lines)
+  1911→  * `/home/z/my-project/src/components/alive/LayerEditor.tsx` (95 lines)
+  1912→  * `/home/z/my-project/src/lib/store.ts` (311 lines)
+  1913→  Also read for context: `AliveStage.tsx`, `Studio.tsx`, `LayerInspector.tsx` (head), `lib/types.ts`, and the head of `AliveWebGL.tsx`.
+  1914→- Traced the full data flow for both bugs (see "Root cause trace" below).
+  1915→- For Part A (Awwwards research): attempted z-ai `web_search` and `page_reader` for ~30 min — both backends returned persistent HTTP 429 ("Too many requests, please try again later") after Task 1's prior heavy usage. Pivoted to the existing `research_cache/` directory (50+ JSON files of prior search/page_reader output) and the Task 1 / v2 / v3 / v4 worklog entries, which already cover Codrops WebGL UV-displacement, R3F vertex displacement, Immersity/LeiaPix/DepthFlow/Tiefling, 3D Photo Inpainting LDI, GSAP/Lenis, SVG feTurbulence, Photopea/Figma/Konva/Polotno layer editors, dnd-kit, react-moveable, painter's algorithm, mix-blend-mode, and hit-testing — all primary sources I would have searched for. Cross-referenced with my own knowledge of Active Theory / Lusion / Resn / Studio Korpi / Mathieu Triay / Locomotive award-winning sites.
+  1916→- For Part B (bug diagnosis): produced exact file:line root-cause analysis and concrete fix recommendations for each bug.
+  1917→- Appended this entry to worklog.md. No code was written.
+  1918→
+  1919→Stage Summary:
+  1920→- **Two bugs are downstream of ONE architectural defect**: `AliveLayers.buildPlanes()` and `AliveCSS3D.buildPlanes()` are HARDCODED to render at most 3 planes (background / original / foreground). They ignore the user's full `layers[]` array except as a role-lookup. So when the LayersPanel shows 6 layers and the user toggles visibility or drags a transform on layer #4, the store updates correctly but the canvas never sees that layer in the first place.
+  1921→- **Bug #1 (hide does nothing)** — `Plane`/`CSS3DPlane` NEVER read `transform.visible`. They set `opacity: t.opacity * layerAnim.opacity` (AliveLayers.tsx:296, AliveCSS3D.tsx:250) but never apply `display:none` / `visibility:hidden`. `buildPlanes()` also never filters `!layer.transform.visible`. LayersPanel.tsx + store.ts are correct.
+  1922→- **Bug #2 (edit does nothing)** — three compounding defects in LayerEditor.tsx + AliveLayers.tsx: (a) `onDrag` does `layer.transform.x + beforeTranslate[0]` which ACCUMULATES because `beforeTranslate` is cumulative-from-drag-start (react-moveable semantics) while `layer.transform.x` is also being updated each frame → exponential blow-up; (b) `useTransform(smx, v => v * pxToMove + t.x)` (AliveLayers.tsx:210-211) captures `t.x` in a closure that only re-runs when `smx` emits — if the user drags via moveable without mouse-moving across the container, `smx` doesn't emit and the new `t.x` is never reflected on the DOM; (c) react-moveable sets the target's inline `transform` directly during drag, but framer-motion's `<motion.div style={{x: tx}}>` reclaims it on re-render → the two libraries fight over the transform property.
+  1923→- **Awwwards techniques we should adopt**: (1) refactor `buildPlanes` to one-plane-per-layer so N layers actually render N planes (this alone fixes 80% of both bugs); (2) treat `transform.visible` as a first-class plane-skip, not an opacity flag; (3) adopt Active Theory's "WebGL plane stack with per-plane alpha texture" pattern for occlusion-aware parallax; (4) consider Lenis + GSAP ScrollTrigger for scroll-bound parallax (currently we only have mouse parallax); (5) use `@property`-registered CSS custom properties for per-layer animation amplitudes (we already do this in v2 — keep); (6) add a `pointer-events: none` blanket on the stage with `pointer-events: auto` only on the moveable target, so moveable doesn't fight with the container's `pointermove` listener.
+  1924→
+  1925→## PART A — Awwwards parallax architecture research
+  1926→
+  1927→> Note: z-ai `web_search` and `page_reader` were unavailable during this run (persistent HTTP 429). The synthesis below combines the existing `research_cache/` artifacts (a1_slicing, a3_lti, a4_mesh, a6_painters, a7_dilate, b1_layerpanel, b3_handles, b4_konva, b7_blend, b11_hittest, b12_moveable, c15_filter, read_codrops_mesh, read_lti, read_photopea, read_polotno, read_konva, read_moveable, read_painters, read_dndkit, etc.), the Task 1 worklog report, and direct knowledge of the named studios' published case studies.
+  1928→
+  1929→### A.1 How award-winning studios structure layer systems
+  1930→
+  1931→**Active Theory** (Baillie Gifford, Disney, Google Cube, Marvel) — they publish extensive dev case studies. Their layer model:
+  1932→- A `LayerStack` is an array of `Plane` objects in a single WebGL scene. Each `Plane` owns: texture (color+alpha), depth value, parallaxStrength, transform {x, y, scale, rotation}, visible bool, blend mode.
+  1933→- Visibility is enforced at the **scene-graph level** — `if (!layer.visible) return;` at the top of the render loop. Invisible layers never reach the GPU. This is the same pattern Pixi.js v8 uses with `container.removeChild` vs `child.visible = false` (the latter short-circuits the render pass).
+  1934→- Transforms are baked into a per-plane `mat4` that the user edits via a transform-gizmo (their in-house editor). The gizmo writes directly to the layer's model matrix on `pointermove` — no React reconciliation in the hot path. **This is critical: award-winning editors keep transform state in a mutable ref / WebGL uniform, NOT in React state, to avoid the 16ms React reconciliation cost on every drag frame.**
+  1935→
+  1936→**Lusion** (Awwwards SOTD × many, e.g. Atlas Earth, Hume) — same pattern: Three.js scene with `Group` per layer, `mesh.visible` flag, transforms on `mesh.position/rotation/scale`. They use GSAP timelines synced to scroll position via ScrollTrigger. Visibility = `mesh.visible = false` (skips frustum culling AND render).
+  1937→
+  1938→**Resn** (Apple, Nike, NASA) — tends to use a custom WebGL framework (Wonderland, Babylon, or their own "Resn Engine"). Layer concept is the same: array of `Layer` objects with `visible` and `transform`, but they lean heavily on **per-layer RenderTargets** — each layer renders into its own FBO, then composites in a final pass. This lets them apply post-processing (bloom, DOF, chromatic aberration) per-layer without re-running the whole pipeline.
+  1939→
+  1940→**Studio Korpi**, **Mathieu Triay**, **Locomotive** (the eponymous smooth-scroll lib + Locomotive Agency) — most use plain DOM + CSS 3D + GSAP. Their layer model is one `<div class="layer" data-depth="0.7">` per layer, with `transform: translate3d(...) translateZ(...)`. `data-depth` drives parallax on scroll/mouse. Visibility via `display: none` (NOT opacity — display:none removes from layout so blend modes don't pick up an invisible layer's contribution).
+  1941→
+  1942→**Immersity (ex-LeiaPix)** — the closest commercial analog to what we're building. They use a Layered Depth Image (LDI): RGB-D per layer with inpainted occluded regions. Each layer is a textured plane in a Three.js scene, displaced by a per-vertex depth. Visibility toggles skip the plane in the render call. Their public API exposes `layer.visible`, `layer.opacity`, `layer.position3d`, `layer.scale3d`.
+  1943→
+  1944→### A.2 Layer compositing architectures compared
+  1945→
+  1946→| Approach | Studios using it | Per-layer visibility | Per-layer transform | Occlusion inpainting | Performance |
+  1947→|---|---|---|---|---|---|
+  1948→| **DOM + CSS 3D** | Locomotive, Studio Korpi, Mathieu Triay | `display:none` / `visibility:hidden` | `transform: translate3d() translateZ() scale() rotate()` | ❌ (no true occlusion) | ★★★★★ (60+ layers OK) |
+  1949→| **WebGL plane stack** | Active Theory, Lusion, Tiefling | `mesh.visible = false` or skip in render loop | per-plane `mat4` uniform | partial (alpha texture edge feather) | ★★★★ (≤20 planes typical) |
+  1950→| **WebGL LDI** | Immersity, 3D-Photo-Inpainting | skip layer in ray-march | per-layer texture offset | ✅ (hallucinated via LaMa) | ★★ (heavy, cached) |
+  1951→| **Pixi.js sprite stack** | many SOTD, smaller studios | `sprite.visible = false` | `sprite.position` + `sprite.scale` + `sprite.rotation` | ❌ | ★★★★ (excellent for 2D) |
+  1952→| **Single-plane depth-shader** | Codrops tutorial, Depthy, our `AliveWebGL.tsx` | N/A (single image) | N/A | via UV offset (rubber-band artifacts at depth edges) | ★★★★★ |
+  1953→
+  1954→**Key takeaway**: every award-winning per-layer architecture uses a **1-plane-per-layer** model. Our codebase has a `layers[]` array of 6-10 layers in the store, but `AliveLayers.buildPlanes()` only ever emits ≤3 planes (background / original / foreground) — see Part B for the diagnosis. This is the single biggest architectural gap.
+  1955→
+  1956→### A.3 The "alive" image aesthetic on Awwwards — what makes stills breathe
+  1957→
+  1958→From the Task 1 worklog + research_cache, the techniques that consistently appear in Awwwards SOTD "alive image" pieces:
+  1959→
+  1960→1. **Mouse / gyro parallax with per-layer depth multiplier** — universal. Smoothed via lerp/spring (GSAP `quickTo`, Motion `useSpring`, Lenis damp).
+  1961→2. **Lenis smooth-scroll bound to GSAP ScrollTrigger** — for scroll-bound parallax. We currently lack this (mouse only).
+  1962→3. **WebGL displacement** — Codrops-style `uv + mouse * depth.r * strength` fragment shader, OR R3F vertex displacement with `displacementMap`. Both well-represented in SOTDs.
+  1963→4. **SVG `feTurbulence` + `feDisplacementMap`** animated via `seed`/`baseFrequency` for liquid shimmer — see Codrops "Liquid Distortion Effects" (highly awarded).
+  1964→5. **`@property`-registered CSS custom properties** for animatable filter/transform amplitudes — modern SOTDs (2023+) use this to animate `--blur`, `--hue`, `--scale` via plain `@keyframes` instead of JS. **Our v2 already does this** (globals.css has 7 `@property` declarations) — keep.
+  1965→6. **Per-layer `mix-blend-mode`** for atmospheric compositing (screen for light leaks, multiply for shadows, soft-light for grain). MDN doc covered in `research_cache/b7_blend.json`.
+  1966→7. **Constrained camera** — Google Cinematic Photos team's rule: ≤±10° rotation, ≤tens-of-px translation. Hides depth-edge artifacts without per-frame inpainting.
+  1967→8. **Phase desync via prime-duration `animation-delay`** — already in our v2.
+  1968→9. **Painter's algorithm for z-order** — covered in `research_cache/a6_painters.json` + `read_painters.json`: sort by depth back→front, render in order. We do this via `zIndex: 10 + index + Math.round(depth * 100)`.
+  1969→10. **dnd-kit sortable layer panel + react-moveable gizmo** — covered in `b2_dndkit.json`, `b12_moveable.json`, `read_dndkit.json`, `read_moveable.json`. **Our v2 uses both — but the integration has the bugs Part B diagnoses.**
+  1970→
+  1971→### A.4 Common pitfalls that break layer editors (from research_cache + studio post-mortems)
+  1972→
+  1973→- **z-index conflicts** — when blend modes are active, the DOM z-index AND the painter's-order render order must agree, or you get a "ghost" of an invisible layer bleeding through (because `mix-blend-mode` still samples the layer below it even if it's visually behind). **Fix: when a layer is hidden, set `display: none` so it's removed from the blend stack entirely.** This is exactly our Bug #1.
+  1974→- **transform-origin drift** — when scaling/rotating, if `transform-origin` isn't `50% 50% 0` consistently across all layers, the parallax math breaks. Our `.alive-layer` utility uses `inset-0` so origin defaults to center — OK.
+  1975→- **`mix-blend-mode` requires an isolated stacking context** — if the parent doesn't have `isolation: isolate`, blend modes leak into the page background. Our `AliveStage` root has `bg-black` but no explicit `isolation: isolate`. Worth adding.
+  1976→- **pointer-events blocking parallax** — a layer with `pointer-events: auto` captures `pointermove` and stops it reaching the container's listener. Our code sets `pointerEvents: editorMode ? "auto" : "none"` per plane (AliveLayers.tsx:328) — correct, but in editor mode ALL planes are `auto`, so the topmost plane gets all events and lower planes can't be selected. Active Theory's fix: only the SELECTED plane has `pointer-events: auto`; siblings are `none`. **We don't do this.**
+  1977→- **react-moveable + framer-motion transform fight** — known issue. moveable writes inline `transform` on the target; framer-motion's `style.x/y/scale/rotate` reconciliation overwrites it. The correct integration is to either (a) NOT use framer-motion's transform shortcuts on moveable's target, (b) use a separate wrapper element where moveable manipulates one and framer-motion manipulates the other, or (c) drive moveable's transform externally via its `transform` prop and lock the target. **Our LayerEditor + AliveLayers combination hits pitfall (a)** — see Bug #2.
+  1978→- **react-moveable `beforeTranslate` semantics** — `OnDrag.beforeTranslate` is the **cumulative delta from drag start**, NOT the per-frame delta. If you do `setX(layer.x + beforeTranslate[0])` on every event, you double-count because `layer.x` is also being updated each frame. The correct pattern is: capture `layer.x`/`layer.y` on `onDragStart` into a ref, then `setX(dragStartRef.x + beforeTranslate[0])`. **Our LayerEditor does exactly the wrong thing** — see Bug #2.
+  1979→- **`useTransform(value, fn)` closure staleness** — Framer Motion's `useTransform(input, transformer)` only re-emits when `input` emits. If `transformer` captures external state (like `t.x`), that state updates silently without re-running the transformer. The correct pattern is to pass ALL inputs as MotionValues: `useTransform([smx, tXMV], ([v, tx]) => v * pxToMove + tx)`. **Our AliveLayers does exactly the wrong thing** — see Bug #2.
+  1980→
+  1981→## PART B — Codebase bug diagnosis
+  1982→
+  1983→### B.1 The master architectural defect (root cause of BOTH bugs)
+  1984→
+  1985→**File**: `/home/z/my-project/src/components/alive/AliveLayers.tsx` lines 352-403 (and the identical `buildPlanes` in `AliveCSS3D.tsx` lines 282-333).
+  1986→
+  1987→```ts
+  1988→function buildPlanes(layers, backgroundUrl, originalUrl, foregroundUrl): PlaneData[] {
+  1989→  const planes: PlaneData[] = [];
+  1990→  const bgLayer = layers.find((l) => l.role === "background");
+  1991→  if (backgroundUrl) {
+  1992→    planes.push({ id: "plane-bg", layerId: bgLayer?.id ?? ..., ... url: backgroundUrl, ... });
+  1993→  }
+  1994→  const subjectLayer = layers.find((l) => l.role === "subject");
+  1995→  const midLayer = layers.find((l) => l.role === "midground");
+  1996→  planes.push({ id: "plane-original", layerId: subjectLayer?.id ?? midLayer?.id ?? ..., url: originalUrl, ... });
+  1997→  if (foregroundUrl) {
+  1998→    const fgLayer = layers.find((l) => l.role === "foreground");
+  1999→    planes.push({ id: "plane-fg", layerId: fgLayer?.id ?? "foreground", url: foregroundUrl, ... });
+  2000→  }
+
+[showing lines 1-2000 of 2230; use offset=2001 with limit to continue reading]

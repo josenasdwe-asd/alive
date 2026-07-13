@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://css-tricks.com/bringing-back-parallax-with-scroll-driven-css-animations",
+    "name": "Bringing Back Parallax With Scroll-Driven CSS Animations",
+    "snippet": "Scroll-driven animations provide two new animation timeline CSS functions. These additions, view() and scroll() , tell the browser what to ...",
+    "host_name": "css-tricks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=Qj0Qx8HpNUo",
+    "name": "True parallax with CSS-only is now possible - YouTube",
+    "snippet": "Well, thanks to scroll-timeline: scroll(), we can now create true ... Simple Pure CSS Parallax Scroll Tutorial. Developer Filip•76K · 27 ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://rebeccamdeprey.com/blog/scroll-driven-animations-css",
+    "name": "Scroll-Driven Animations in CSS: No JavaScript Required",
+    "snippet": "How to use the CSS scroll-driven animations API to create scroll-linked effects like progress bars, parallax, and reveal animations",
+    "host_name": "rebeccamdeprey.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=ywBHtTSiluQ&vl=en",
+    "name": "Creating Parallax with Scroll Speed in Framer (Animation Lesson 9)",
+    "snippet": "Parallax scrolling adds instant depth to any website by making elements move at different speeds. In this tutorial, you'll discover how ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://motion.dev/docs/react-scroll-animations",
+    "name": "React scroll animation | scroll-linked & parallax - Motion.dev",
+    "snippet": "This guide covers scroll-linked animations, scroll-triggered animations, parallax, horizontal scrolling, and more. All with live examples and copy-paste code.",
+    "host_name": "motion.dev",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://prismic.io/blog/css-scroll-effects",
+    "name": "CSS Scroll Effects: 50 Interactive Animations to Try - Prismic",
+    "snippet": "It allows for parallax effects, where elements move at different speeds during scroll, and lag effects, where elements take time to \"catch up\" ...",
+    "host_name": "prismic.io",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://schwartz-edmisten.com/blog/hero-banner-parallax-scrolling-animation-in-squarespace-71",
+    "name": "Hero Banner Parallax Scrolling Animation in Squarespace 7.1",
+    "snippet": "In this tutorial I show you how to create a cool multi layer parallax animation that is tied to scroll. As the user scrolls down the page, the different ...",
+    "host_name": "schwartz-edmisten.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.cloudways.com/blog/what-is-parallax-scrolling",
+    "name": "What Is Parallax Scrolling? 2026 Guide & Examples - Cloudways",
+    "snippet": "Each layer moves at a different speed as you scroll, creating the illusion of three-dimensional depth on a flat screen. The background drifts ...",
+    "host_name": "www.cloudways.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

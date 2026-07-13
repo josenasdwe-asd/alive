@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.liftgammagain.com/forum/index.php?threads/halation-and-gate-weave.13056",
+    "name": "Halation and Gate Weave - Colorist & Color Grading Forum",
+    "snippet": "I'm working on stepping up my film emulation strategies and I was curious how you guys are handling halation and gate weave. Simulating Film Halation in Premiere Pro Halation and Gate Weave | Page 8 More results from www.liftgammagain.com",
+    "host_name": "www.liftgammagain.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.facebook.com/groups/BCPANY/posts/3095830063994986",
+    "name": "How to emulate 35mm film gate weave and optical effects in motion",
+    "snippet": "The basic node path can be summarized as INPUT > HALATION > COLOR TRANSFORM> GRAIN> GATE WEAVE > OUTPUT. This is more or less a test, and I ...",
+    "host_name": "www.facebook.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=nbWsJT2tpNY",
+    "name": "Gate Weave and Film Breath cinematic emulation color grading",
+    "snippet": "LEFT: Film Profile, Print Options, Vignette, Expand, Color Head, Film Grain, Halation, Bloom RIGHT: Film Breath and Gate Weave. Download ...",
+    "host_name": "www.youtube.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DTiLUhACTd0",
+    "name": "Free Film Emualtion Dctl - 35mm grain halation gateweave in Davinci",
+    "snippet": "anyway to turn down the amount of gate weave? January 15. Transcript. One of key realization in film emulation is this. Film is ...",
+    "host_name": "www.instagram.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=S-yhF6gXw2s",
+    "name": "Film Halation in After Effects and Premiere Pro - YouTube",
+    "snippet": "In this video, we look at creating film halation for use in film. I will cover techniques used in RAKK Production's film emulation tutorial ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/davinciresolve/comments/1hbvoeu/i_created_a_guide_for_achieving_a_film_look",
+    "name": "I created a guide for achieving a \"film look\", including halation and grain",
+    "snippet": "I created a guide for achieving a \"film look\", including halation and grain, common in print film emulation looks",
+    "host_name": "www.reddit.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.dehancer.com/learn/articles/film-breath-gate-weave",
+    "name": "Film Breath and Gate Weave - Dehancer",
+    "snippet": "To mimic the Film such devices, the Gate Weave effect will be subtle, but it is usually still present and subconsciously affects the perception.",
+    "host_name": "www.dehancer.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://community.adobe.com/feature-requests-730/halation-effect-glow-grain-and-other-film-simulation-controls-on-color-mode-1628258",
+    "name": "Halation effect, Glow, Grain and other Film Simulation Controls on Color",
+    "snippet": "Halation effect, Glow, Grain ... Gate Weave & Subtle Film Movement. Optional micro-movement simulation; Adjustable strength. Film Texture Controls.",
+    "host_name": "community.adobe.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.yedlin.net/NerdyFilmTechStuff/OnFilmGrainEmulation",
+    "name": "On Grain Emulation - Steve Yedlin",
+    "snippet": "The algorithms in the demo that ARE my own custom ones built from scratch are the film emulation ones: color, density, halation, grain, gate weave, etc. Not ...",
+    "host_name": "www.yedlin.net",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/davinciresolve/comments/1pliwok/besides_the_film_grain_what_other_effects_are_in",
+    "name": "Besides the film grain, what other effects are in use in this video?",
+    "snippet": "For the whole video: Grain Gate Weave Framerate turned down. Transitions : Cross dissolves. Sometimes with gamma dissolve ? (maybe)",
+    "host_name": "www.reddit.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://css-tricks.com/lets-make-one-of-those-fancy-scrolling-animations-used-on-apple-product-pages",
+    "name": "Let's Make One of Those Fancy Scrolling Animations Used on",
+    "snippet": "By synchronizing each frame to the user's scroll position, we can play the animation as the user scrolls down (or back up) the page.",
+    "host_name": "css-tricks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=UUhoCb5nagY",
+    "name": "Recreating Apple's Addicting Scroll Animation - YouTube",
+    "snippet": "Animated UI components for React, Tailwind CSS, Framer Motion & More ✨ https://www.hover.dev Today we'll break down some wizardry from ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/25188-airpods-image-sequence-animation-using-scrolltrigger",
+    "name": "AirPods image sequence animation using ScrollTrigger - GSAP",
+    "snippet": "My idea is to use an array which holds all the images and then make use of ScrollTrigger.update() to update the img src based on the scrolling position.",
+    "host_name": "gsap.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/CfWl5NzATEB",
+    "name": "How Apple makes those awesome zoom effects as you scroll. #css #ux",
+    "snippet": "It's really just using two tricks. So trick number one is just using position sticky. So as you scroll, the iPhone sticks to the top and then ...",
+    "host_name": "www.instagram.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://ankittrehan2000.medium.com/creating-scroll-animations-similar-to-apples-airpods-pro-page-bc5c1c0814df",
+    "name": "Creating scroll animations similar to Apple's AirPods Pro page |",
+    "snippet": "My first idea was that they utilized position: sticky for styling the page since every image or frame sort of “sticks” to the area being ...",
+    "host_name": "ankittrehan2000.medium.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://codyhouse.co/blog/post/sticky-hero-section",
+    "name": "How to create a Sticky Hero section - CodyHouse",
+    "snippet": "In this tutorial, we'll take a look at how to create a sticky hero section, with the help of the CSS position sticky and the Intersection Observer API.",
+    "host_name": "codyhouse.co",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=PKLnHvpNabc",
+    "name": "Create Scrolling Animations Used On Apple Product Pages - YouTube",
+    "snippet": "This tutorial will use Dora to rebuild an Apple Air Pods Pro website, covering the Keyframe [Drivers], Constraint layout, Image sequences ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.protopie.io/blog/parallax-effect",
+    "name": "How to Recreate Apple's Parallax Effect with ProtoPie",
+    "snippet": "We'll walk you through a technique involving the creation of a dummy scroll element to regulate the scroll depth.",
+    "host_name": "www.protopie.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

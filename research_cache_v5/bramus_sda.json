@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://developer.chrome.com/blog/scroll-driven-animations-video-course",
+    "name": "Introducing \"Unleash the power of Scroll-Driven Animations\" | Blog",
+    "snippet": "A 10-part video course to learn all about scroll-driven animations using CSS or JavaScript. You can watch the series on YouTube.",
+    "host_name": "developer.chrome.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/docs/css-ui/scroll-driven-animations",
+    "name": "Animate elements on scroll with Scroll-driven animations | CSS and UI",
+    "snippet": "Learn how to work with Scroll Timelines and View Timelines to create scroll-driven animations in a declarative way. Scroll-driven animations · Getting practical with Scroll...",
+    "host_name": "developer.chrome.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/blog/css-ui-ecommerce-sda",
+    "name": "Scroll-driven animations case studies | Blog - Chrome for Developers",
+    "snippet": "To learn how to implement scroll-driven animations in your own site using the new APIs read Animate elements on scroll with Scroll-driven ...",
+    "host_name": "developer.chrome.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/blog/nrk-casestudy",
+    "name": "How NRK uses scroll-driven animations to bring stories to life",
+    "snippet": "Scroll-driven and scroll-triggered animations enhance their storytelling articles by making them more interactive, engaging, and memorable.",
+    "host_name": "developer.chrome.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/authors/bramus",
+    "name": "Bramus | Authors - Chrome for Developers",
+    "snippet": "Learn more CSS scroll-triggered animations are coming! We have scroll-driven animations. 22 powerful new CSS features that landed in Chrome this year. Learn ...",
+    "host_name": "developer.chrome.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/docs/css-ui/css-animation-composition",
+    "name": "Combine multiple animation effects with animation-composition | CSS",
+    "snippet": "() Scroll-driven animations. The animation-composition property allows control of what should happen when multiple animations affect the same ...",
+    "host_name": "developer.chrome.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/blog/new-in-web-ui-io-2024",
+    "name": "The latest in CSS and web UI: I/O 2024 recap | Blog",
+    "snippet": "Here, you'll learn the basics of scroll-driven animations from Bramus Van Damme including how the feature works, vocabulary, various ways to ...",
+    "host_name": "developer.chrome.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/blog/new-in-web-ui-io26?hl=en",
+    "name": "What's new in web UI | Blog - Chrome for Developers",
+    "snippet": "a 10-part video course to learn all about scroll-driven animations using CSS or JavaScript. You can watch the series on YouTube.",
+    "host_name": "developer.chrome.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

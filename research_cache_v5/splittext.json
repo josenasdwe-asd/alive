@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://gsap.com/text",
+    "name": "Text - GSAP",
+    "snippet": "ScrambleText. Randomize characters of words with code, ideal for rollovers.",
+    "host_name": "gsap.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=mkflz2sNeOg",
+    "name": "How To Create Incredible Text Animation Using GSAP - YouTube",
+    "snippet": "Hi guys, in this video, we will learn how to create awesome text animations using GSAP library. We will also be using a GSAP plugin called ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsapify.com/gsap-splittext",
+    "name": "GSAP SplitText: Complete Guide to Text Splitting Animations - GSAPify",
+    "snippet": "SplitText is a GSAP plugin that breaks text into granular DOM elements—characters, words, or lines—so you can animate each piece individually.",
+    "host_name": "gsapify.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=XBbhPck_jjA&vl=en",
+    "name": "3 Split Text Animations With The New GSAP UI on Webflow - YouTube",
+    "snippet": "In this tutorial, we are recreating Split Text animations in Webflow, but now with the brand new GSAP UI. You'll see 3 different text ...",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@idorenyinudoh10/create-a-text-reveal-animation-with-gsap-21cc8b425030",
+    "name": "Create a Text Reveal Animation with GSAP - Medium",
+    "snippet": "Learn how to use the Greensock Animation Platform (GSAP), a lightweight JavaScript animation library, to create a text reveal animation.",
+    "host_name": "medium.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=zQcweNpS_Xc",
+    "name": "Smooth Text Reveal Animation with GSAP SplitText in Elementor | Part 1",
+    "snippet": "How to Create Smooth Text Reveal Animation with GSAP SplitText in Elementor In this Tutorial you will learn How to Create Smooth Text Reveal ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/fahadalikhanca/building-an-animated-portfolio-hero-with-gsap-splittext-and-a-canvas-particle-background-3d4e",
+    "name": "Building an Animated Portfolio Hero with GSAP, SplitText, and a Canvas",
+    "snippet": "Recently, I built an animated hero section that combines: Character-by-character text reveal using GSAP SplitText; Liquid morph social icons ...",
+    "host_name": "dev.to",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://forum.bricksforge.io/t/how-i-use-the-gsap-stagger-effect-with-text-across-a-whole-page/2221",
+    "name": "How I use the (GSAP) Stagger effect with text across a whole page",
+    "snippet": "This video will walk you through: Setting Up the Big Hero Text Animation: Learn how to animate a headline that triggers upon page load.",
+    "host_name": "forum.bricksforge.io",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://codepen.io/collection/ExBwoK",
+    "name": "Text - a Collection by GSAP on CodePen",
+    "snippet": "SplitText - Club GSAP SplitText makes it easy to break apart the text in an HTML element so that each character, word, and/or line is in its own ...",
+    "host_name": "codepen.io",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://freefrontend.com/split-text-js",
+    "name": "20+ GSAP SplitText Examples - FreeFrontend",
+    "snippet": "Explore SplitText.js examples for breaking text into characters, words, or lines to create detailed animations ... Hero Reveal Scroll Animation ...",
+    "host_name": "freefrontend.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

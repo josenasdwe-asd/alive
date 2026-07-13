@@ -190,6 +190,35 @@ export interface AnimationConfig {
   layers: Record<string, LayerAnimationConfig>;
   /** effect-layer config (which procedural overlays are active) */
   effects: Record<EffectType, boolean>;
+
+  // === Hero mode ===
+  /** scroll-bound parallax strength (0..1, how much layers move per scroll) */
+  scrollParallax: number;
+  /** entrance reveal: staggered layer fade/scale on load */
+  entranceEnabled: boolean;
+  /** color grading preset */
+  colorGrade: ColorGrade;
+  /** letterbox bars (cinematic 2.39:1) */
+  letterbox: boolean;
+  /** gate weave (sub-pixel film jitter) */
+  gateWeave: boolean;
+}
+
+export type ColorGrade =
+  | "none"
+  | "teal-orange"
+  | "bleach-bypass"
+  | "portra"
+  | "blade-runner"
+  | "noir-film";
+
+export interface TextOverlay {
+  headline: string;
+  subheadline: string;
+  cta: string;
+  align: "left" | "center";
+  position: "top" | "center" | "bottom";
+  enabled: boolean;
 }
 
 export interface ProjectState {
@@ -218,6 +247,10 @@ export interface ProjectState {
   strategy?: DecompositionStrategy;
   /** current pipeline step (for the progress indicator) */
   pipelineStep?: PipelineStep;
+  /** text overlay config (hero mode) */
+  textOverlay?: TextOverlay;
+  /** hero mode active (full-viewport scroll-driven) */
+  heroMode?: boolean;
 }
 
 export const DEFAULT_TRANSFORM: LayerTransform = {

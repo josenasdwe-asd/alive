@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.reddit.com/r/Frontend/comments/10thqsn/smooth_scroll_opinions",
+    "name": "Smooth scroll opinions? : r/Frontend - Reddit",
+    "snippet": "With the introduction of lenis, we have smooth scrolling that's using the browsers native scrolling instead of hijacking the scroll. Smooth scrolling in next.js : r/nextjs Lenis Smooth Scroll Issue : r/Wordpress More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=WlxNpYJ7EPs",
+    "name": "Master Smooth Scrolling in Webflow with Lenis & GSAP - YouTube",
+    "snippet": "Transform your Webflow projects with buttery smooth scrolling and high-end animations using Lenis. In this tutorial, Webflow expert Ognjen ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.digidop.com/blog/lenis-smooth-scroll",
+    "name": "Lenis Smooth Scroll: Step-by-Step Integration Guide in Webflow",
+    "snippet": "Lenis is the top choice for adding smooth scrolling to your Webflow projects. Its lightweight nature guarantees excellent performance.",
+    "host_name": "www.digidop.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/orgs/elementor/discussions/29132",
+    "name": "Elementor 3.25.3 breaks Lenis Smooth Scroll (Duplicate of #29103)",
+    "snippet": "Elementor adds native CSS smooth-scroll behavior to all websites, but only when your OS is configured to enable system wide, or browser animations.",
+    "host_name": "github.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.lenis.dev",
+    "name": "Lenis – Smooth Scroll",
+    "snippet": "Lenis is a lightweight, performant smooth scroll library for the web. Add butter-smooth scrolling to any site with Javascript, React, or Vue.",
+    "host_name": "www.lenis.dev",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.lucaspaganini.com/academy/native-smooth-scroll-with-pure-css-and-js",
+    "name": "Native Smooth Scroll with pure CSS and JS | Academy - Lucas Paganini",
+    "snippet": "Do you want a smooth scroll? Forget JQuery, we're past that. Let me introduce you to our tools for a native smooth scroll.",
+    "host_name": "www.lucaspaganini.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://wordpress.org/support/topic/issue-with-smoothscroll-feature-from-lenis-scroll",
+    "name": "Issue with SmoothScroll feature from Lenis Scroll - WordPress.org",
+    "snippet": "It overrides the native scrolling behavior to provide features like inertial scrolling, easing effects, and frame-based rendering, resulting in a smoother",
+    "host_name": "wordpress.org",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/77387611/smooth-scroll-doesnt-work-with-lenis-when-link-with-id-clicked",
+    "name": "Smooth scroll doesn't work with Lenis when link with id clicked",
+    "snippet": "Apparently, lenis scroll works by taking control of the scroll on the html element and it doesn't keep it on smooth scroll to achieve the effect manually by ...",
+    "host_name": "stackoverflow.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.edoardolunardi.dev/blog/building-smooth-scroll-in-2025-with-lenis",
+    "name": "Blog | Building Smooth Scroll in 2025 with Lenis | Edoardo Lunardi",
+    "snippet": "Lenis normalizes input, keeps native APIs intact, and delivers smooth motion without breaking the platform. Smooth scrolling has been part of ...",
+    "host_name": "www.edoardolunardi.dev",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://kontra.agency/smooth-scroll-the-setup-for-beginners",
+    "name": "Smooth Scroll Website - The Setup for Beginners - Kontra Agency",
+    "snippet": "When compared with the other two libraries, Lenis is specific because it does not use CSS translation, but somehow, it enables smooth scrolling ...",
+    "host_name": "kontra.agency",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

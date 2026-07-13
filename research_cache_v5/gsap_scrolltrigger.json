@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=yW0D7n1VvLA",
+    "name": "Parallax Image Waterfall with Gsap Scrolltrigger - YouTube",
+    "snippet": "Tutorial on how to build a parallax image waterfall effect in Webflow with GSAP ScrollTrigger where the smaller images move faster than the ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2026/05/28/the-never-ending-story-building-a-seamless-infinite-scroll-experience-with-gsap-lenis",
+    "name": "Building a Seamless Infinite Scroll Experience with GSAP & Lenis",
+    "snippet": "In this tutorial, we're breaking down a small but mighty scroll interaction built around infinite looping, parallax depth, and snap-based ...",
+    "host_name": "tympanus.net",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/25542-parallax-effect-using-scrolltrigger",
+    "name": "Parallax effect using Scrolltrigger - GSAP",
+    "snippet": "This tutorial uses ScrollMagic for achieving the effect in the website gsap's ScrollTrigger.",
+    "host_name": "gsap.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://animation-addons.com/blog/gsap-scrolltrigger-examples",
+    "name": "20 GSAP ScrollTrigger Examples for Inspiration - Animation Addons",
+    "snippet": "Parallax scrolling creates depth by moving background and foreground elements at different speeds. Using ScrollTrigger, you can precisely ...",
+    "host_name": "animation-addons.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=7AYZt-13XgY",
+    "name": "Build a Premium Parallax Scroll Effect Using GSAP - YouTube",
+    "snippet": "Want your website to feel alive? In this tutorial, I'll show you how to create a cinematic Parallax Scrolling Effect using GSAP (GreenSock ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://schwartz-edmisten.com/blog/hero-banner-parallax-scrolling-animation-in-squarespace-71",
+    "name": "Hero Banner Parallax Scrolling Animation in Squarespace 7.1",
+    "snippet": "In this tutorial I show you how to create a cool multi layer parallax animation that is tied to scroll. parallax at different speeds for a very immersive  ...",
+    "host_name": "schwartz-edmisten.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsapify.com/gsap-examples",
+    "name": "GSAP Examples: Real-World Animation Patterns & Code | GSAPify",
+    "snippet": "Explore practical GSAP animation examples for hero sections, scroll reveals, navigation, text effects, loaders, and more. Copy-ready code for your projects.",
+    "host_name": "gsapify.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://jsmastery.com/blogs/how-to-create-a-parallax-scrolling-effect-with-gsap",
+    "name": "How to Create a Parallax Scrolling Effect with GSAP - JS Mastery Pro",
+    "snippet": "In this tutorial, we'll show you how to bring that effect to life using GSAP (GreenSock Animation Platform) and its powerful ScrollTrigger plugin.",
+    "host_name": "jsmastery.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=r2lJKWB8K4c",
+    "name": "This Scroll Animation Holds the Hero Hostage & Hands It Over to a",
+    "snippet": "This hero section went from full-screen confidence to a 150px thumbnail real quick. Meanwhile a parallax photo wall just casually drifted in ...",
+    "host_name": "www.youtube.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://uxdev.org/lessons/gsap-parallax",
+    "name": "Parallax - ux dev",
+    "snippet": "Parallax. Lesson 2. Multiple layers get different y tween values via scrollTrigger: { scrub: true } . scrub: true ties the animation directly to scroll ...",
+    "host_name": "uxdev.org",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

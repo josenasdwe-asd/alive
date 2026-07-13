@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://gsap.com/community/forums/topic/34157-how-to-make-stickyparallax-effect-on-section",
+    "name": "How to make sticky/parallax effect on section? - GSAP",
+    "snippet": "Easiest way, animate the stroke dash offset. snapping requires a progress value, so convert the scroll position into a normalized progress ...",
+    "host_name": "gsap.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=E5NK61vO_sg",
+    "name": "Build Smooth Scrolling Parallax Effects with React & Framer Motion",
+    "snippet": "Animated UI components for React, Tailwind CSS, Framer Motion & More ✨ https://www.hover.dev Today we'll learn how to add smooth scrolling ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://prismic.io/blog/css-scroll-effects",
+    "name": "CSS Scroll Effects: 50 Interactive Animations to Try - Prismic",
+    "snippet": "Explore 50 engaging CSS scroll effects to enhance your website's interactivity. Discover parallax, sticky, and fade animations for ...",
+    "host_name": "prismic.io",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://stackoverflow.com/questions/52087978/temporarily-sticky-parallax",
+    "name": "temporarily sticky parallax - Stack Overflow",
+    "snippet": "In a typical parallax, the image is instantly over taken by the following div, creating the parrallax efffect. What tricks me is that as you ...",
+    "host_name": "stackoverflow.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.w3schools.com/howto/howto_css_parallax.asp",
+    "name": "How To Create a Parallax Scrolling Effect - W3Schools",
+    "snippet": "Learn how to create a \"parallax\" scrolling effect with CSS. Use a container element and add a background image to the container with a specific height. Then ...",
+    "host_name": "www.w3schools.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=_fykqti6DYc",
+    "name": "Creating Sticky Parallax Effects | YOOtheme Documentation - YouTube",
+    "snippet": "... parallax effect. Since the column is sticky, the elements will not scroll out of the viewport, but will be animated while scrolling. View ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/css/comments/1p29dfp/how_do_i_do_this_parallax_scroll_trick",
+    "name": "How do I do this parallax scroll trick? : r/css - Reddit",
+    "snippet": "position: sticky; is what you're looking for here. set the content of one column to be position: sticky (with whatever top and left settings ...",
+    "host_name": "www.reddit.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://library.superhi.com/posts/parallax-overlapping-sections-using-sticky-positioning",
+    "name": "Parallax Overlapping Sections Using Sticky Positioning - SuperHi",
+    "snippet": "A great effect where each section sticks to the top of the page and other sections overlap it in a parallax style. In this tutorial, we talk about how it was ...",
+    "host_name": "library.superhi.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://dev.to/ingosteinke/pure-css-parallax-perspective-beyond-landscape-images-24g2",
+    "name": "Pure CSS parallax perspective beyond landscape images",
+    "snippet": "A popular parallax effect simply resizes full-width hero images to make them slightly larger than they need to be, then adding a subtle scroll-linked movement.",
+    "host_name": "dev.to",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://css-tricks.com/creating-sliding-effects-using-sticky-positioning",
+    "name": "Creating sliding effects using sticky positioning - CSS-Tricks",
+    "snippet": "Sticky elements are predominantly used for keeping something shown on the screen throughout scrolling. As cool as that is, we can also hide elements in the ...",
+    "host_name": "css-tricks.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

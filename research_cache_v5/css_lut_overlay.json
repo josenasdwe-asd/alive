@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/backdrop-filter",
+    "name": "backdrop-filter CSS property - MDN Web Docs - Mozilla",
+    "snippet": "The backdrop-filter CSS property lets you apply graphical effects such as blurring or color shifting to the area behind an element.",
+    "host_name": "developer.mozilla.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=wiIbol5tZaI",
+    "name": "Backdrop Filter CSS Blur - YouTube",
+    "snippet": "Backdrop Filter CSS Tutorial In this tutorial we will take a look at backdrop-filter a css property that allows you to do blurs similar to ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.joshwcomeau.com/css/backdrop-filter",
+    "name": "Next-level frosted glass with backdrop-filter - Josh Comeau",
+    "snippet": "CSS gives us quick and easy access to SVG filters via the filter property. The backdrop-filter algorithm only considers the pixels that are ...",
+    "host_name": "www.joshwcomeau.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://web.dev/articles/backdrop-filter",
+    "name": "Create OS-style backgrounds with backdrop-filter | Articles - web.dev",
+    "snippet": "Learn how to add background effects like blurring and transparency to UI elements on the web using the CSS backdrop-filter property.",
+    "host_name": "web.dev",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://drafts.csswg.org/filter-effects-2",
+    "name": "Filter Effects Module Level 2",
+    "snippet": "Filters apply an effect before the compositing stage. Examples of such effects are blurring, changing color intensity and warping the image.",
+    "host_name": "drafts.csswg.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=vi-vi4_UpqM",
+    "name": "Grainy Backgrounds with CSS and SVG Filters - YouTube",
+    "snippet": "... SVG image and one using inline SVG code straight in our CSS! Arc browser site: https://arc.net/ Arc website noisy PNG: https://arc.net/noise ...",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://blog.logrocket.com/use-css-backdrop-filter-property",
+    "name": "How to use the CSS backdrop-filter property - LogRocket Blog",
+    "snippet": "This filter is very similar to the contrast() filter. It controls the intensity of the background colors and also ranges from 0-200 percent.",
+    "host_name": "blog.logrocket.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://support.google.com/webdesigner/answer/10632079?hl=en",
+    "name": "Backdrop filters - Google Web Designer Help",
+    "snippet": "Use the backdrop tool to draw a backdrop element and apply CSS filter effects to the area behind the element. The backdrop tool is only available for video ...",
+    "host_name": "support.google.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

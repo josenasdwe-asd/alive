@@ -538,6 +538,11 @@ export function buildAnimationFromPreset(
     mouseSmoothing: preset.base.mouseSmoothing,
     perspective: preset.base.perspective ?? 1000,
     rotate3dStrength: preset.base.rotate3dStrength ?? 8,
+    scrollParallax: 0.4,
+    entranceEnabled: true,
+    colorGrade: "none",
+    letterbox: false,
+    gateWeave: false,
     layers,
     effects,
   };

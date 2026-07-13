@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://css-tricks.com/lets-make-one-of-those-fancy-scrolling-animations-used-on-apple-product-pages",
+    "name": "Let's Make One of Those Fancy Scrolling Animations Used on",
+    "snippet": "By synchronizing each frame to the user's scroll position, we can play the animation as the user scrolls down (or back up) the page.\nMay 22, 2020 — By synchronizing each frame to the user's scroll position, we can play the animation as the user scrolls down (or back up) the page .",
+    "host_name": "css-tricks.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=JO-g2vz7BYE",
+    "name": "Apple-Style Image Sequence Animation On Scroll with GSAP In",
+    "snippet": "Learn how to recreate the iconic scroll-triggered animation from Apple's AirPods Pro page — directly inside Webflow, using GSAP and ...",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@kozelsky/how-to-create-scroll-driven-image-sequence-animations-964359507371",
+    "name": "How to Create Scroll Driven Image Sequence Animations - Medium",
+    "snippet": "Scroll driven image sequence animations are one of the most powerful techniques for creating immersive, high-engagement web experiences.",
+    "host_name": "medium.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://gsap.com/community/forums/topic/25188-airpods-image-sequence-animation-using-scrolltrigger",
+    "name": "AirPods image sequence animation using ScrollTrigger - GSAP",
+    "snippet": "My idea is to use an array which holds all the images and then make use of ScrollTrigger.update() to update the img src based on the scrolling position. AirPods image sequence animation using ScrollTrigger - Page 2 ScrollTrigger like apple More results from gsap.com",
+    "host_name": "gsap.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=PKLnHvpNabc",
+    "name": "Create Scrolling Animations Used On Apple Product Pages - YouTube",
+    "snippet": "This tutorial will use Dora to rebuild an Apple Air Pods Pro website, covering the Keyframe [Drivers], Constraint layout, Image sequences ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DKz2wyhMh0u",
+    "name": "Here's how to build Apple's iconic scroll animation in Workshop",
+    "snippet": "Create a scroll driven image sequence using jpgs. As the user ... Apple Store Mac iPad iPhone Watch Vision AirPods TV & Home ...",
+    "host_name": "www.instagram.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/webdev/comments/vl7gs3/how_apple_makes_3d_effects_as_you_scroll_the_page",
+    "name": "How Apple makes 3D effects as you scroll the page : r/webdev - Reddit",
+    "snippet": "... image sequence scroll animations out of curiosity a while back. We ... If you have products that are so extremely design-oriented as Apple's ...\nAnother trick that Apple does and I have used is making the scroll action feel \"slower\", so you have to scroll \"more\" to get through the full ...",
+    "host_name": "www.reddit.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://geyer.dev/blog/css-image-sequence-animations",
+    "name": "Using (almost) pure CSS to make fancy scroll-driven image sequence",
+    "snippet": "As you scroll, you get blasted in the face by a flashy highly-complex scroll-driven animation. pair of AirPods twisting and flying out towards ...",
+    "host_name": "geyer.dev",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://webflow.com/made-in-webflow/website/gsap-video-animation-on-scroll",
+    "name": "GSAP Image Sequence Scrub (Apple AirPods) - Webflow",
+    "snippet": "Learn how to recreate the iconic scroll-triggered animation from Apple's AirPods Pro page — directly inside Webflow, using GSAP and ScrollTrigger, ...",
+    "host_name": "webflow.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://nexterwp.com/blog/top-scroll-image-sequence-animation-inspirations-with-gifs",
+    "name": "Top 13 Scroll Image Sequence Animation Inspirations [With Videos]",
+    "snippet": "Apple utilizes scroll sequence animations to reveal product details for the AirPods Pro and Apple Watch Ultra, demonstrating the craftsmanship and technology ...",
+    "host_name": "nexterwp.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

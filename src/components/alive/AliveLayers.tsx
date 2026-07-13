@@ -24,6 +24,8 @@ interface AliveLayersProps {
   selectedLayerId?: string;
   onSelectLayer?: (id: string) => void;
   onLayerTransform?: (id: string, transform: Partial<ImageLayer["transform"]>) => void;
+  /** optional scroll progress 0..1 for scroll-driven parallax (hero mode) */
+  scrollY?: MotionValue<number>;
 }
 
 const DURATIONS = {
@@ -69,6 +71,7 @@ export function AliveLayers({
   editorMode = false,
   selectedLayerId,
   onSelectLayer,
+  scrollY,
 }: AliveLayersProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -139,6 +142,7 @@ export function AliveLayers({
           key={layer.id}
           layer={layer}
           index={i}
+          total={sorted.length}
           smx={smx}
           smy={smy}
           smvx={smvx}
@@ -148,6 +152,7 @@ export function AliveLayers({
           editorMode={editorMode}
           selected={selectedLayerId === layer.id}
           onSelect={() => onSelectLayer?.(layer.id)}
+          scrollY={scrollY}
         />
       ))}
     </div>
@@ -157,6 +162,7 @@ export function AliveLayers({
 interface LayerPlaneProps {
   layer: ImageLayer;
   index: number;
+  total: number;
   smx: MotionValue<number>;
   smy: MotionValue<number>;
   smvx: MotionValue<number>;
@@ -166,11 +172,13 @@ interface LayerPlaneProps {
   editorMode?: boolean;
   selected?: boolean;
   onSelect?: () => void;
+  scrollY?: MotionValue<number>;
 }
 
 function LayerPlane({
   layer,
   index,
+  total,
   smx,
   smy,
   smvx,
@@ -180,6 +188,7 @@ function LayerPlane({
   editorMode,
   selected,
   onSelect,
+  scrollY,
 }: LayerPlaneProps) {
   const t = layer.transform;
 
@@ -205,8 +214,18 @@ function LayerPlane({
     smvy,
     (v) => v * layerAnim.mouseVelocityInfluence * intensity * (0.3 + layer.depth) * 0.5
   );
+  // scroll-driven parallax: back layers move less, front layers move more
+  const fallbackScroll = useMotionValue(0);
+  const scrollSource = scrollY ?? fallbackScroll;
+  const scrollOffset = useTransform(
+    scrollSource,
+    (v) => v * (0.2 + layer.depth * 0.4) * config.scrollParallax * 300
+  );
   const tx = useTransform([parallaxX, velX] as any, (vals: any) => vals[0] + vals[1]);
-  const ty = useTransform([parallaxY, velY] as any, (vals: any) => vals[0] + vals[1]);
+  const ty = useTransform(
+    [parallaxY, velY, scrollOffset] as any,
+    (vals: any) => vals[0] + vals[1] + (vals[2] ?? 0)
+  );
 
   // === BUG FIX #1: respect visibility (after all hooks) ===
   if (!t.visible) return null;
@@ -287,18 +306,34 @@ function LayerPlane({
   const userScale = t.scale * overscale;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
+  // entrance reveal: back layers first, front layers last, expo.out
+  const entranceDelay = config.entranceEnabled
+    ? layer.depth * 0.12 * Math.min(total, 6)
+    : 0;
+
   return (
-    // OUTER wrapper — parallax (framer-motion owns x/y here)
+    // OUTER wrapper — parallax (framer-motion owns x/y here) + entrance
     <motion.div
       className="absolute inset-0"
+      initial={config.entranceEnabled ? { opacity: 0, scale: 1.08, filter: "blur(8px)" } : false}
+      animate={
+        config.entranceEnabled
+          ? { opacity: t.opacity * layerAnim.opacity, scale: 1, filter: "blur(0px)" }
+          : undefined
+      }
+      transition={
+        config.entranceEnabled
+          ? { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: entranceDelay }
+          : undefined
+      }
       style={{
         x: tx,
         y: ty,
         zIndex,
         mixBlendMode: BLEND_CSS[t.blendMode],
-        opacity: t.opacity * layerAnim.opacity,
+        opacity: config.entranceEnabled ? undefined : t.opacity * layerAnim.opacity,
         isolation: t.blendMode !== "normal" ? "isolate" : undefined,
-        willChange: "transform",
+        willChange: "transform, filter",
         pointerEvents: editorMode ? "auto" : "none",
         cursor: editorMode ? (selected ? "move" : "pointer") : "default",
       }}

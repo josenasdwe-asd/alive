@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Scroll-driven_animations/Timelines",
+    "name": "Scroll-driven animation timelines - CSS - MDN Web Docs",
+    "snippet": "Animations can be set to progress along a scroll-based timeline instead of the default time-based document timeline, without needing JavaScript.",
+    "host_name": "developer.mozilla.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.smashingmagazine.com/2024/12/introduction-css-scroll-driven-animations",
+    "name": "An Introduction To CSS Scroll-Driven Animations - Smashing Magazine",
+    "snippet": "In a scroll-timeline animation, the scroll() function is used inside the animation-timeline property. It only takes two parameters: <scroller> ...",
+    "host_name": "www.smashingmagazine.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/blog/css-ui-ecommerce-sda",
+    "name": "Scroll-driven animations case studies | Blog - Chrome for Developers",
+    "snippet": "Scroll-driven animations are a common UX pattern on the web. A scroll-driven animation is linked to the scroll position of a scroll container.",
+    "host_name": "developer.chrome.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=86-HLEkHkcI",
+    "name": "Mastering CSS Scroll-driven Animations #8 - Browser Support",
+    "snippet": "I Use: https://caniuse.com/?search=CSS%20property%3A%20animation-timeline. ... Mastering CSS Scroll-driven Animations #6 - View Animation Ranges.",
+    "host_name": "www.youtube.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://connect.mozilla.org/t5/ideas/implement-css-scroll-driven-animations-animation-timeline/idi-p/116931",
+    "name": "Implement CSS Scroll-Driven Animations (animation-timeline)",
+    "snippet": "This feature is already supported in Chromium-based browsers and is essential for developers to create lighter, smoother scroll animations without heavy ...",
+    "host_name": "connect.mozilla.org",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://rebeccamdeprey.com/blog/scroll-driven-animations-css",
+    "name": "Scroll-Driven Animations in CSS: No JavaScript Required",
+    "snippet": "The CSS scroll-driven animations API lets you tie any CSS @keyframes animation directly to scroll progress, entirely in CSS. Scroll-driven ...",
+    "host_name": "rebeccamdeprey.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://web-platform-dx.github.io/web-features-explorer/features/scroll-driven-animations",
+    "name": "Web platform features explorer - Scroll-driven animations",
+    "snippet": "The animation-timeline , scroll-timeline , and view-timeline CSS properties advance animations based on the user's scroll position. Browser support Chrome 115 ...",
+    "host_name": "web-platform-dx.github.io",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://caniuse.com/mdn-css_properties_animation-timeline_scroll",
+    "name": "CSS property: animation-timeline: `scroll()` - CanIUse",
+    "snippet": "\"Can I use\" provides up-to-date browser support tables for support of front-end web technologies on desktop and mobile web browsers.",
+    "host_name": "caniuse.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/firefox/comments/1nl63n5/as_of_today_mozilla_firefox_is_the_only_major",
+    "name": "As of today, Mozilla Firefox is the only major browser that does not support",
+    "snippet": "As of today, Mozilla Firefox is the only major browser that does not support CSS scroll-driven animations by default.",
+    "host_name": "www.reddit.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2024/01/17/a-practical-introduction-to-scroll-driven-animations-with-css-scroll-and-view",
+    "name": "A Practical Introduction to Scroll-Driven Animations with CSS",
+    "snippet": "With just CSS you can add scroll animations that toggle shadows on navbars, reveal images, add scrollytelling, link up carousel elements and much more.",
+    "host_name": "tympanus.net",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

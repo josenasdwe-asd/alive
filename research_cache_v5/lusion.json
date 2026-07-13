@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://discourse.threejs.org/t/background-animation-on-lusion-co-about-page/62610",
+    "name": "Background animation on lusion.co/about page - three.js forum",
+    "snippet": "Hello everyone, I'm new to Three.js and I'm intrigued by the animation featured on the Lusion - About Us page where the background effect for ...",
+    "host_name": "discourse.threejs.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=8PG4RrNwby0",
+    "name": "Curl tubes with three.js from lusion.co #9 - YouTube",
+    "snippet": "... website: https://lusion.co/ Support: https ... com/akella #threejs #glsl #webgl.",
+    "host_name": "www.youtube.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://lusion.co",
+    "name": "Lusion - Award Winning 3D and Interactive Web Studio",
+    "snippet": "We design and produce 3D visual storytelling, immersive websites, and interactive digital experiences that help brands stand out online.",
+    "host_name": "lusion.co",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.utsubo.com/blog/top-threejs-agencies",
+    "name": "10 Best Three.js Agencies (2026): Pricing, Strengths & How to Choose",
+    "snippet": "Lusion — UK lusion Strengths:Buttery motion and inventive interactions that feel alive. Best for: Campaigns and brand sites where animation ...",
+    "host_name": "www.utsubo.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.reddit.com/r/threejs/comments/1fzr6vf/how_to_create_a_cursor_animation_like_in_lusionco",
+    "name": "How to create a cursor animation like in Lusion.co WebGL ( three.js )",
+    "snippet": "Here is how we made it: // Create motion vector map // Do the distortion (You can do something other than distortion with that vector map) questions about lusion.co : r/threejs - Reddit How to Recreate This Cursor Effect from lusion.co? (Three.js Beginner) More results from www.reddit.com",
+    "host_name": "www.reddit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/tag/three-js",
+    "name": "Three.js - Codrops",
+    "snippet": "A tutorial on building a scroll-driven WebGL gallery in Three.js with depth-layered images, palette-driven backgrounds, and motion that responds to scroll ...",
+    "host_name": "tympanus.net",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DSaXIVJDGB7",
+    "name": "Let's animate a hero section with WebGL animation! 1. Go to your",
+    "snippet": "Let's animate a hero section with WebGL animation! 1. Go to your @wixstudio site 2. Prepare the design with an image or video background",
+    "host_name": "www.instagram.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=rbIbvw6c53k",
+    "name": "This 3D Scroll Animation is INSANE Thanks to Three.js (3D  - YouTube",
+    "snippet": "Learn how to create an eye-catching 3D scroll animation for websites using HTML, CSS, and JavaScript! This tutorial dives into Three.js, ...",
+    "host_name": "www.youtube.com",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://freefrontend.com/three-js",
+    "name": "160+ three.js Examples - FreeFrontend",
+    "snippet": "Browse three.js examples for 3D rendering, lighting, and camera control — ideal for building immersive browser-based experiences with WebGL.",
+    "host_name": "freefrontend.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2021/05/17/curly-tubes-from-the-lusion-website-with-three-js",
+    "name": "Curly Tubes from the Lusion Website with Three.js - Codrops",
+    "snippet": "Learn how to replicate the curly tubes from the Lusion website using light scattering in Three.js. curly glsl noise Three.js video WebGL.",
+    "host_name": "tympanus.net",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

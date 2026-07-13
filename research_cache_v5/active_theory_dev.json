@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=s6s3rOoEluI",
+    "name": "I Made a Scroll Animation That Slowly Destroys the Hero  - YouTube",
+    "snippet": "This scroll animation slowly breaks the hero section using a real-time WebGL dissolve effect. Built with HTML, CSS, JavaScript — powered by ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2026/02/02/building-a-scroll-revealed-webgl-gallery-with-gsap-three-js-astro-and-barba-js",
+    "name": "Building a Scroll-Revealed WebGL Gallery with GSAP, Three.js",
+    "snippet": "Learn how to build a multi-page WebGL image gallery with scroll-triggered shader reveals, smooth scrolling, and seamless page transitions ...",
+    "host_name": "tympanus.net",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.linkedin.com/pulse/craft-matters-active-theory-webgl-utility-future-digital-2qlnc",
+    "name": "WebGL, Utility, and the Future of Digital Craft - Active Theory - LinkedIn",
+    "snippet": "WebGL brings space. It gives full control over composition and pixel behavior, allowing textures to blend, type to distort, and atmospheres to ...\nWebGL compresses complexity into real-time. It enables heavy particle systems, multi-video compositions, and intricate visual systems to run ...",
+    "host_name": "www.linkedin.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.chrome.com/blog/nrk-casestudy",
+    "name": "How NRK uses scroll-driven animations to bring stories to life | Blog",
+    "snippet": "By being scroll-driven, these animations allow the user to control the progression of the narrative through their scrolling. Elevating the user ...",
+    "host_name": "developer.chrome.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.instagram.com/reel/DVGwFJPDjvn",
+    "name": "Composite rendering in WebGL goes far beyond post-processing",
+    "snippet": "... CASE STUDY: DESIGN PORTFOLIO 2024 <STRAY /> BRIDGING BETWEEN DESIGN AND DEVELOPMENT ... Active Theory. Google. Nike. Netflix. This is who ...\n🎞️ Scroll fast and these project cards bend like a strip of film being pulled through a projector. By @dev_manish_js. https://www.webgpu.com/ ...",
+    "host_name": "www.instagram.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://activetheory.net",
+    "name": "Active Theory · Creative Digital Experiences",
+    "snippet": "Founded in 2012. We blend story, art & technology as an in-house team of passionate makers. Our industry-leading web toolset consistently delivers ...",
+    "host_name": "activetheory.net",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=xTU1qWZHm10",
+    "name": "Animate hero elements with scroll-driven CSS animations - YouTube",
+    "snippet": "... scroll-driven animations with animation-timeline. Understand the difference between scroll() and view() functions. Set up named view progress ...",
+    "host_name": "www.youtube.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://tympanus.net/codrops/2020/10/19/implementing-webgl-powered-scroll-animations",
+    "name": "Implementing WebGL Powered Scroll Animations - Codrops",
+    "snippet": "Learn how to build a custom inertia scroll from scratch, using it in WebGL with some images from HTML, and adding a navigation to the whole experience.",
+    "host_name": "tympanus.net",
+    "rank": 7,
+    "date": "",
+    "favicon": ""
+  }
+]

@@ -11,6 +11,7 @@ import { Particles } from "./Particles";
 import { ShimmerOverlay } from "./ShimmerOverlay";
 import { EffectOverlays } from "./EffectOverlays";
 import { ParticleCanvas } from "./ParticleCanvas";
+import { ColorGrading } from "./ColorGrading";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -151,6 +152,8 @@ export function AliveStage({
       />
 
       <EffectOverlays effects={config.effects} speed={config.speed} />
+
+      <ColorGrading grade={config.colorGrade} intensity={1} />
 
       <div
         aria-hidden

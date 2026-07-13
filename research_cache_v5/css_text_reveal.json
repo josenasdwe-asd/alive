@@ -1,0 +1,92 @@
+[
+  {
+    "url": "https://www.youtube.com/watch?v=hkRH7uCgwR0",
+    "name": "How to Create a Blurry Text Reveal Animation with HTML & CSS - YouTube",
+    "snippet": "... text reveal animation CSS and CSS text reveal effect techniques. The best part? It's all done with pure CSS — no JavaScript needed! Hit like ...",
+    "host_name": "www.youtube.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://prismic.io/blog/css-text-animations",
+    "name": "CSS Text Animations: 40 Creative Examples to Try - Prismic",
+    "snippet": "We'll explore 40 creative CSS text animations featuring ten custom animations I've personally created, plus 30 additional hand-picked examples from talented ...",
+    "host_name": "prismic.io",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://freefrontend.com/css-text-animations",
+    "name": "60+ CSS Text Animations - FreeFrontend",
+    "snippet": "This Staggered Bars Reveal Animation creates a cinematic intro for landing pages using zero JavaScript. By orchestrating a single pseudo-element ...",
+    "host_name": "freefrontend.com",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://medium.com/@jurouhlar/simple-text-reveal-css-effect-using-clip-path-and-framer-motion-4d0866b1d949",
+    "name": "Simple text-reveal CSS effect using Clip-path and Framer Motion | by Juro Uhlar | Medium",
+    "snippet": "You can achieve that using a single CSS property: clip-path. It allows you to define what part of the element is shown, using a variety of shapes.",
+    "host_name": "medium.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=bmtA9bdq3eM",
+    "name": "Epic Text Reveal Animation with GSAP | Crazy Loader Effect Tutorial - YouTube",
+    "snippet": "... text animation loader using HTML, CSS, and GSAP! 🛠️ This \"HANKTHETANK\" text reveal animation uses a combination of clip-path and linear ...",
+    "host_name": "www.youtube.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=AaTvB4uHhxc",
+    "name": "Pure CSS Morph Effect | Awesome UI Hover Animations with CSS Clip Path Property",
+    "snippet": "Today I will show you how to use CSS clip path property to create awesome morph effect transition animations on hover.",
+    "host_name": "www.youtube.com",
+    "rank": 5,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://cruip.com/blur-reveal-effect-with-framer-motion-and-tailwind-css",
+    "name": "Blur Reveal Effect with Framer Motion and Tailwind CSS - Cruip",
+    "snippet": "Learn how to create a blur reveal effect for your text content with Next.js, Tailwind CSS and Framer Motion.",
+    "host_name": "cruip.com",
+    "rank": 6,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://abduarrahman.com/blog/css-text-animations-part-2-10-more-effects",
+    "name": "CSS Text Animations Part 2 — 10 More Effects with Code | Muhammad Abdu Ar Rahman",
+    "snippet": "A cinematic text reveal — starts fully blurred and smoothly sharpens into crystal clarity. Cinematic reveal effect for headings and titles.",
+    "host_name": "abduarrahman.com",
+    "rank": 7,
+    "date": "Jul 13, 2026",
+    "favicon": ""
+  },
+  {
+    "url": "https://codefronts.com/motion/css-text-animations",
+    "name": "25 CSS Text Animations — Free Live Demos & Copy-Paste Code | CodeFronts",
+    "snippet": "A premium editorial text reveal using clip-path inset() to wipe text into view from behind an invisible mask — elegant, production-ready. Live ...",
+    "host_name": "codefronts.com",
+    "rank": 8,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://devnahian.com/10-css-text-animations-latest",
+    "name": "20 CSS Text Animations (latest) – Abdullah Nahian",
+    "snippet": "Text Blur In-Out Animation. This elegant blur text animation creates a captivating in-and-out reveal, where letters start blurred and ...",
+    "host_name": "devnahian.com",
+    "rank": 9,
+    "date": "",
+    "favicon": ""
+  }
+]

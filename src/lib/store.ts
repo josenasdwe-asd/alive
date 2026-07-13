@@ -50,8 +50,9 @@ interface AliveStore extends ProjectState {
   setReducedMotion: (v: boolean) => void;
   setStrategy: (s: DecompositionStrategy) => void;
   setPipelineStep: (s: PipelineStep) => void;
-  /** set layers from depth-slicing (back→front, with depth centroids) */
   setSlicedLayers: (layers: Array<{ url: string; name: string; depth: number }>) => void;
+  setTextOverlay: (t: Partial<import("./types").TextOverlay>) => void;
+  setHeroMode: (v: boolean) => void;
 }
 
 const emptyEffects = ALL_EFFECTS.reduce(
@@ -79,6 +80,11 @@ const emptyAnim: AnimationConfig = {
   rotate3dStrength: 8,
   layers: {},
   effects: emptyEffects,
+  scrollParallax: 0.4,
+  entranceEnabled: true,
+  colorGrade: "none",
+  letterbox: false,
+  gateWeave: false,
 };
 
 const initialState: ProjectState = {
@@ -277,7 +283,6 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
   setPipelineStep: (s) => set({ pipelineStep: s }),
 
   setSlicedLayers: (sliced) => {
-    // build ImageLayer[] from sliced layers (already back→front with depth centroids)
     const layers: ImageLayer[] = sliced.map((s, i) => ({
       id: `slice-${i}-${Math.random().toString(36).slice(2, 7)}`,
       name: s.name,
@@ -296,7 +301,6 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
       transform: { ...DEFAULT_TRANSFORM },
     }));
     set({ layers, pipelineStep: "animate", status: "ready" });
-    // build animation config from current preset
     const preset = get().animation.preset;
     const depths: Record<string, number> = {};
     layers.forEach((l) => (depths[l.id] = l.depth));
@@ -308,4 +312,20 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
       ),
     });
   },
+
+  setTextOverlay: (t) =>
+    set((s) => ({
+      textOverlay: {
+        headline: "",
+        subheadline: "",
+        cta: "",
+        align: "left",
+        position: "bottom",
+        enabled: false,
+        ...s.textOverlay,
+        ...t,
+      },
+    })),
+
+  setHeroMode: (v) => set({ heroMode: v }),
 }));

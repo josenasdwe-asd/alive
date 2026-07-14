@@ -255,6 +255,13 @@ export async function sliceImageByDepth(
   // This GUARANTEES each layer has its own depth range — no more
   // one cluster swallowing the entire image.
   // pixel at depth d → layer = floor(d / 256 * k)
+  //
+  // Apply light smoothing to depth first to avoid noisy edges
+  const smoothedDepth = await sharp(depthGray, { raw: { width: W, height: H, channels: 1 } })
+    .blur(3)
+    .raw()
+    .toBuffer();
+
   const labels = new Uint8Array(W * H);
   for (let i = 0; i < smoothedDepth.length; i++) {
     labels[i] = Math.min(k - 1, Math.floor((smoothedDepth[i] / 256) * k));

@@ -76,10 +76,10 @@ export function AnalysisPanel() {
     let lastErr: any;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        // NO timeout for /api/segment (needs up to 2 min for AI extraction)
-        // 60s timeout for everything else
+        // Dynamic timeout: segment=180s, analyze=120s, everything else=60s
         const isSegment = url.includes("/api/segment");
-        const timeoutMs = isSegment ? 180000 : 60000;
+        const isAnalyze = url.includes("/api/analyze");
+        const timeoutMs = isSegment ? 180000 : isAnalyze ? 120000 : 60000;
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), timeoutMs);
         const res = await fetch(url, { ...opts, signal: controller.signal });

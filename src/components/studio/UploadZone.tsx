@@ -81,12 +81,15 @@ export function UploadZone() {
       setUploading(true);
       try {
         toast.info(`Cargando ejemplo: ${label}…`);
-        const res = await fetch(url);
-        const blob = await res.blob();
+        // Download via server proxy to avoid CORS/NetworkError
+        // The server fetches the external URL and returns the image
+        const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
+        if (!proxyRes.ok) throw new Error("No se pudo descargar la imagen");
+        const blob = await proxyRes.blob();
         const file = new File([blob], "example.jpg", { type: "image/jpeg" });
         await handleFile(file);
-      } catch {
-        toast.error("No se pudo cargar el ejemplo");
+      } catch (err: any) {
+        toast.error(err?.message ?? "No se pudo cargar el ejemplo");
         setUploading(false);
       }
     },

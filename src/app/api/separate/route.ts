@@ -54,8 +54,7 @@ export async function POST(req: NextRequest) {
     const origH = originalMeta.height ?? 1024;
 
     // Phase 1: try AI for bg + depth, fallback to deterministic on 429
-    // v3 FIX: 5s timeout on each AI call — if it 429s, fail fast to fallback
-    // instead of waiting 30s with retries. The deterministic fallback is instant.
+    // v3: 30s timeout on AI calls (was 5s — too aggressive, killed legitimate calls)
     const out: Record<string, { url: string; filename: string } | null> = {};
 
     const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
@@ -68,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     // depth map — resize AI output to match original aspect ratio
     try {
-      const buf = await withTimeout(generateDepthMap(dataUrl, subject), 5000);
+      const buf = await withTimeout(generateDepthMap(dataUrl, subject), 30000);
       const resizedDepth = await sharp(buf)
         .resize(origW, origH, { fit: "fill" })
         .png()
@@ -82,7 +81,7 @@ export async function POST(req: NextRequest) {
 
     // background plate — resize AI output to match original aspect ratio
     try {
-      const buf = await withTimeout(generateBackgroundPlate(dataUrl, subject), 5000);
+      const buf = await withTimeout(generateBackgroundPlate(dataUrl, subject), 30000);
       const resizedBg = await sharp(buf)
         .resize(origW, origH, { fit: "fill" })
         .png()

@@ -30,6 +30,7 @@ import {
   type LayerMotionConfig,
   type SpringState,
 } from "@/lib/motion-engine";
+import { useGyroscope } from "@/hooks/use-gyroscope";
 
 interface AliveLayersProps {
   layers: ImageLayer[];
@@ -82,6 +83,23 @@ export function AliveLayersMath({
   const my = useMotionValue(0);
   const mvx = useMotionValue(0);
   const mvy = useMotionValue(0);
+
+  // v3 FEATURE: Mobile gyroscope parallax — blends with mouse input
+  const gyro = useGyroscope();
+
+  // Feed gyroscope tilt into the same mx/my motion values (blended with mouse)
+  useEffect(() => {
+    if (!gyro.enabled || !gyro.permissionGranted) return;
+    // Gyro tilt is -1..1, same range as mouse. Blend: add gyro to current mouse value.
+    // Use a gentle lerp so gyro doesn't fight mouse on desktop.
+    const currentX = mx.get();
+    const currentY = my.get();
+    // Only apply gyro if mouse is near center (not actively moving)
+    if (Math.abs(currentX) < 0.3 && Math.abs(currentY) < 0.3) {
+      mx.set(gyro.tilt.x);
+      my.set(gyro.tilt.y);
+    }
+  }, [gyro.tilt, gyro.enabled, gyro.permissionGranted, mx, my]);
 
   useEffect(() => {
     if (config.reducedMotion || !config.parallaxEnabled) return;
@@ -415,7 +433,7 @@ function LayerPlane({
     <motion.div
       className="absolute inset-0"
       initial={config.entranceEnabled ? { opacity: 0, scale: 1.08, filter: "blur(8px)" } : false}
-      animate={config.entranceEnabled ? { opacity: 1, scale: 1, filter: "blur(0px)" } : undefined}
+      animate={config.entranceEnabled ? { opacity: 1, scale: 1, filter: "none" } : undefined}
       transition={config.entranceEnabled ? { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: entranceDelay } : undefined}
       style={{
         zIndex,

@@ -345,13 +345,13 @@ function LayerPlane({
     : 0;
 
   return (
-    // OUTER wrapper — parallax (framer-motion owns x/y here) + entrance
+    // OUTER wrapper — entrance reveal (opacity + scale + blur)
     <motion.div
       className="absolute inset-0"
       initial={config.entranceEnabled ? { opacity: 0, scale: 1.08, filter: "blur(8px)" } : false}
       animate={
         config.entranceEnabled
-          ? { opacity: t.opacity * layerAnim.opacity, scale: 1, filter: "blur(0px)" }
+          ? { opacity: 1, scale: 1, filter: "blur(0px)" }
           : undefined
       }
       transition={
@@ -360,10 +360,6 @@ function LayerPlane({
           : undefined
       }
       style={{
-        x: tx,
-        y: ty,
-        scaleX: squashX,
-        scaleY: squashY,
         zIndex,
         mixBlendMode: BLEND_CSS[t.blendMode],
         opacity: config.entranceEnabled ? undefined : t.opacity * layerAnim.opacity,
@@ -379,6 +375,17 @@ function LayerPlane({
         }
       }}
     >
+      {/* MIDDLE wrapper — parallax + squash (separate from entrance to avoid conflict) */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          x: tx,
+          y: ty,
+          scaleX: squashX,
+          scaleY: squashY,
+          willChange: "transform",
+        }}
+      >
       {/* INNER content — user transform (plain CSS, moveable controls this) */}
       {/* The .alive-layer class applies breathing/sway/etc via @property */}
       <div
@@ -403,6 +410,7 @@ function LayerPlane({
           />
         ) : null}
       </div>
+      </motion.div>
     </motion.div>
   );
 }

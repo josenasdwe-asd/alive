@@ -20,9 +20,9 @@ export function MiniTimeline() {
   const rafRef = useRef<number>(0);
   const lastTRef = useRef<number>(performance.now());
 
-  // auto-advance playhead
+  // auto-advance playhead (respect reducedMotion)
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || config.reducedMotion) return;
     lastTRef.current = performance.now();
     const tick = () => {
       const now = performance.now();
@@ -36,7 +36,7 @@ export function MiniTimeline() {
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [playing, config.speed]);
+  }, [playing, config.speed, config.reducedMotion]);
 
   // scrubbing
   const onPointerDown = (e: React.PointerEvent) => {

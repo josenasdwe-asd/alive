@@ -130,7 +130,7 @@ function makeId(prefix: string) {
 export const useAliveStore = create<AliveStore>((set, get) => ({
   ...initialState,
 
-  reset: () => set({ ...initialState }),
+  reset: () => set({ ...initialState, selectedLayerId: undefined, strategy: undefined, pipelineStep: undefined, textOverlay: undefined, heroMode: false }),
 
   setOriginal: ({ id, url, width, height, dataUrl }) =>
     set({

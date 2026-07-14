@@ -4713,3 +4713,58 @@ Stage Summary:
 - The system is now genuinely INTELLIGENT: VLM understands content, suggests
   per-layer animations, recommends full config, parses natural language, scores
   quality, and auto-selects color grade — all AI-driven.
+
+---
+Task ID: MATH-ENGINE-v3
+Agent: Z.ai Code (main)
+Task: Implement mathematical motion engine + fix 429 rate-limiting
+
+Work Log:
+- **429 FIX: Resilient AI client** (`src/lib/ai-resilient.ts`):
+  - Singleton promise (avoid re-creating client per request)
+  - In-memory cache (10-min TTL) — repeated VLM analysis of same image = no API call
+  - Request queuing (1 AI request at a time, avoid hitting rate limits)
+  - Exponential backoff retry (3 attempts: 2s, 4s, 8s + jitter on 429/5xx)
+  - Applied to: analyzeImage, generateDepthMap, generateBackgroundPlate, nl-animate
+- **429 FIX: NL animate graceful fallback** — when LLM is rate-limited, falls back
+  to local keyword parser (regex-based) instead of returning 500. Parses 23 presets
+  + intensity/speed/colorGrade/effects from Spanish/English keywords.
+- **MATHEMATICAL MOTION ENGINE** (`src/lib/motion-engine.ts`):
+  - 5 DESIGN PRINCIPLES:
+    1. NON-DEFORMING: scale is ALWAYS uniform (scaleX === scaleY). Removed
+       squash & stretch that changed aspect ratio and deformed images.
+    2. BOUNDED: all translation bounded to overscale margin via
+       safeTranslationBound() — layers can NEVER reveal edges.
+    3. HARMONIC: layer frequencies use PRIME/irrational ratios (golden φ=1.618,
+       silver=2.414, bronze=3.303...) so animations NEVER sync visually.
+    4. EXACT: all motion is pure mathematical functions of time. Given (t,
+       layerIndex, config), transform is deterministic — no CSS easing ambiguity.
+    5. ORGANIC: Perlin value noise + sinusoidal combos produce natural motion.
+  - Mathematical functions: sinusoidal(), lissajous(), dampedSpring(), valueNoise1D()
+  - computeLayerTransform() — the CORE: computes exact bounded non-deforming transform
+  - buildLayerMotionConfig() — assigns harmonic ratios + prime phases per layer
+  - computeSyncScore() — measures phase alignment (0=synced bad, 1=desynced good)
+  - computeDeformationScore() — should always be 0 (verifies non-deforming)
+- **AliveLayersMath component** (`src/components/alive/AliveLayersMath.tsx`):
+  - Replaces CSS @property keyframes with JS-driven RAF math
+  - Each layer's transform computed every frame via computeLayerTransform()
+  - Uses framer-motion MotionValues for GPU-accelerated transforms
+  - Scale is UNIFORM (motion.div scale prop, not separate scaleX/scaleY)
+  - Translation is bounded via safeTranslationBound()
+- **Integration**:
+  - Added `useMathEngine: boolean` to AnimationConfig type
+  - Default: `useMathEngine: true` (math engine is the new default)
+  - AliveStage renders AliveLayersMath when useMathEngine && renderMode === "css"
+  - ControlPanel has "Motor matemático" toggle (with description: "exact, non-
+    deforming, harmonic (primos)")
+  - Presets and store initial state include useMathEngine: true
+
+Stage Summary:
+- 429 errors: now handled with cache + queue + retry + local fallback (no more 500s)
+- Deformation: 0.000000 on ALL layers (verified via browser — scaleX === scaleY)
+- Motion: RAF-driven, mathematically exact, non-deforming, bounded, harmonic
+- Layers NEVER sync: prime/irrational frequency ratios (φ, silver, bronze means)
+- Translation NEVER reveals edges: bounded to overscale margin
+- The "alive" effect is now subtle and exact — images breathe without deforming
+- Browser verified: 7 layers animating with deformation=0, smooth scale/rotate
+- No console errors, no page errors, lint passes cleanly

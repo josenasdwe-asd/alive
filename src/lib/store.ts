@@ -119,6 +119,8 @@ const emptyAnim: AnimationConfig = {
   colorScriptAct: -1,
   motionBlurEnabled: false,
   motionBlurStrength: 0.5,
+  // v3: default to mathematical motion engine (exact, non-deforming, harmonic)
+  useMathEngine: true,
 };
 
 const initialState: ProjectState = {

@@ -1021,6 +1021,8 @@ export function buildAnimationFromPreset(
     colorScriptAct: -1,
     motionBlurEnabled: false,
     motionBlurStrength: 0.5,
+    // v3: mathematical motion engine (exact, non-deforming, harmonic)
+    useMathEngine: true,
     layers,
     effects,
   };

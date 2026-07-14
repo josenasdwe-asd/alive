@@ -232,6 +232,25 @@ export function ControlPanel() {
           )}
         </div>
 
+        {/* v3 MATHEMATICAL MOTION ENGINE toggle — exact, non-deforming, harmonic */}
+        {config.renderMode === "css" && (
+          <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-2.5">
+            <div className="flex flex-col">
+              <Label className="flex items-center gap-1.5 text-xs">
+                <Cpu className="h-3.5 w-3.5 text-primary" />
+                Motor matemático
+              </Label>
+              <span className="mt-0.5 text-[9px] leading-tight text-muted-foreground">
+                Animación exacta, no deformante, armónica (primos)
+              </span>
+            </div>
+            <Switch
+              checked={config.useMathEngine}
+              onCheckedChange={(v) => updateAnimation({ useMathEngine: v })}
+            />
+          </div>
+        )}
+
         {/* Reduced motion */}
         <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-2.5">
           <Label className="flex items-center gap-1.5 text-xs">

@@ -37,6 +37,8 @@ function hashKey(...parts: any[]): string {
   return String(hash);
 }
 
+export { hashKey };
+
 export function getCached<T>(key: string): T | null {
   const entry = cache.get(key);
   if (!entry) return null;
@@ -55,7 +57,7 @@ export function setCached(key: string, value: any) {
 // Only 1 AI request at a time to avoid hitting rate limits.
 let queue: Promise<any> = Promise.resolve();
 
-function enqueue<T>(fn: () => Promise<T>): Promise<T> {
+export function enqueue<T>(fn: () => Promise<T>): Promise<T> {
   const result = queue.then(fn, fn); // run even if previous rejected
   // reset queue after this completes (don't chain forever)
   queue = result.catch(() => {}).then(() => undefined);

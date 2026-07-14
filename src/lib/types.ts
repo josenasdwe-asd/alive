@@ -300,6 +300,10 @@ export interface AnimationConfig {
   /** motion blur direccional */
   motionBlurEnabled: boolean;
   motionBlurStrength: number;
+
+  // === v3 MATHEMATICAL MOTION ENGINE ===
+  /** use the exact mathematical motion engine (non-deforming, harmonic, bounded) */
+  useMathEngine: boolean;
 }
 
 /** .2p5d export format (Disguise-compatible container) */

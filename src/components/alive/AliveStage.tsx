@@ -4,6 +4,7 @@ import { useId, useMemo } from "react";
 import { motion } from "framer-motion";
 import type { AnimationConfig, ImageLayer } from "@/lib/types";
 import { AliveLayers } from "./AliveLayers";
+import { AliveLayersMath } from "./AliveLayersMath";
 import { AliveCSS3D } from "./AliveCSS3D";
 import { AliveWebGL } from "./AliveWebGL";
 import { AliveKenBurns3D } from "./AliveKenBurns3D";
@@ -121,6 +122,17 @@ export function AliveStage({
           />
         ) : config.renderMode === "css3d" ? (
           <AliveCSS3D
+            layers={layers}
+            config={config}
+            liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
+            editorMode={editorMode}
+            selectedLayerId={selectedLayerId}
+            onSelectLayer={onSelectLayer}
+            onLayerTransform={onLayerTransform}
+          />
+        ) : config.useMathEngine ? (
+          // v3 MATHEMATICAL MOTION ENGINE: exact, non-deforming, harmonic
+          <AliveLayersMath
             layers={layers}
             config={config}
             liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}

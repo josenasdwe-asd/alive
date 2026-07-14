@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAliveStore } from "@/lib/store";
 import { AliveStage } from "@/components/alive/AliveStage";
 import { LayerEditor } from "@/components/alive/LayerEditor";
@@ -20,8 +20,10 @@ import { MiniTimeline } from "./MiniTimeline";
 import { ComparisonSlider } from "./ComparisonSlider";
 import { NaturalLanguageAnimate } from "./NaturalLanguageAnimate";
 import { QualityScore } from "./QualityScore";
+import { ProjectPanel } from "./ProjectPanel";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useUndoRedo } from "@/hooks/use-undo-redo";
+import { useProjectPersistence } from "@/hooks/use-project-persistence";
 import {
   Loader2,
   AlertCircle,
@@ -67,9 +69,24 @@ export function Studio() {
   const stageWrapperRef = useRef<HTMLDivElement>(null);
   const [editorMode, setEditorMode] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>("animate");
+  const [restored, setRestored] = useState(false);
 
   useKeyboardShortcuts(editorMode, setEditorMode);
   const undoRedo = useUndoRedo();
+  const { loadCurrentSession } = useProjectPersistence();
+
+  // v3 FEATURE: Auto-restore last session on mount (prevents losing work on refresh)
+  useEffect(() => {
+    if (restored) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRestored(true);
+    const didRestore = loadCurrentSession();
+    if (didRestore) {
+      toast.success("Sesión restaurada", {
+        description: "Tu proyecto anterior se cargó automáticamente",
+      });
+    }
+  }, [restored, loadCurrentSession]);
 
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";
@@ -298,7 +315,12 @@ function RightPanelTabs({
       {tab === "scene" && <ScenePanel />}
       {tab === "atmosphere" && <EffectsPanel />}
       {tab === "hero" && <HeroPanel />}
-      {tab === "export" && isReady && <ExportPanel />}
+      {tab === "export" && isReady && (
+        <>
+          <ProjectPanel />
+          <ExportPanel />
+        </>
+      )}
     </div>
   );
 }

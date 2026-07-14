@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useId, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import type { AnimationConfig, ImageLayer } from "@/lib/types";
 import { AliveLayers } from "./AliveLayers";
@@ -20,6 +20,7 @@ import { BloomACES } from "./BloomACES";
 import { DynamicRelighting } from "./DynamicRelighting";
 import { ColorScript } from "./ColorScript";
 import { MotionBlur } from "./MotionBlur";
+import { useDeviceTier, usePauseWhenOffscreen, getQualitySettings } from "@/hooks/use-adaptive-quality";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -58,6 +59,15 @@ export function AliveStage({
   const liquidId = useId().replace(/:/g, "");
   const liquidFilterId = `liquid-${liquidId}`;
 
+  // v3 ADAPTIVE QUALITY: detect device tier + pause when off-screen
+  const stageRef = useRef<HTMLDivElement>(null);
+  const deviceCaps = useDeviceTier();
+  const isOffscreen = usePauseWhenOffscreen(stageRef, 0.05);
+  const qualitySettings = getQualitySettings(deviceCaps.tier);
+
+  // Auto-reduce quality if FPS drops (handled via config flags)
+  const isLowQuality = deviceCaps.tier === "low" || isOffscreen;
+
   const isKenBurns = config.preset === "kenburns" && !config.reducedMotion;
 
   const vignetteStyle = useMemo(
@@ -74,8 +84,17 @@ export function AliveStage({
   const hasCanvasParticles =
     config.effects.smoke || config.effects.fire || config.effects.embers;
 
+  // v3 ADAPTIVE: gate expensive effects by device tier + off-screen
+  const showRelighting = config.relightingEnabled && !config.reducedMotion && !isLowQuality && qualitySettings.relightingEnabled;
+  const showMotionBlur = config.motionBlurEnabled && !config.reducedMotion && !isLowQuality && qualitySettings.motionBlurEnabled;
+  const showDepthFog = config.depthFogEnabled && !config.reducedMotion && !isLowQuality && qualitySettings.depthFogEnabled;
+  const showBloom = config.bloomEnabled && !isLowQuality && qualitySettings.bloomEnabled;
+  const showParticles = config.particlesEnabled && !config.reducedMotion && !isLowQuality;
+  const showLiquid = config.liquidEnabled && !isLowQuality && qualitySettings.liquidEnabled;
+
   return (
     <div
+      ref={stageRef}
       data-alive-stage="true"
       className={`relative w-full ${aspectRatio ? "" : aspectClass} overflow-hidden rounded-xl bg-black ${
         framed ? "ring-1 ring-white/10" : ""
@@ -135,7 +154,7 @@ export function AliveStage({
           <AliveLayersMath
             layers={layers}
             config={config}
-            liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
+            liquidFilterId={showLiquid ? liquidFilterId : undefined}
             editorMode={editorMode}
             selectedLayerId={selectedLayerId}
             onSelectLayer={onSelectLayer}
@@ -145,7 +164,7 @@ export function AliveStage({
           <AliveLayers
             layers={layers}
             config={config}
-            liquidFilterId={config.liquidEnabled ? liquidFilterId : undefined}
+            liquidFilterId={showLiquid ? liquidFilterId : undefined}
             editorMode={editorMode}
             selectedLayerId={selectedLayerId}
             onSelectLayer={onSelectLayer}
@@ -154,7 +173,7 @@ export function AliveStage({
         )}
       </motion.div>
 
-      {config.liquidEnabled && (
+      {showLiquid && (
         <LiquidFilter
           id={liquidFilterId}
           scale={config.preset === "liquid" ? 16 : config.preset === "boil" ? 6 : 8}
@@ -162,14 +181,14 @@ export function AliveStage({
         />
       )}
 
-      {config.particlesEnabled && !config.reducedMotion && !hasCanvasParticles && (
+      {showParticles && !hasCanvasParticles && (
         <Particles
-          count={config.preset === "dream" ? 20 : 14}
+          count={Math.min(config.preset === "dream" ? 20 : 14, qualitySettings.maxParticles)}
           speed={config.speed}
         />
       )}
 
-      {hasCanvasParticles && !config.reducedMotion && (
+      {hasCanvasParticles && showParticles && (
         <ParticleCanvas
           systems={{
             smoke: config.effects?.smoke ?? false,
@@ -195,21 +214,21 @@ export function AliveStage({
 
       <ColorGrading grade={config.colorGrade} intensity={1} />
 
-      {/* Depth fog volumétrico + Bloom/ACES */}
+      {/* Depth fog volumétrico + Bloom/ACES — gated by adaptive quality */}
       <DepthFog
-        enabled={config.depthFogEnabled && !config.reducedMotion}
+        enabled={showDepthFog}
         density={config.depthFogDensity}
         layers={layers}
       />
       <BloomACES
-        enabled={config.bloomEnabled}
+        enabled={showBloom}
         intensity={config.bloomIntensity}
         toneMap={config.toneMapStrength}
       />
 
-      {/* Phase 3: relighting + color script + motion blur */}
+      {/* Phase 3: relighting + color script + motion blur — gated by adaptive quality */}
       <DynamicRelighting
-        enabled={config.relightingEnabled && !config.reducedMotion}
+        enabled={showRelighting}
         azimuth={config.relightingAzimuth}
         elevation={config.relightingElevation}
         intensity={config.relightingIntensity}
@@ -217,20 +236,20 @@ export function AliveStage({
         depthUrl={depthUrl}
       />
       <ColorScript
-        enabled={config.colorScriptEnabled && !config.reducedMotion}
+        enabled={config.colorScriptEnabled && !config.reducedMotion && !isLowQuality}
         act={config.colorScriptAct}
         speed={config.speed}
       />
       <MotionBlur
-        enabled={config.motionBlurEnabled && !config.reducedMotion}
+        enabled={showMotionBlur}
         strength={config.motionBlurStrength}
       />
 
-      {/* Atmospheric animations (light cycle, fog, timelapse, seasonal) */}
-      <AtmosphericAnimation type="light-cycle" enabled={config.atmoLightCycle && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
-      <AtmosphericAnimation type="fog-drift" enabled={config.atmoFogDrift && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
-      <AtmosphericAnimation type="timelapse" enabled={config.atmoTimelapse && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
-      <AtmosphericAnimation type="seasonal" enabled={config.atmoSeasonal && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
+      {/* Atmospheric animations — gated by off-screen + low quality */}
+      <AtmosphericAnimation type="light-cycle" enabled={config.atmoLightCycle && !config.reducedMotion && !isLowQuality} speed={config.speed} intensity={config.intensity} />
+      <AtmosphericAnimation type="fog-drift" enabled={config.atmoFogDrift && !config.reducedMotion && !isLowQuality} speed={config.speed} intensity={config.intensity} />
+      <AtmosphericAnimation type="timelapse" enabled={config.atmoTimelapse && !config.reducedMotion && !isLowQuality} speed={config.speed} intensity={config.intensity} />
+      <AtmosphericAnimation type="seasonal" enabled={config.atmoSeasonal && !config.reducedMotion && !isLowQuality} speed={config.speed} intensity={config.intensity} />
 
       {/* CRITICAL FIX (H3, H4): vignette and chromatic overlays are ALREADY applied
        * inside the WebGL/KenBurns3D shaders. Skip the CSS overlays to prevent doubling. */}

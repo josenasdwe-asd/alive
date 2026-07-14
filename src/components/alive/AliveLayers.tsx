@@ -250,10 +250,10 @@ function LayerPlane({
     (vals: any) => vals[0] + vals[1] + (vals[2] ?? 0) + (vals[3] ?? 0)
   );
 
-  // === SQUASH & STRETCH (Principle 1): at parallax extremes, layers deform elastically ===
-  // CALIBRATED: doubled from 0.03/0.02 to 0.06/0.04 for perceptible elastic feel
-  const squashX = useTransform(smx, (v) => 1 + Math.abs(v) * 0.06 * layer.depth * intensity);
-  const squashY = useTransform(smx, (v) => 1 - Math.abs(v) * 0.04 * layer.depth * intensity);
+  // === SQUASH & STretch REMOVED — was deforming images with non-uniform scale
+  // Using uniform scale = 1 (no squash) to keep images non-deformed
+  const squashX = useMotionValue(1);
+  const squashY = useMotionValue(1);
 
   // === BUG FIX #1: respect visibility (after all hooks) ===
   if (!t.visible) return null;
@@ -387,12 +387,9 @@ function LayerPlane({
   const layerBlur = t.blur + layerAnim.blur + dofBlur;
   ampVars["--layer-blur"] = `${layerBlur}px`;
 
-  // === Scale-with-depth: layers auto-scale based on Z (Disguise "Scale with depth") ===
-  const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
-  // CALIBRATED (BUG B1 fix): bumped from 1.08 to 1.18 base + intensity-aware extra
-  // Old: (1.08 + depth*0.04) — insufficient at extreme mouse+velocity (max parallax 43px > 36px tolerance)
-  // New: (1.18 + depth*0.06) + intensity*0.04 — front layer 1.24×+intensity, back 1.18×+intensity
-  const overscale = (1.18 + layer.depth * 0.06 + intensity * 0.04) * depthScale;
+  // === Scale-with-depth: minimal overscale to hide parallax edges without zooming too much
+  const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.08 : 1;
+  const overscale = (1.06 + layer.depth * 0.03) * depthScale;
   const userScale = t.scale * overscale;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 

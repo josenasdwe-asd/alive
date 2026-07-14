@@ -1022,7 +1022,7 @@ export function buildAnimationFromPreset(
     motionBlurEnabled: false,
     motionBlurStrength: 0.5,
     // v3: mathematical motion engine (exact, non-deforming, harmonic)
-    useMathEngine: true,
+    useMathEngine: false,
     layers,
     effects,
   };

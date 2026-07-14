@@ -6,6 +6,7 @@ import { useAliveStore } from "@/lib/store";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { generateHtml, generateReact, generate2p5d, type ExportFormat } from "@/lib/export-code";
+import { VideoExport } from "./VideoExport";
 import { PRESET_MAP } from "@/lib/presets";
 
 export function ExportPanel() {
@@ -97,6 +98,7 @@ export function ExportPanel() {
             )}
             {copied ? "Copiado" : "Copiar"}
           </Button>
+          <VideoExport />
         </div>
       </header>
 

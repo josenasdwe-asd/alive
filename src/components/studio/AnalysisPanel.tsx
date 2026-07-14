@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AutoSetup } from "./AutoSetup";
 import {
   ScanSearch,
   Layers as LayersIcon,
@@ -464,6 +465,9 @@ export function AnalysisPanel() {
               {layers.length} capas · estrategia{" "}
               {strategy === "depth-slice" ? "Depth Slice" : "AI Extract"}
             </span>
+          </div>
+          <div className="pt-1">
+            <AutoSetup />
           </div>
         </div>
       )}

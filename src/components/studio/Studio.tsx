@@ -17,6 +17,8 @@ import { Pipeline25DPanel } from "./Pipeline25DPanel";
 import { ScenePanel } from "./ScenePanel";
 import { CinematicPanel } from "./CinematicPanel";
 import { MiniTimeline } from "./MiniTimeline";
+import { ComparisonSlider } from "./ComparisonSlider";
+import { AutoSetup } from "./AutoSetup";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import {
   Loader2,
@@ -129,6 +131,8 @@ export function Studio() {
                 )}
                 {editorMode ? "Editando" : "Mover capas"}
               </button>
+
+              <ComparisonSlider />
 
               <div className="h-4 w-px bg-white/10" />
 

@@ -20,6 +20,7 @@ import { MiniTimeline } from "./MiniTimeline";
 import { ComparisonSlider } from "./ComparisonSlider";
 import { AutoSetup } from "./AutoSetup";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { useUndoRedo } from "@/hooks/use-undo-redo";
 import {
   Loader2,
   AlertCircle,
@@ -32,6 +33,8 @@ import {
   Maximize2,
   Mountain,
   ChevronRight,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +62,7 @@ export function Studio() {
   const [rightTab, setRightTab] = useState<RightTab>("animate");
 
   useKeyboardShortcuts(editorMode, setEditorMode);
+  const undoRedo = useUndoRedo();
 
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";
@@ -134,6 +138,25 @@ export function Studio() {
               </button>
 
               <ComparisonSlider />
+
+              <div className="h-4 w-px bg-white/10" />
+
+              <button
+                onClick={() => undoRedo.undo()}
+                disabled={!undoRedo.canUndo}
+                className="rounded-md border border-white/5 p-1 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
+                title="Deshacer (Ctrl+Z)"
+              >
+                <Undo2 className="h-3 w-3" />
+              </button>
+              <button
+                onClick={() => undoRedo.redo()}
+                disabled={!undoRedo.canRedo}
+                className="rounded-md border border-white/5 p-1 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
+                title="Rehacer (Ctrl+Shift+Z)"
+              >
+                <Redo2 className="h-3 w-3" />
+              </button>
 
               <div className="h-4 w-px bg-white/10" />
 

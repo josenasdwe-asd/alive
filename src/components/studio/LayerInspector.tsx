@@ -284,8 +284,16 @@ function NumInput({
   // Scrubby input: drag left/right on the label to change the value
   const onScrubStart = (e: React.PointerEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const startX = e.clientX;
     const startVal = value;
+
+    // block keyboard shortcuts during scrub (prevents Delete from removing layer)
+    const onKeyBlock = (ev: KeyboardEvent) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+
     const onMove = (ev: PointerEvent) => {
       const delta = (ev.clientX - startX) * step;
       onChange(startVal + delta);
@@ -293,9 +301,11 @@ function NumInput({
     const onUp = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("keydown", onKeyBlock, true);
     };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
+    window.addEventListener("keydown", onKeyBlock, true); // capture phase
   };
 
   return (

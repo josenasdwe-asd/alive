@@ -40,26 +40,33 @@ export function AutoSetup() {
 
     let sceneId: SceneCompositionId = "free";
     if (layerCount >= 5 && hasBackground) {
-      sceneId = "horizon"; // landscapes with depth
+      sceneId = "horizon";
     } else if (layers.some((l) => l.role === "subject")) {
-      sceneId = "subject-focus"; // portraits / subjects
+      sceneId = "subject-focus";
     } else if (layerCount <= 4) {
-      sceneId = "anchor-midground"; // few layers = balanced
+      sceneId = "anchor-midground";
     }
     applySceneComp(sceneId);
 
-    // 3. Optimal global settings based on preset type
+    // 3. Only adjust intensity/speed if user hasn't manually changed them
+    // (check if they're still at default values)
+    const userAdjustedIntensity = animation.intensity !== 1;
+    const userAdjustedSpeed = animation.speed !== 1;
+
     const isCinematic = presetId === "cinematic3d" || presetId === "cosmic";
     const isDreamy = presetId === "dream" || presetId === "ethereal" || presetId === "aurora";
 
-    updateAnimation({
-      intensity: isCinematic ? 1.3 : isDreamy ? 0.9 : 1.0,
-      speed: isCinematic ? 0.85 : isDreamy ? 0.8 : 1.0,
-      // auto-enable some effects for maximum "alive" feel
-      entranceEnabled: true,
-      parallaxEnabled: true,
-      // don't auto-enable heavy effects — let user discover them
-    });
+    const patch: Partial<typeof animation> = {};
+    if (!userAdjustedIntensity) {
+      patch.intensity = isCinematic ? 1.3 : isDreamy ? 0.9 : 1.0;
+    }
+    if (!userAdjustedSpeed) {
+      patch.speed = isCinematic ? 0.85 : isDreamy ? 0.8 : 1.0;
+    }
+    // always enable entrance + parallax (these are almost always wanted)
+    patch.entranceEnabled = true;
+    patch.parallaxEnabled = true;
+    updateAnimation(patch);
 
     const presetName = PRESET_MAP[presetId]?.name ?? presetId;
     const sceneName = SCENE_MAP[sceneId]?.name ?? sceneId;

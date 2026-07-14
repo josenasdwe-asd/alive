@@ -11,6 +11,10 @@ import { EffectOverlays } from "./EffectOverlays";
 import { ParticleCanvas } from "./ParticleCanvas";
 import { ShimmerOverlay } from "./ShimmerOverlay";
 import { ColorGrading } from "./ColorGrading";
+import { DepthFog } from "./DepthFog";
+import { BloomACES } from "./BloomACES";
+import { DynamicRelighting } from "./DynamicRelighting";
+import { ColorScript } from "./ColorScript";
 import { TextOverlayView } from "./TextOverlay";
 import { Particles } from "./Particles";
 import { useId } from "react";
@@ -160,6 +164,31 @@ export function HeroMode({ onExit }: HeroModeProps) {
         <EffectOverlays effects={config.effects} speed={config.speed} />
 
         <ColorGrading grade={config.colorGrade} intensity={1} />
+
+        {/* Phase 2-3 cinematic effects */}
+        <DepthFog
+          enabled={config.depthFogEnabled && !config.reducedMotion}
+          density={config.depthFogDensity}
+          layers={layers}
+        />
+        <BloomACES
+          enabled={config.bloomEnabled}
+          intensity={config.bloomIntensity}
+          toneMap={config.toneMapStrength}
+        />
+        <DynamicRelighting
+          enabled={config.relightingEnabled && !config.reducedMotion}
+          azimuth={config.relightingAzimuth}
+          elevation={config.relightingElevation}
+          intensity={config.relightingIntensity}
+          colorTemp={config.relightingColorTemp}
+          depthUrl={depthMapUrl}
+        />
+        <ColorScript
+          enabled={config.colorScriptEnabled && !config.reducedMotion}
+          act={config.colorScriptAct}
+          speed={config.speed}
+        />
 
         {/* Vignette */}
         <div

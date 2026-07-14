@@ -293,7 +293,7 @@ function LayerPlane({
   if (!config.reducedMotion) {
     if (layerAnim.breathing) {
       animations.push(`alive-breath ${breathDur}s ease-in-out infinite`);
-      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity * 0.02;
+      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity * 0.04;
     }
     if (layerAnim.sway) {
       animations.push(`alive-sway ${swayDur}s ease-in-out infinite`);
@@ -339,7 +339,7 @@ function LayerPlane({
     // NEW v3 animations
     if (layerAnim.heartbeat) {
       animations.push(`alive-heartbeat ${heartbeatDur}s ease-in-out infinite`);
-      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity * 0.03;
+      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity * 0.05;
     }
     if (layerAnim.vortex) {
       animations.push(`alive-vortex ${vortexDur}s ease-in-out infinite`);
@@ -361,7 +361,7 @@ function LayerPlane({
     }
     if (layerAnim.breatheX) {
       animations.push(`alive-breathe-x ${breatheXDur}s ease-in-out infinite`);
-      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity * 0.02;
+      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity * 0.04;
     }
     if (layerAnim.scan) {
       animations.push(`alive-scan ${scanDur}s linear infinite`);
@@ -393,7 +393,7 @@ function LayerPlane({
 
   // === Scale-with-depth: minimal overscale to hide parallax edges without zooming too much
   const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.08 : 1;
-  const overscale = (1.06 + layer.depth * 0.03) * depthScale;
+  const overscale = (1.10 + layer.depth * 0.04) * depthScale;
   const userScale = t.scale * overscale;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 

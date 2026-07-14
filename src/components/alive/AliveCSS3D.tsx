@@ -219,7 +219,7 @@ function CSS3DLayer({
     // calc actually reads were never set, so 4 of 5 animations were doubly dead.
     if (layerAnim.breathing) {
       animations.push(`alive-breath ${breathDur}s ease-in-out infinite`);
-      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity * 0.02;
+      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity * 0.04;
     }
     if (layerAnim.sway) {
       animations.push(`alive-sway ${swayDur}s ease-in-out infinite`);
@@ -267,7 +267,7 @@ function CSS3DLayer({
     // v3 animations — parity with AliveLayers
     if (layerAnim.heartbeat) {
       animations.push(`alive-heartbeat ${heartbeatDur}s ease-in-out infinite`);
-      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity * 0.03;
+      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity * 0.05;
     }
     if (layerAnim.vortex) {
       animations.push(`alive-vortex ${vortexDur}s ease-in-out infinite`);
@@ -289,7 +289,7 @@ function CSS3DLayer({
     }
     if (layerAnim.breatheX) {
       animations.push(`alive-breathe-x ${breatheXDur}s ease-in-out infinite`);
-      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity * 0.02;
+      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity * 0.04;
     }
     if (layerAnim.scan) {
       animations.push(`alive-scan ${scanDur}s linear infinite`);
@@ -323,7 +323,7 @@ function CSS3DLayer({
   // New: divide by perspective factor so back layers compensate for shrink.
   const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
   const perspectiveFactor = config.perspective / (config.perspective - translateZ);
-  const overscale = ((1.18 + layer.depth * 0.06 + intensity * 0.04) * depthScale * t.scale) * perspectiveFactor;
+  const overscale = ((1.10 + layer.depth * 0.04) * depthScale * t.scale) * perspectiveFactor;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
   // entrance reveal (same calibration as AliveLayers) — BUG D2 FIX: now actually applied

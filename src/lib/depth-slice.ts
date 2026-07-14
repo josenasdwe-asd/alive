@@ -113,32 +113,12 @@ function kmeans1d(
   k: number,
   maxIter = 20
 ): { labels: Uint8Array; centers: number[] } {
-  // init centers: evenly spaced quantiles of the histogram
-  const histogram = new Array(256).fill(0);
-  for (let i = 0; i < data.length; i++) histogram[data[i]]++;
+  // EQUAL-RANGE initialization: centers evenly spaced across 0-255 depth range.
+  // This ensures each cluster covers an equal DEPTH BAND regardless of pixel
+  // distribution. Prevents one cluster from swallowing the entire image.
   let centers: number[] = [];
-  const total = data.length;
-  const step = total / k;
-  let count = 0;
-  let target = step;
-  for (let v = 0; v < 256; v++) {
-    count += histogram[v];
-    if (count >= target || v === 255) {
-      // only add if this center value isn't already in the list (dedupe)
-      if (centers.length === 0 || centers[centers.length - 1] !== v) {
-        centers.push(v);
-      }
-      target += step;
-      if (centers.length >= k) break;
-    }
-  }
-  // pad if needed — use evenly spaced values across the data range instead of duplicates
-  const dataMin = centers[0] ?? 0;
-  const dataMax = centers[centers.length - 1] ?? 255;
-  while (centers.length < k) {
-    const idx = centers.length;
-    const interpolated = Math.round(dataMin + ((dataMax - dataMin) * idx) / Math.max(1, k - 1));
-    centers.push(interpolated);
+  for (let i = 0; i < k; i++) {
+    centers.push(Math.round((255 * (i + 0.5)) / k));
   }
 
   const labels = new Uint8Array(data.length);
@@ -247,8 +227,8 @@ export async function sliceImageByDepth(
   options: SliceOptions = {}
 ): Promise<SlicedLayer[]> {
   const k = Math.max(2, Math.min(12, options.k ?? 6));
-  const dilationRadius = options.dilationRadius ?? 8;  // CORRECTED: was 25 (too aggressive, covered entire image)
-  const featherSigma = options.featherSigma ?? 8;       // CORRECTED: was 10 (too soft, made layers indistinguishable)
+  const dilationRadius = options.dilationRadius ?? 18;  // WIDER: covers gaps when layers parallax
+  const featherSigma = options.featherSigma ?? 20;      // SOFTER: smooth alpha edges, no visible seams
   const mode = options.mode ?? "anchor-base"; // default: base + isolated bands
 
   // Load both images at the same size (use original's dimensions)
@@ -270,13 +250,24 @@ export async function sliceImageByDepth(
     .raw()
     .toBuffer();
 
-  // === EDGE-AWARE K-MEANS ===
-  // 1. Detect edges in the depth map with Sobel
-  const edges = sobelEdges(depthGray, W, H);
-  // 2. Smooth depth values AT edges (median filter) to prevent objects from splitting
-  const smoothedDepth = edgeAwareSmooth(depthGray, edges, W, H, 50);
-  // 3. K-means on the edge-smoothed depth → cleaner object-aligned clusters
-  const { labels, centers } = kmeans1d(smoothedDepth, k);
+  // === DEPTH QUANTIZATION (replaces K-means) ===
+  // Assign each pixel to a depth band based on its depth value.
+  // This GUARANTEES each layer has its own depth range — no more
+  // one cluster swallowing the entire image.
+  // pixel at depth d → layer = floor(d / 256 * k)
+  const labels = new Uint8Array(W * H);
+  for (let i = 0; i < smoothedDepth.length; i++) {
+    labels[i] = Math.min(k - 1, Math.floor((smoothedDepth[i] / 256) * k));
+  }
+  // Compute centers (average depth per band) for depth centroid
+  const centers: number[] = [];
+  for (let c = 0; c < k; c++) {
+    let sum = 0, count = 0;
+    for (let i = 0; i < labels.length; i++) {
+      if (labels[i] === c) { sum += smoothedDepth[i]; count++; }
+    }
+    centers.push(count > 0 ? Math.round(sum / count) : Math.round((255 * (c + 0.5)) / k));
+  }
 
   const results: SlicedLayer[] = [];
 

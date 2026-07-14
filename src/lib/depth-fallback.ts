@@ -26,23 +26,24 @@ export async function generateDeterministicDepth(
     .toBuffer();
 
   // build depth: luminance + vertical gradient
+  // HIGHER CONTRAST: more weight to luminance so objects separate better
   const depth = Buffer.alloc(W * H);
   for (let y = 0; y < H; y++) {
-    // wider range (30-225 vs 40-215) for better K-means separation
-    const vGrad = 30 + (y / H) * 195;
+    const vGrad = 20 + (y / H) * 215; // wider range for better K-means
     for (let x = 0; x < W; x++) {
       const idx = y * W + x;
       const lumVal = lum[idx];
-      // more luminance weight (40% vs 35%) so bright objects pop forward
-      const d = Math.round(lumVal * 0.40 + vGrad * 0.60);
+      // 50% luminance + 50% vertical = balanced depth perception
+      const d = Math.round(lumVal * 0.50 + vGrad * 0.50);
       depth[idx] = Math.max(0, Math.min(255, d));
     }
   }
 
-  // smooth + contrast stretch for maximum K-means separability
+  // stronger smoothing + double normalise for maximum K-means separation
   const smoothed = await sharp(depth, { raw: { width: W, height: H, channels: 1 } })
-    .blur(3)
-    .normalise() // second pass: stretch the combined depth histogram
+    .blur(5)       // more blur = smoother depth transitions
+    .normalise()   // stretch to full 0-255
+    .normalise()   // stretch again for max contrast
     .png()
     .toBuffer();
 

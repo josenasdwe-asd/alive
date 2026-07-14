@@ -46,27 +46,9 @@ export async function analyzeImage(dataUrl: string): Promise<SceneAnalysis> {
 
   const zai = await getZai();
 
-  const prompt = `Analyze this image for a 2.5D parallax animation system. Identify ALL distinct visual elements and separate them into layers. Return ONLY raw JSON (no markdown, no prose):
-{"sceneDescription":"one sentence","subject":"main focal subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"short semantic name (e.g. 'Cielo', 'Nubes lejanas', 'Montañas', 'Niebla', 'Dragón', 'Partículas')","role":"background|midground|subject|foreground","depth":0..1,"description":"short phrase","extractPrompt":"precise visual description to isolate this element for AI extraction","suggestedAnimations":["breathing"|"sway"|"twist"|"floatY"|"driftX"|"wave"|"jitter"|"glow"|"hueDrift"|"focusPull"|"shadowDrift"|"chromatic"|"liquid"|"heartbeat"|"vortex"|"ripple"|"zTilt"|"sway3d"|"breatheX"|"scan"]}],"recommendedPreset":"dream|float|pulse|liquid|cinematic3d|shimmer|boil|kenburns|aurora|underwater|ethereal|noir|cosmic|paper|glass|vintage|techno|zen|lava|prism|ghost|origami|neon|vivo","recommendedConfig":{"renderMode":"css|css3d|webgl|kenburns3d","sceneComposition":"horizon|subject-focus|tunnel|wind|anchor-midground|free","colorGrade":"none|teal-orange|bleach-bypass|portra|blade-runner|noir-film","effects":{"fog":bool,"snow":bool,"rain":bool,"godrays":bool,"bokeh":bool,"dust":bool,"lightleak":bool,"grain":bool,"smoke":bool,"fire":bool,"embers":bool},"dofEnabled":bool,"dofFocusDepth":0..1,"relightingEnabled":bool,"relightingAzimuth":0..360,"relightingElevation":0..90,"intensity":0.5..1.5,"speed":0.5..1.5,"depthFogEnabled":bool,"bloomEnabled":bool}}
-Rules:
-- Identify 8-15 distinct visual elements, ordered far→near. Each element gets its OWN layer.
-- Examples of elements to identify: sky, distant clouds, mountains, mid clouds, fog/mist, light glow, main subject, foreground particles, foreground elements, etc.
-- Exactly one "subject" (depth 0.6-0.9). Depth strictly increasing from 0.0 (farthest) to 1.0 (closest).
-- extractPrompt: MUST be a precise visual description that an AI image editor can use to ISOLATE this element. Include color, position, shape. Example: "the large dragon with red scales in the center of the image, breathing fire, with horns and wings spread".
-- suggestedAnimations: pick 1-3 animations that MATCH the content:
-  • Sky → ["driftX"] — clouds drift horizontally
-  • Clouds → ["driftX","floatY"] — drift and float
-  • Mountains/rocks → ["breathing"] — subtle scale pulse
-  • Trees/plants → ["sway"] — sway in wind
-  • Water/lake/river → ["wave","liquid"] — ripple
-  • Person/animal → ["breathing","sway"] — breathe + slight sway
-  • Fire/lava/sun/glow → ["glow","heartbeat"] — pulsing light
-  • Fog/mist → ["driftX","focusPull"] — drift + blur
-  • Particles/sparks → ["floatY","jitter"] — float and shimmer
-  • Buildings → ["zTilt"] — subtle 3D tilt
-  • Night/digital → ["scan","chromatic"] — CRT effect
-- recommendedPreset: nature/landscape→vivo, landscapes→aurora/zen, portraits→ethereal/float, night→noir/cosmic/neon, water→underwater/lava, fire→lava, urban→techno/neon.
-- recommendedConfig: renderMode css for organic, webgl for depth parallax. sceneComposition: horizon for landscapes, subject-focus for portraits. colorGrade matches mood. intensity/speed: calm 0.7-0.9, dramatic 1.2-1.4.`;
+  const prompt = `Analyze this image for 2.5D parallax animation. Identify 6-10 visual elements as layers. Return ONLY raw JSON:
+{"sceneDescription":"one sentence","subject":"main subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"element name","role":"background|midground|subject|foreground","depth":0..1,"description":"phrase","extractPrompt":"how to isolate this element","suggestedAnimations":["driftX"|"breathing"|"sway"|"floatY"|"wave"|"glow"|"jitter"]}],"recommendedPreset":"vivo|dream|aurora|zen|ethereal|float|noir|cosmic|neon|underwater|lava"}
+Rules: 6-10 layers far→near, depth increasing. One "subject" at depth 0.6-0.9. suggestedAnimations: sky→driftX, clouds→driftX+floatY, mountains→breathing, water→wave, person→breathing, fire→glow, particles→floatY+jitter. recommendedPreset: nature→vivo, portrait→ethereal, night→noir, water→underwater, fire→lava.`;
 
   // v3 FIX: minimal retry (1 attempt, 1s delay) — VLM is often 429,
   // retrying 3× with 2s/4s/8s causes 14s waits. Better to fail fast to fallback.
@@ -92,6 +74,79 @@ Rules:
 }
 
 function parseAnalysis(content: string): SceneAnalysis {
+
+  /**
+   * v3 FIX: Repair truncated JSON from VLM.
+   * When VLM response is too long, it gets cut off mid-string.
+   * This function tries to close open strings, arrays, and objects.
+   */
+  function repairTruncatedJSON(str: string): any | null {
+    // Strategy 1: Find the last complete layer object and close from there
+    // Look for the last "}," or "}" that closes a layer
+    const lastCompleteLayer = str.lastIndexOf("},");
+    if (lastCompleteLayer > 0) {
+      // Truncate after last complete layer, close the array and object
+      let repaired = str.substring(0, lastCompleteLayer + 1); // include the }
+      repaired += "]"; // close layers array
+
+      // Check if recommendedPreset exists
+      if (repaired.includes('"recommendedPreset"')) {
+        // Try to find it
+        const presetMatch = repaired.match(/"recommendedPreset"\s*:\s*"([^"]*)"/);
+        if (presetMatch) {
+          repaired += "}";
+        } else {
+          repaired += ',"recommendedPreset":"dream"}';
+        }
+      } else {
+        repaired += ',"recommendedPreset":"vivo"}';
+      }
+
+      try {
+        return JSON.parse(repaired);
+      } catch {
+        // Try strategy 2: even more aggressive truncation
+      }
+    }
+
+    // Strategy 2: Find the last "name" field and build a minimal valid JSON
+    const nameMatches = [...str.matchAll(/"name"\s*:\s*"([^"]+)"/g)];
+    if (nameMatches.length > 0) {
+      // Extract what we can: sceneDescription, subject, palette
+      const sceneMatch = str.match(/"sceneDescription"\s*:\s*"([^"]*)"/);
+      const subjectMatch = str.match(/"subject"\s*:\s*"([^"]*)"/);
+      const moodMatch = str.match(/"mood"\s*:\s*"([^"]*)"/);
+      const paletteMatch = str.matchAll(/"#[0-9a-fA-F]{6}"/g);
+
+      const palette = [...paletteMatch].map(m => m[0]).slice(0, 4);
+
+      // Build layers from what we extracted
+      const layers: any[] = [];
+      nameMatches.forEach((m, i) => {
+        layers.push({
+          name: m[1],
+          role: i === 0 ? "background" : i === nameMatches.length - 2 ? "subject" : "midground",
+          depth: i / Math.max(1, nameMatches.length),
+          description: "",
+        });
+      });
+
+      const repaired = {
+        sceneDescription: sceneMatch?.[1] ?? "Escena analizada",
+        subject: subjectMatch?.[1] ?? "el sujeto principal",
+        mood: moodMatch?.[1] ?? "atmospheric",
+        palette: palette.length > 0 ? palette : ["#3a3a4a", "#6a6a7a", "#9a9aaa", "#cacada"],
+        layers,
+        recommendedPreset: "vivo",
+      };
+
+      return repaired;
+    }
+
+    return null;
+  }
+
+
   // extract JSON even if wrapped in code fences or extra prose
   let jsonStr = content.trim();
   const fenceMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -101,7 +156,21 @@ function parseAnalysis(content: string): SceneAnalysis {
   if (braceStart >= 0 && braceEnd > braceStart) {
     jsonStr = jsonStr.slice(braceStart, braceEnd + 1);
   }
-  const parsed = JSON.parse(jsonStr);
+
+  // v3 FIX: VLM often returns truncated JSON (too many layers = too long response).
+  // Try to repair: close unclosed strings, arrays, and objects.
+  let parsed: any;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch (parseErr) {
+    console.warn("[ai] JSON parse failed, attempting repair…");
+    parsed = repairTruncatedJSON(jsonStr);
+    if (!parsed) {
+      // If repair fails, use fallback analysis
+      console.error("[ai] JSON repair failed, using fallback");
+      throw new Error("VLM response was truncated and could not be repaired");
+    }
+  }
 
   // validate / normalize
   const layers = (parsed.layers ?? [])

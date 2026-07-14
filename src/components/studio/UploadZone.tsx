@@ -41,26 +41,31 @@ export function UploadZone() {
       }
       setUploading(true);
       try {
+        // Read as data URL FIRST (for instant preview, no waiting for upload)
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(new Error("No se pudo leer el archivo"));
+          reader.readAsDataURL(file);
+        });
+
+        // Upload to server
         const fd = new FormData();
         fd.append("file", file);
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || "Upload failed");
 
-        // also create a local data URL for instant preview
-        const reader = new FileReader();
-        reader.onload = () => {
-          setOriginal({
-            id: data.id,
-            url: data.url,
-            width: data.width,
-            height: data.height,
-            dataUrl: reader.result as string,
-          });
-        };
-        reader.readAsDataURL(file);
+        // Set original with BOTH the server URL and data URL (instant preview)
+        setOriginal({
+          id: data.id,
+          url: data.url,
+          width: data.width,
+          height: data.height,
+          dataUrl,
+        });
 
-        toast.success("Imagen cargada — analizando profundidad…");
+        toast.success("Imagen cargada — analizando…");
       } catch (err: any) {
         toast.error(err?.message ?? "Error al subir la imagen");
         setStatus("error", err?.message);

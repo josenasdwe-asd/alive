@@ -76,8 +76,12 @@ export function AnalysisPanel() {
     let lastErr: any;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        const res = await fetch(url, opts);
-        // Only retry on gateway errors and rate limiting — NOT on 4xx client errors
+        // Add 30s timeout for each attempt
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
+        const res = await fetch(url, { ...opts, signal: controller.signal });
+        clearTimeout(timeout);
+
         if (res.status === 502 || res.status === 503 || res.status === 504 || res.status === 429) {
           throw new Error(`Gateway ${res.status} — reintentando…`);
         }
@@ -86,10 +90,12 @@ export function AnalysisPanel() {
         return data;
       } catch (err: any) {
         lastErr = err;
-        // Don't retry on 4xx (except 429) — these are permanent failures
-        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429") || err?.name === "TypeError"; // network errors
+        if (err.name === "AbortError") {
+          lastErr = new Error("Tiempo agotado. El servidor tardó demasiado.");
+          break;
+        }
+        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429") || err?.name === "TypeError";
         if (attempt < maxRetries && isRetryable) {
-          // v3 FIX: reduced from 3s/6s/9s to 1.5s — fail fast to fallback
           const delay = 1500 + Math.random() * 500;
           setProgress((p) => Math.max(p, 15 + attempt * 10));
           await new Promise((r) => setTimeout(r, delay));

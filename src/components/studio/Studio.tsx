@@ -15,6 +15,7 @@ import { ExportPanel } from "./ExportPanel";
 import { HeroPanel } from "./HeroPanel";
 import { Pipeline25DPanel } from "./Pipeline25DPanel";
 import { ScenePanel } from "./ScenePanel";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import {
   Loader2,
   AlertCircle,
@@ -51,6 +52,8 @@ export function Studio() {
   const stageWrapperRef = useRef<HTMLDivElement>(null);
   const [editorMode, setEditorMode] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>("animate");
+
+  useKeyboardShortcuts(editorMode, setEditorMode);
 
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";

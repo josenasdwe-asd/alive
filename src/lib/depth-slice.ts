@@ -42,6 +42,63 @@ export interface SliceOptions {
 }
 
 /**
+ * Sobel edge detection on a grayscale buffer.
+ * Returns edge magnitude 0..255 per pixel.
+ * Used to prevent K-means from splitting objects across depth bands.
+ */
+function sobelEdges(data: Uint8Array, W: number, H: number): Uint8Array {
+  const edges = new Uint8Array(W * H);
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      const idx = y * W + x;
+      // Sobel X kernel
+      const gx =
+        -data[idx - W - 1] - 2 * data[idx - 1] - data[idx + W - 1] +
+        data[idx - W + 1] + 2 * data[idx + 1] + data[idx + W + 1];
+      // Sobel Y kernel
+      const gy =
+        -data[idx - W - 1] - 2 * data[idx - W] - data[idx - W + 1] +
+        data[idx + W - 1] + 2 * data[idx + W] + data[idx + W + 1];
+      const mag = Math.min(255, Math.sqrt(gx * gx + gy * gy));
+      edges[idx] = mag;
+    }
+  }
+  return edges;
+}
+
+/**
+ * Edge-aware smoothing: at strong edges, snap the depth value to the nearest
+ * cluster center of the neighboring pixels. This prevents K-means from
+ * splitting an object (like a mountain) across two bands.
+ */
+function edgeAwareSmooth(
+  data: Uint8Array,
+  edges: Uint8Array,
+  W: number,
+  H: number,
+  edgeThreshold = 50
+): Uint8Array {
+  const smoothed = Buffer.from(data);
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      const idx = y * W + x;
+      if (edges[idx] > edgeThreshold) {
+        // at an edge: take the median of a 3x3 neighborhood to preserve the edge
+        const neighbors: number[] = [];
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            neighbors.push(data[idx + dy * W + dx]);
+          }
+        }
+        neighbors.sort((a, b) => a - b);
+        smoothed[idx] = neighbors[4]; // median
+      }
+    }
+  }
+  return smoothed;
+}
+
+/**
  * K-means 1D clustering.
  * Returns the cluster label (0..k-1) for each pixel, plus the sorted cluster
  * centers (so cluster 0 = darkest = farthest).
@@ -186,8 +243,13 @@ export async function sliceImageByDepth(
     .raw()
     .toBuffer();
 
-  // K-means clustering
-  const { labels, centers } = kmeans1d(depthGray, k);
+  // === EDGE-AWARE K-MEANS ===
+  // 1. Detect edges in the depth map with Sobel
+  const edges = sobelEdges(depthGray, W, H);
+  // 2. Smooth depth values AT edges (median filter) to prevent objects from splitting
+  const smoothedDepth = edgeAwareSmooth(depthGray, edges, W, H, 50);
+  // 3. K-means on the edge-smoothed depth → cleaner object-aligned clusters
+  const { labels, centers } = kmeans1d(smoothedDepth, k);
 
   const results: SlicedLayer[] = [];
 

@@ -281,10 +281,39 @@ function NumInput({
   onChange: (v: number) => void;
   step?: number;
 }) {
+  // Scrubby input: drag left/right on the label to change the value
+  const onScrubStart = (e: React.PointerEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startVal = value;
+    const onMove = (ev: PointerEvent) => {
+      const delta = (ev.clientX - startX) * step;
+      onChange(startVal + delta);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+
   return (
     <div className="flex items-center gap-1 rounded-md border border-white/5 bg-white/[0.02] px-1.5 py-1">
-      <span className="text-muted-foreground">{icon}</span>
-      <span className="text-[10px] text-muted-foreground">{label}</span>
+      <span
+        className="cursor-ew-resize select-none text-muted-foreground"
+        onPointerDown={onScrubStart}
+        title="Arrastra para cambiar"
+      >
+        {icon}
+      </span>
+      <span
+        className="cursor-ew-resize select-none text-[10px] text-muted-foreground"
+        onPointerDown={onScrubStart}
+        title="Arrastra para cambiar"
+      >
+        {label}
+      </span>
       <input
         type="number"
         value={value}

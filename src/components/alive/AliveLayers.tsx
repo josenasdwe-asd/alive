@@ -79,10 +79,6 @@ export function AliveLayers({
   const my = useMotionValue(0);
   const mvx = useMotionValue(0);
   const mvy = useMotionValue(0);
-  const smx = useSpring(mx, { stiffness: 50, damping: 20, mass: 0.5 });
-  const smy = useSpring(my, { stiffness: 50, damping: 20, mass: 0.5 });
-  const smvx = useSpring(mvx, { stiffness: 80, damping: 30 });
-  const smvy = useSpring(mvy, { stiffness: 80, damping: 30 });
 
   useEffect(() => {
     if (config.reducedMotion || !config.parallaxEnabled) return;
@@ -143,10 +139,10 @@ export function AliveLayers({
           layer={layer}
           index={i}
           total={sorted.length}
-          smx={smx}
-          smy={smy}
-          smvx={smvx}
-          smvy={smvy}
+          mx={mx}
+          my={my}
+          mvx={mvx}
+          mvy={mvy}
           config={config}
           liquidFilterId={liquidFilterId}
           editorMode={editorMode}
@@ -163,10 +159,10 @@ interface LayerPlaneProps {
   layer: ImageLayer;
   index: number;
   total: number;
-  smx: MotionValue<number>;
-  smy: MotionValue<number>;
-  smvx: MotionValue<number>;
-  smvy: MotionValue<number>;
+  mx: MotionValue<number>;
+  my: MotionValue<number>;
+  mvx: MotionValue<number>;
+  mvy: MotionValue<number>;
   config: AnimationConfig;
   liquidFilterId?: string;
   editorMode?: boolean;
@@ -179,10 +175,10 @@ function LayerPlane({
   layer,
   index,
   total,
-  smx,
-  smy,
-  smvx,
-  smvy,
+  mx,
+  my,
+  mvx,
+  mvy,
   config,
   liquidFilterId,
   editorMode,
@@ -191,6 +187,17 @@ function LayerPlane({
   scrollY,
 }: LayerPlaneProps) {
   const t = layer.transform;
+
+  // === FOLLOW-THROUGH (Principle 5): per-layer spring with depth-based stiffness ===
+  // Near layers = stiffer (react fast, settle quick). Far layers = softer (lag behind, drift).
+  // This creates the "overlapping action" where layers don't move in sync.
+  const springStiffness = 30 + layer.depth * 80; // 30..110
+  const springDamping = 15 + layer.depth * 15;   // 15..30
+  const springMass = 0.3 + (1 - layer.depth) * 0.8; // far = heavier (more lag)
+  const smx = useSpring(mx, { stiffness: springStiffness, damping: springDamping, mass: springMass });
+  const smy = useSpring(my, { stiffness: springStiffness, damping: springDamping, mass: springMass });
+  const smvx = useSpring(mvx, { stiffness: 60 + layer.depth * 60, damping: 25 });
+  const smvy = useSpring(mvy, { stiffness: 60 + layer.depth * 60, damping: 25 });
 
   const layerAnim: LayerAnimationConfig =
     config.layers[layer.id] ??
@@ -222,10 +229,20 @@ function LayerPlane({
     (v) => v * (0.2 + layer.depth * 0.4) * config.scrollParallax * 300
   );
   const tx = useTransform([parallaxX, velX] as any, (vals: any) => vals[0] + vals[1]);
+
+  // === ARCS (Principle 7): layers move in a parabola, not a straight line ===
+  // y gets a subtle quadratic offset based on x position — gives organic arc motion
+  const arcY = useTransform(smx, (v) => -Math.abs(v) * pxToMove * 0.15 * layer.depth);
+
   const ty = useTransform(
-    [parallaxY, velY, scrollOffset] as any,
-    (vals: any) => vals[0] + vals[1] + (vals[2] ?? 0)
+    [parallaxY, velY, scrollOffset, arcY] as any,
+    (vals: any) => vals[0] + vals[1] + (vals[2] ?? 0) + (vals[3] ?? 0)
   );
+
+  // === SQUASH & STRETCH (Principle 1): at parallax extremes, layers deform elastically ===
+  // scaleX stretches when mouse is at edges, scaleY compresses (area preserved)
+  const squashX = useTransform(smx, (v) => 1 + Math.abs(v) * 0.03 * layer.depth * intensity);
+  const squashY = useTransform(smx, (v) => 1 - Math.abs(v) * 0.02 * layer.depth * intensity);
 
   // === BUG FIX #1: respect visibility (after all hooks) ===
   if (!t.visible) return null;
@@ -344,6 +361,8 @@ function LayerPlane({
       style={{
         x: tx,
         y: ty,
+        scaleX: squashX,
+        scaleY: squashY,
         zIndex,
         mixBlendMode: BLEND_CSS[t.blendMode],
         opacity: config.entranceEnabled ? undefined : t.opacity * layerAnim.opacity,

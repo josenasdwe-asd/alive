@@ -140,8 +140,8 @@ export function AliveKenBurns3D({
 
     const gl = canvas.getContext("webgl2", {
       antialias: true,
-      alpha: true,
-      premultipliedAlpha: false,
+      alpha: false,
+      premultipliedAlpha: true,
     });
     if (!gl) return;
 
@@ -243,7 +243,7 @@ export function AliveKenBurns3D({
 
     const loadTex = (url: string, tex: WebGLTexture, done: () => void) => {
       const img = new Image();
-      img.crossOrigin = "anonymous";
+      
       img.onload = () => {
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
@@ -252,6 +252,10 @@ export function AliveKenBurns3D({
       img.onerror = () => console.warn("tex load failed", url);
       img.src = url;
     };
+
+    // load textures
+    loadTex(imageUrl, imageTex, () => {});
+    loadTex(depthUrl, depthTex, () => {});
 
     // mouse for subtle parallax tilt
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -321,7 +325,7 @@ export function AliveKenBurns3D({
         tiltY
       );
 
-      gl.clearColor(0, 0, 0, 0);
+      gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       gl.enable(gl.DEPTH_TEST);
 

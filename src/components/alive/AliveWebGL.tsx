@@ -44,28 +44,15 @@ void main() {
   vec4 d = texture(uDepth, vUv);
   float depth = d.r;
 
-  // breathing: subtle scale pulse driven by time and depth
-  float breath = sin(uTime * 0.6) * 0.004 * uIntensity * (0.5 + depth);
-
-  // parallax: near pixels (depth~1) move more with mouse, far pixels stay
+  // parallax offset
   vec2 mouseOff = uMouse * depth * 0.07 * uIntensity;
+  float breath = sin(uTime * 0.6) * 0.004 * uIntensity * (0.5 + depth);
   vec2 offset = mouseOff + vec2(breath, breath * 0.6);
 
-  // subtle organic drift using hash noise (the "alive" shimmer)
-  float n = hash(vUv * 200.0 + uTime * 0.05);
-  vec2 organic = vec2(n - 0.5) * 0.0015 * uIntensity;
-  offset += organic;
-
-  // chromatic aberration scaled by mouse distance from center + depth edges
-  float chromaAmt = uChroma * 0.0015 * (0.5 + length(uMouse) * 0.5);
-  vec2 chromaOff = uMouse * chromaAmt;
-
-  float r = texture(uImage, vUv + offset + chromaOff).r;
-  float g = texture(uImage, vUv + offset).g;
-  float b = texture(uImage, vUv + offset - chromaOff).b;
-  float a = texture(uImage, vUv + offset).a;
-
-  vec3 color = vec3(r, g, b);
+  // sample image
+  vec4 imgColor = texture(uImage, vUv + offset);
+  vec3 color = imgColor.rgb;
+  float a = imgColor.a;
 
   // vignette
   if (uVignette > 0.0) {
@@ -115,8 +102,8 @@ export function AliveWebGL({
 
     const gl = canvas.getContext("webgl2", {
       antialias: true,
-      alpha: true,
-      premultipliedAlpha: false,
+      alpha: false,
+      premultipliedAlpha: true,
     });
     if (!gl) {
       console.warn("WebGL2 not available");
@@ -193,6 +180,9 @@ export function AliveWebGL({
     const imageTex = makeTex();
     const depthTex = makeTex();
 
+    // track if textures are loaded to avoid drawing black frames
+    let imageLoaded = false;
+    let depthLoaded = false;
 
     const loadTex = (
       url: string,
@@ -200,15 +190,21 @@ export function AliveWebGL({
       done: () => void
     ) => {
       const img = new Image();
-      img.crossOrigin = "anonymous";
+      let cancelled = false;
       img.onload = () => {
+        if (cancelled) return;
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
         done();
       };
-      img.onerror = () => console.warn("texture load failed", url);
+      img.onerror = () => {};
       img.src = url;
+      return () => { cancelled = true; };
     };
+
+    // load textures
+    const cancelImage = loadTex(imageUrl, imageTex, () => { imageLoaded = true; });
+    const cancelDepth = loadTex(depthUrl, depthTex, () => { depthLoaded = true; });
 
     // mouse tracking (smoothed)
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -253,7 +249,7 @@ export function AliveWebGL({
       const p = propsRef.current;
       const t = (performance.now() - start) / 1000;
 
-      gl.clearColor(0, 0, 0, 0);
+      gl.clearColor(0, 0, 0, 1); // opaque black background
       gl.clear(gl.COLOR_BUFFER_BIT);
 
       gl.activeTexture(gl.TEXTURE0);
@@ -284,6 +280,8 @@ export function AliveWebGL({
       ro.disconnect();
       container.removeEventListener("pointermove", onMove);
       container.removeEventListener("pointerleave", onLeave);
+      cancelImage();
+      cancelDepth();
       gl.deleteProgram(prog);
       gl.deleteShader(vs);
       gl.deleteShader(fs);

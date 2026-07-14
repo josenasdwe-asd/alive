@@ -5,12 +5,14 @@ import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 
 /**
- * Mini-timeline visual with scrubbing.
+ * Mini-timeline with HONEST play/pause control.
  *
- * Shows a 30s horizontal bar with loop markers for each animation cycle.
- * The playhead auto-advances when playing, showing where the animation
- * is in its cycle. Loop markers indicate when each animation type
- * (breathing, sway, float, etc.) completes a full cycle.
+ * v3 PATH B fix: play/pause now ACTUALLY controls the animation by toggling
+ * `animation-play-state: paused` on all .alive-layer elements via a body class.
+ * Previously the playhead moved but CSS @keyframes kept running independently.
+ *
+ * The loop markers show the active preset's primary animation cycle durations
+ * (derived from the first layer's active animations, not hardcoded).
  */
 export function MiniTimeline() {
   const { animation: config } = useAliveStore();
@@ -19,6 +21,15 @@ export function MiniTimeline() {
   const barRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const lastTRef = useRef<number>(performance.now());
+
+  // Toggle animation-play-state on all .alive-layer elements via a body class.
+  // This is the PATH B fix: play/pause now ACTUALLY controls CSS animations.
+  useEffect(() => {
+    const aliveLayers = document.querySelectorAll(".alive-layer");
+    aliveLayers.forEach((el) => {
+      (el as HTMLElement).style.animationPlayState = playing ? "running" : "paused";
+    });
+  }, [playing, config.layers]);
 
   // auto-advance playhead (respect reducedMotion)
   useEffect(() => {
@@ -56,12 +67,42 @@ export function MiniTimeline() {
     window.addEventListener("pointerup", onUp);
   };
 
-  // loop markers: breathing (6.2s), sway (8.3s), float (11.1s), drift (13.7s)
-  const loopDurations = [6.2, 8.3, 11.1, 13.7, 9.4, 5.7, 14.3, 9.7];
-  const markers = loopDurations.map((d) => {
+  // Derive loop markers from the FIRST layer's active animations (not hardcoded).
+  // This makes the timeline honest — it reflects the actual preset's cycles.
+  const DURATIONS: Record<string, number> = {
+    breath: 6.2, sway: 8.3, twist: 11.3, float: 11.1, drift: 13.7,
+    wave: 9.4, glow: 5.7, hue: 28, focus: 14.3, shadow: 9.7,
+    heartbeat: 2.4, vortex: 16.5, ripple: 7.2, zTilt: 12.1,
+    sway3d: 10.4, breatheX: 5.3, scan: 3.8,
+  };
+  const firstLayer = Object.values(config.layers)[0] as any;
+  const activeDurations: number[] = [];
+  if (firstLayer) {
+    if (firstLayer.breathing) activeDurations.push(DURATIONS.breath);
+    if (firstLayer.sway) activeDurations.push(DURATIONS.sway);
+    if (firstLayer.twist) activeDurations.push(DURATIONS.twist);
+    if (firstLayer.floatY) activeDurations.push(DURATIONS.float);
+    if (firstLayer.driftX) activeDurations.push(DURATIONS.drift);
+    if (firstLayer.wave) activeDurations.push(DURATIONS.wave);
+    if (firstLayer.glow) activeDurations.push(DURATIONS.glow);
+    if (firstLayer.hueDrift) activeDurations.push(DURATIONS.hue);
+    if (firstLayer.heartbeat) activeDurations.push(DURATIONS.heartbeat);
+    if (firstLayer.vortex) activeDurations.push(DURATIONS.vortex);
+    if (firstLayer.ripple) activeDurations.push(DURATIONS.ripple);
+    if (firstLayer.zTilt) activeDurations.push(DURATIONS.zTilt);
+    if (firstLayer.sway3d) activeDurations.push(DURATIONS.sway3d);
+    if (firstLayer.breatheX) activeDurations.push(DURATIONS.breatheX);
+    if (firstLayer.scan) activeDurations.push(DURATIONS.scan);
+  }
+  // Fallback to a default marker if no animations active
+  const durations = activeDurations.length > 0 ? activeDurations : [6.2];
+  const markers = durations.map((d) => {
     const loopsIn30s = Math.floor(30 / d);
     return Array.from({ length: loopsIn30s }, (_, i) => (i * d) / 30);
   }).flat();
+
+  // Show the primary (shortest) cycle as a chip
+  const primaryCycle = durations.length > 0 ? Math.min(...durations) : 0;
 
   return (
     <div className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1.5">
@@ -76,6 +117,7 @@ export function MiniTimeline() {
         onClick={() => setPlaying(!playing)}
         className="text-primary"
         aria-label={playing ? "Pausar" : "Reproducir"}
+        title={playing ? "Pausar animación" : "Reproducir animación"}
       >
         {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
       </button>
@@ -125,6 +167,16 @@ export function MiniTimeline() {
           30s
         </div>
       </div>
+
+      {/* Primary cycle chip — honest info about the active preset's main loop */}
+      {primaryCycle > 0 && (
+        <span
+          className="hidden sm:inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[9px] text-primary"
+          title="Ciclo primario de animación"
+        >
+          {primaryCycle.toFixed(1)}s
+        </span>
+      )}
 
       <span className="font-mono text-[10px] text-muted-foreground">
         {(time * 30).toFixed(1)}s

@@ -18,7 +18,6 @@ import { ScenePanel } from "./ScenePanel";
 import { CinematicPanel } from "./CinematicPanel";
 import { MiniTimeline } from "./MiniTimeline";
 import { ComparisonSlider } from "./ComparisonSlider";
-import { AutoSetup } from "./AutoSetup";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useUndoRedo } from "@/hooks/use-undo-redo";
 import {
@@ -32,11 +31,15 @@ import {
   Code2,
   Maximize2,
   Mountain,
-  ChevronRight,
   Undo2,
   Redo2,
+  Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { PRESET_MAP } from "@/lib/presets";
+import { SCENE_MAP } from "@/lib/scene-compositions";
+import type { PresetId, SceneCompositionId } from "@/lib/types";
 
 type RightTab = "animate" | "scene" | "atmosphere" | "hero" | "export";
 
@@ -85,15 +88,15 @@ export function Studio() {
   return (
     <div className="mx-auto max-w-[1600px] px-3 py-4 sm:px-6 sm:py-6">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)_300px]">
-        {/* Left column — layers */}
-        <aside className="space-y-3 lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
+        {/* Left column — layers (desktop: left, mobile: below stage) */}
+        <aside className="order-2 space-y-3 lg:order-1 lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
           <AnalysisPanel />
           {isReady && <LayersPanel />}
           {isReady && selectedLayerId && <LayerInspector />}
         </aside>
 
-        {/* Center — stage */}
-        <main className="space-y-3">
+        {/* Center — stage (mobile: first, desktop: center) */}
+        <main className="order-1 space-y-3 lg:order-2">
           <div ref={stageWrapperRef} className="relative">
             {showStage ? (
               isReady ? (
@@ -129,6 +132,11 @@ export function Studio() {
           {/* Toolbar */}
           {isReady && (
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2">
+              {/* P0 fix: prominent AutoSetup button as primary CTA */}
+              <AutoSetupToolbar />
+
+              <div className="h-4 w-px bg-white/10" />
+
               <button
                 onClick={() => setEditorMode(!editorMode)}
                 className={cn(
@@ -200,8 +208,8 @@ export function Studio() {
           {/* Mini-timeline */}
           {isReady && <MiniTimeline />}
 
-          {/* Mobile: panels below stage */}
-          <div className="space-y-3 lg:hidden">
+          {/* Mobile: right-panel tabs below stage (P1 fix: was before the stage on mobile) */}
+          <div className="order-3 space-y-3 lg:hidden">
             {isReady && (
               <RightPanelTabs
                 tab={rightTab}
@@ -212,8 +220,8 @@ export function Studio() {
           </div>
         </main>
 
-        {/* Right column — contextual tabs (desktop) */}
-        <aside className="hidden lg:block lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
+        {/* Right column — contextual tabs (desktop only) */}
+        <aside className="order-3 hidden lg:order-3 lg:block lg:sticky lg:top-[4.5rem] lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto scroll-thin lg:pr-1">
           {isReady ? (
             <RightPanelTabs
               tab={rightTab}
@@ -276,18 +284,9 @@ function RightPanelTabs({
         <>
           <PresetPicker />
           <ControlPanel />
-          {/* Collapsible advanced sections */}
-          <details className="group">
-            <summary className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground">
-              <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
-              Pipeline 2.5D + Cinemático
-              <span className="ml-auto text-[10px] text-muted-foreground/60">avanzado</span>
-            </summary>
-            <div className="mt-2 space-y-3">
-              <Pipeline25DPanel />
-              <CinematicPanel />
-            </div>
-          </details>
+          {/* GAP-H fix: Pipeline 2.5D + Cinematic now always visible (was collapsed in <details>) */}
+          <Pipeline25DPanel />
+          <CinematicPanel />
         </>
       )}
       {tab === "scene" && <ScenePanel />}
@@ -358,6 +357,71 @@ function PreviewLoading({
         </p>
       </div>
     </div>
+  );
+}
+
+/**
+ * P0 fix: prominent AutoSetup toolbar button — the primary "one-click animate" CTA.
+ * Wraps the existing AutoSetup logic in a toolbar-friendly styled button.
+ */
+function AutoSetupToolbar() {
+  const analysis = useAliveStore((s) => s.analysis);
+  const layers = useAliveStore((s) => s.layers);
+  const animation = useAliveStore((s) => s.animation);
+  const applyPreset = useAliveStore((s) => s.applyPreset);
+  const applySceneComp = useAliveStore((s) => s.applySceneComp);
+  const updateAnimation = useAliveStore((s) => s.updateAnimation);
+
+  if (!analysis || layers.length === 0) return null;
+
+  const handleAutoSetup = () => {
+    const presetId = (analysis.recommendedPreset as PresetId) ?? "dream";
+    applyPreset(presetId);
+
+    const hasForeground = layers.some((l) => l.role === "foreground");
+    const hasBackground = layers.some((l) => l.role === "background");
+    const layerCount = layers.length;
+
+    let sceneId: SceneCompositionId = "free";
+    if (layerCount >= 5 && hasBackground) {
+      sceneId = "horizon";
+    } else if (layers.some((l) => l.role === "subject")) {
+      sceneId = "subject-focus";
+    } else if (layerCount <= 4) {
+      sceneId = "anchor-midground";
+    }
+    applySceneComp(sceneId);
+
+    const isCinematic = presetId === "cinematic3d" || presetId === "cosmic";
+    const isDreamy = presetId === "dream" || presetId === "ethereal" || presetId === "aurora";
+
+    const patch: Partial<typeof animation> = {
+      entranceEnabled: true,
+      parallaxEnabled: true,
+    };
+    if (animation.intensity === 1) {
+      patch.intensity = isCinematic ? 1.3 : isDreamy ? 0.9 : 1.0;
+    }
+    if (animation.speed === 1) {
+      patch.speed = isCinematic ? 0.85 : isDreamy ? 0.8 : 1.0;
+    }
+    updateAnimation(patch);
+
+    const presetName = PRESET_MAP[presetId]?.name ?? presetId;
+    const sceneName = SCENE_MAP[sceneId]?.name ?? sceneId;
+    toast.success(`✨ ${presetName} + ${sceneName}`, {
+      description: "La imagen está viva. Mueve el mouse para sentir el parallax.",
+    });
+  };
+
+  return (
+    <button
+      onClick={handleAutoSetup}
+      className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+    >
+      <Wand2 className="h-3 w-3" />
+      Dar vida
+    </button>
   );
 }
 

@@ -11,6 +11,15 @@ import {
   Cpu,
   Accessibility,
   RotateCw,
+  Heart,
+  Disc3,
+  Radio,
+  Box,
+  ScanLine,
+  Activity,
+  Wind,
+  Waves,
+  Moon,
 } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { Label } from "@/components/ui/label";
@@ -21,7 +30,29 @@ import { cn } from "@/lib/utils";
 export function ControlPanel() {
   const config = useAliveStore((s) => s.animation);
   const updateAnimation = useAliveStore((s) => s.updateAnimation);
+  const toggleGlobalAnim = useAliveStore((s) => s.toggleGlobalAnim);
   const depthMapUrl = useAliveStore((s) => s.depthMapUrl);
+
+  // Derive global "active" state for each v3 animation: true if ALL layers have it on
+  const layerValues = Object.values(config.layers);
+  const allOn = (field: string) =>
+    layerValues.length > 0 && layerValues.every((l: any) => l[field] === true);
+  const someOn = (field: string) =>
+    layerValues.some((l: any) => l[field] === true);
+
+  const v3Motions = [
+    { field: "heartbeat", label: "Heartbeat", icon: <Heart className="h-3 w-3" /> },
+    { field: "vortex", label: "Vortex", icon: <Disc3 className="h-3 w-3" /> },
+    { field: "ripple", label: "Ripple", icon: <Radio className="h-3 w-3" /> },
+    { field: "zTilt", label: "Z-tilt", icon: <Box className="h-3 w-3" /> },
+    { field: "sway3d", label: "Sway-3D", icon: <RotateCw className="h-3 w-3" /> },
+    { field: "breatheX", label: "Breathe-X", icon: <Activity className="h-3 w-3" /> },
+    { field: "scan", label: "Scan", icon: <ScanLine className="h-3 w-3" /> },
+    // Also expose v2 animations globally for convenience
+    { field: "breathing", label: "Breath", icon: <Wind className="h-3 w-3" /> },
+    { field: "sway", label: "Sway", icon: <Waves className="h-3 w-3" /> },
+    { field: "floatY", label: "Float", icon: <Moon className="h-3 w-3" /> },
+  ] as const;
 
   return (
     <section className="glass rounded-xl p-3">
@@ -101,6 +132,40 @@ export function ControlPanel() {
             checked={config.shimmerEnabled}
             onChange={(v) => updateAnimation({ shimmerEnabled: v })}
           />
+        </div>
+
+        {/* v3: Global organic motion toggles — apply to ALL layers at once */}
+        <div className="space-y-1.5">
+          <Label className="flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+            <Sparkles className="h-3 w-3" />
+            Movimiento orgánico (global)
+          </Label>
+          <div className="grid grid-cols-2 gap-1.5">
+            {v3Motions.map((m) => {
+              const isAllOn = allOn(m.field);
+              const isSomeOn = someOn(m.field);
+              return (
+                <button
+                  key={m.field}
+                  onClick={() => toggleGlobalAnim(m.field, !isAllOn)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-[10px] transition-all",
+                    isAllOn
+                      ? "border-primary bg-primary/15 text-primary"
+                      : isSomeOn
+                        ? "border-primary/40 bg-primary/5 text-primary/80"
+                        : "border-white/5 text-muted-foreground hover:border-white/15 hover:text-foreground"
+                  )}
+                  title={isAllOn ? "Todas las capas" : isSomeOn ? "Algunas capas" : "Ninguna capa"}
+                >
+                  <span className={isAllOn || isSomeOn ? "text-primary" : "text-muted-foreground"}>
+                    {m.icon}
+                  </span>
+                  {m.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Render mode */}

@@ -6,12 +6,32 @@ import type {
 } from "./types";
 import { DEFAULT_LAYER_ANIM, DEFAULT_TRANSFORM, ALL_EFFECTS } from "./types";
 
+/** Mood-based category for preset organization (user-facing) */
+export type PresetCategory =
+  | "calm"
+  | "cinematic"
+  | "dramatic"
+  | "retro"
+  | "cyberpunk"
+  | "abstract";
+
+export const PRESET_CATEGORIES: { id: PresetCategory; label: string; emoji: string }[] = [
+  { id: "calm", label: "Calma", emoji: "🌌" },
+  { id: "cinematic", label: "Cinemático", emoji: "🎬" },
+  { id: "dramatic", label: "Dramático", emoji: "🔥" },
+  { id: "retro", label: "Retro", emoji: "📼" },
+  { id: "cyberpunk", label: "Cyberpunk", emoji: "🤖" },
+  { id: "abstract", label: "Abstracto", emoji: "🔮" },
+];
+
 export interface PresetMeta {
   id: PresetId;
   name: string;
   emoji: string;
   tagline: string;
   description: string;
+  /** mood-based category for filtering in the UI */
+  category: PresetCategory;
   /** builds per-layer config from a base layer (depth 0..1, index) */
   buildLayer: (depth: number, index: number, total: number) => Omit<LayerAnimationConfig, "layerId">;
   base: Pick<
@@ -45,6 +65,7 @@ export const PRESETS: PresetMeta[] = [
     id: "dream",
     name: "Dream",
     emoji: "🌙",
+    category: "calm",
     tagline: "Respiración sutil + líquido + parallax",
     description:
       "El efecto por defecto. La imagen respira, se balancea dulcemente y ondula como agua. Parallax suave con el mouse.",
@@ -78,6 +99,7 @@ export const PRESETS: PresetMeta[] = [
     id: "float",
     name: "Float",
     emoji: "🪶",
+    category: "calm",
     tagline: "Capas flotando en el aire",
     description:
       "Cada capa flota y deriva suavemente como si estuviera suspendida en el aire. Sin distorsión líquida.",
@@ -113,6 +135,7 @@ export const PRESETS: PresetMeta[] = [
     id: "pulse",
     name: "Pulse",
     emoji: "💓",
+    category: "dramatic",
     tagline: "Latido rítmico orgánico",
     description:
       "La imagen late como un corazón. Respiración intensa y opacidad pulsante, sin parallax.",
@@ -145,6 +168,7 @@ export const PRESETS: PresetMeta[] = [
     id: "liquid",
     name: "Liquid",
     emoji: "💧",
+    category: "abstract",
     tagline: "Distorsión líquida LSD",
     description:
       "Máxima distorsión SVG tipo agua. La imagen se ondula como una superficie líquida.",
@@ -178,6 +202,7 @@ export const PRESETS: PresetMeta[] = [
     id: "cinematic3d",
     name: "Cinematic 3D",
     emoji: "🎬",
+    category: "cinematic",
     tagline: "Parallax por mapa de profundidad (WebGL)",
     description:
       "Usa el mapa de profundidad generado por IA para un parallax 3D real píxel-a-píxel.",
@@ -206,6 +231,7 @@ export const PRESETS: PresetMeta[] = [
     id: "shimmer",
     name: "Shimmer",
     emoji: "✨",
+    category: "calm",
     tagline: "Brillo de luz barriente",
     description:
       "Un haz de luz barre la imagen lentamente. Sutil movimiento + shimmer.",
@@ -235,6 +261,7 @@ export const PRESETS: PresetMeta[] = [
     id: "boil",
     name: "Hand-drawn Boil",
     emoji: "✏️",
+    category: "retro",
     tagline: "Temblor de ilustración animada",
     description:
       "El 'boiling' de la animación tradicional: temblor orgánico continuo como dibujo a mano.",
@@ -269,6 +296,7 @@ export const PRESETS: PresetMeta[] = [
     id: "kenburns",
     name: "Ken Burns",
     emoji: "🎥",
+    category: "cinematic",
     tagline: "Zoom y pan lento cinematográfico",
     description:
       "El clásico efecto Ken Burns: zoom muy lento + pan sutil. Sin parallax de mouse.",
@@ -299,6 +327,7 @@ export const PRESETS: PresetMeta[] = [
     id: "aurora",
     name: "Aurora",
     emoji: "🌌",
+    category: "calm",
     tagline: "Deriva de color etérea",
     description:
       "Capas con hue-drift lento, glow pulsante y deriva sutil. Crea una aurora boreal de color sobre la imagen.",
@@ -338,6 +367,7 @@ export const PRESETS: PresetMeta[] = [
     id: "underwater",
     name: "Underwater",
     emoji: "🌊",
+    category: "abstract",
     tagline: "Inmersión acuosa con caustics",
     description:
       "Líquido intenso + wave + focus pull + glow. Simula estar bajo el agua con caustics de luz.",
@@ -381,6 +411,7 @@ export const PRESETS: PresetMeta[] = [
     id: "ethereal",
     name: "Ethereal",
     emoji: "🪽",
+    category: "calm",
     tagline: "Susurrante y divino",
     description:
       "Brillo suave, niebla, partículas bokeh y deriva etérea. Para retratos y escenas celestiales.",
@@ -420,6 +451,7 @@ export const PRESETS: PresetMeta[] = [
     id: "noir",
     name: "Noir",
     emoji: "🕶️",
+    category: "cinematic",
     tagline: "Cine negro con grano",
     description:
       "Alto contraste, grano animado, viñeta fuerte y parallax lento. Estética de cine negro.",
@@ -455,6 +487,7 @@ export const PRESETS: PresetMeta[] = [
     id: "cosmic",
     name: "Cosmic",
     emoji: "☄️",
+    category: "dramatic",
     tagline: "Cosmos con polvo estelar",
     description:
       "Glow intenso, hue drift cósmico, chromatic aberration y muchísimas partículas. Para escenas espaciales.",
@@ -500,6 +533,7 @@ export const PRESETS: PresetMeta[] = [
     id: "paper",
     name: "Paper",
     emoji: "📄",
+    category: "retro",
     tagline: "Papel temblante con grano",
     description:
       "Jitter sutil + breathing + grano. Simula una foto de papel viejo temblando levemente. Cálido y analógico.",
@@ -539,6 +573,7 @@ export const PRESETS: PresetMeta[] = [
     id: "glass",
     name: "Glass",
     emoji: "🪞",
+    category: "abstract",
     tagline: "Vidrio esmerilado refractante",
     description:
       "Chromatic aberration fuerte + z-tilt + sway3d. La imagen se ve a través de un vidrio que se inclina y refracta la luz.",
@@ -580,6 +615,7 @@ export const PRESETS: PresetMeta[] = [
     id: "vintage",
     name: "Vintage",
     emoji: "📽️",
+    category: "retro",
     tagline: "Película 8mm con gate weave",
     description:
       "Gate weave + grano + scanlines + light leak. Replica una proyección de película antigua con todos sus defectos encantadores.",
@@ -622,6 +658,7 @@ export const PRESETS: PresetMeta[] = [
     id: "techno",
     name: "Techno",
     emoji: "🤖",
+    category: "cyberpunk",
     tagline: "Glitch digital rítmico",
     description:
       "Pulso rítmico + scan + jitter + chromatic. Estética cyberpunk con latido techno y artefactos digitales.",
@@ -662,6 +699,7 @@ export const PRESETS: PresetMeta[] = [
     id: "zen",
     name: "Zen",
     emoji: "🧘",
+    category: "calm",
     tagline: "Meditación lenta y mínima",
     description:
       "Breathing muy lento + sway sutil + drift mínimo. Movimiento casi imperceptible como un jardín zen. Ideal para paisajes serenos.",
@@ -700,6 +738,7 @@ export const PRESETS: PresetMeta[] = [
     id: "lava",
     name: "Lava",
     emoji: "🌋",
+    category: "dramatic",
     tagline: "Magma fluyente con calor",
     description:
       "Liquid intenso + hue drift cálido + glow naranja + wave. Simula el movimiento convectivo de la lava incandescente.",
@@ -741,6 +780,7 @@ export const PRESETS: PresetMeta[] = [
     id: "prism",
     name: "Prism",
     emoji: "🔮",
+    category: "abstract",
     tagline: "Prisma refractante arcoíris",
     description:
       "Hue drift extremo + chromatic aberration + ripple + glow. La imagen se descompone como a través de un prisma que crea arcoíris.",
@@ -782,6 +822,7 @@ export const PRESETS: PresetMeta[] = [
     id: "ghost",
     name: "Ghost",
     emoji: "👻",
+    category: "dramatic",
     tagline: "Espectral etéreo y frío",
     description:
       "Hue drift frío + focus pull + drift lento + opacidad pulsante. Crea appariciones espectrales que aparecen y desaparecen.",
@@ -826,6 +867,7 @@ export const PRESETS: PresetMeta[] = [
     id: "origami",
     name: "Origami",
     emoji: "🦢",
+    category: "abstract",
     tagline: "Papel plegado 3D",
     description:
       "Z-tilt + sway3d + twist + breathing. Las capas se pliegan como papel origami, rotando en 3D con elegancia.",
@@ -866,6 +908,7 @@ export const PRESETS: PresetMeta[] = [
     id: "neon",
     name: "Neon",
     emoji: "💡",
+    category: "cyberpunk",
     tagline: "Neón brillante cyberpunk",
     description:
       "Glow extremo + chromatic + hue drift + scan. Estética neon cyberpunk con brillos eléctricos y aberración cromática.",

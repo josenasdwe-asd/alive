@@ -158,43 +158,79 @@ export function LayerInspector() {
               />
             </div>
 
-            {/* Effect toggles */}
+            {/* Effect toggles with per-layer amplitude sliders (v3 GAP-B fix) */}
             <div className="grid grid-cols-2 gap-1">
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Moon className="h-3 w-3" />}
                 label="Respira"
                 checked={la.breathing}
                 onChange={(v) => updateLayerAnim(layer.id, { breathing: v })}
+                ampValue={la.breathingAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { breathingAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<RotateCw className="h-3 w-3" />}
                 label="Balancea"
                 checked={la.sway}
                 onChange={(v) => updateLayerAnim(layer.id, { sway: v })}
+                ampValue={la.swayAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { swayAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Sparkles className="h-3 w-3" />}
                 label="Twist"
                 checked={la.twist}
                 onChange={(v) => updateLayerAnim(layer.id, { twist: v })}
+                ampValue={la.twistAmp}
+                ampMin={0}
+                ampMax={5}
+                ampStep={0.1}
+                ampFormat={(v) => `${v.toFixed(1)}°`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { twistAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Waves className="h-3 w-3" />}
                 label="Flota"
                 checked={la.floatY}
                 onChange={(v) => updateLayerAnim(layer.id, { floatY: v })}
+                ampValue={la.floatAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { floatAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Wind className="h-3 w-3" />}
                 label="Deriva"
                 checked={la.driftX}
                 onChange={(v) => updateLayerAnim(layer.id, { driftX: v })}
+                ampValue={la.driftAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { driftAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Waves className="h-3 w-3" />}
                 label="Onda"
                 checked={la.wave}
                 onChange={(v) => updateLayerAnim(layer.id, { wave: v })}
+                ampValue={la.waveAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { waveAmp: v })}
               />
               <EffectToggle
                 icon={<Droplets className="h-3 w-3" />}
@@ -202,29 +238,53 @@ export function LayerInspector() {
                 checked={la.liquid}
                 onChange={(v) => updateLayerAnim(layer.id, { liquid: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Zap className="h-3 w-3" />}
                 label="Jitter"
                 checked={la.jitter}
                 onChange={(v) => updateLayerAnim(layer.id, { jitter: v })}
+                ampValue={la.jitterAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { jitterAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Sun className="h-3 w-3" />}
                 label="Glow"
                 checked={la.glow}
                 onChange={(v) => updateLayerAnim(layer.id, { glow: v })}
+                ampValue={la.glowAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { glowAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Palette className="h-3 w-3" />}
                 label="Hue"
                 checked={la.hueDrift}
                 onChange={(v) => updateLayerAnim(layer.id, { hueDrift: v })}
+                ampValue={la.hueDriftAmp}
+                ampMin={0}
+                ampMax={30}
+                ampStep={0.5}
+                ampFormat={(v) => `${v.toFixed(1)}°`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { hueDriftAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Aperture className="h-3 w-3" />}
                 label="Focus"
                 checked={la.focusPull}
                 onChange={(v) => updateLayerAnim(layer.id, { focusPull: v })}
+                ampValue={la.focusAmp}
+                ampMin={0}
+                ampMax={6}
+                ampStep={0.1}
+                ampFormat={(v) => `${v.toFixed(1)}px`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { focusAmp: v })}
               />
               <EffectToggle
                 icon={<Sparkles className="h-3 w-3" />}
@@ -232,9 +292,39 @@ export function LayerInspector() {
                 checked={la.shadowDrift}
                 onChange={(v) => updateLayerAnim(layer.id, { shadowDrift: v })}
               />
+              {/* GAP-C fix: per-layer chromatic toggle (was missing) */}
+              <EffectToggleWithAmp
+                icon={<Droplets className="h-3 w-3" />}
+                label="Chromatic"
+                checked={la.chromatic}
+                onChange={(v) => updateLayerAnim(layer.id, { chromatic: v })}
+                ampValue={la.chromaticAmp}
+                ampMin={0}
+                ampMax={6}
+                ampStep={0.1}
+                ampFormat={(v) => `${v.toFixed(1)}px`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { chromaticAmp: v })}
+              />
             </div>
 
-            {/* v3 animations — new creative motion forms */}
+            {/* GAP-D fix: per-layer inertia slider (was missing) */}
+            <div className="space-y-1">
+              <Label className="text-[10px] text-muted-foreground">
+                Inercia (continúa moviéndose)
+              </Label>
+              <Slider
+                value={[la.inertia]}
+                min={0}
+                max={1}
+                step={0.01}
+                onValueChange={(v) =>
+                  updateLayerAnim(layer.id, { inertia: v[0] })
+                }
+                className="py-0.5"
+              />
+            </div>
+
+            {/* v3 animations — new creative motion forms (with amplitude sliders) */}
             <div className="flex items-center gap-1.5 pt-1">
               <div className="h-px flex-1 bg-white/5" />
               <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
@@ -243,47 +333,89 @@ export function LayerInspector() {
               <div className="h-px flex-1 bg-white/5" />
             </div>
             <div className="grid grid-cols-2 gap-1.5">
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Heart className="h-3 w-3" />}
                 label="Heartbeat"
                 checked={la.heartbeat}
                 onChange={(v) => updateLayerAnim(layer.id, { heartbeat: v })}
+                ampValue={la.heartbeatAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { heartbeatAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Disc3 className="h-3 w-3" />}
                 label="Vortex"
                 checked={la.vortex}
                 onChange={(v) => updateLayerAnim(layer.id, { vortex: v })}
+                ampValue={la.vortexRotAmp}
+                ampMin={0}
+                ampMax={30}
+                ampStep={0.5}
+                ampFormat={(v) => `${v.toFixed(1)}°`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { vortexRotAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Radio className="h-3 w-3" />}
                 label="Ripple"
                 checked={la.ripple}
                 onChange={(v) => updateLayerAnim(layer.id, { ripple: v })}
+                ampValue={la.rippleAmp}
+                ampMin={0}
+                ampMax={12}
+                ampStep={0.2}
+                ampFormat={(v) => `${v.toFixed(1)}px`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { rippleAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Box className="h-3 w-3" />}
                 label="Z-tilt"
                 checked={la.zTilt}
                 onChange={(v) => updateLayerAnim(layer.id, { zTilt: v })}
+                ampValue={la.zTiltAmp}
+                ampMin={0}
+                ampMax={15}
+                ampStep={0.5}
+                ampFormat={(v) => `${v.toFixed(1)}°`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { zTiltAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<RotateCw className="h-3 w-3" />}
                 label="Sway-3D"
                 checked={la.sway3d}
                 onChange={(v) => updateLayerAnim(layer.id, { sway3d: v })}
+                ampValue={la.sway3dAmp}
+                ampMin={0}
+                ampMax={15}
+                ampStep={0.5}
+                ampFormat={(v) => `${v.toFixed(1)}°`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { sway3dAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<Activity className="h-3 w-3" />}
                 label="Breathe-X"
                 checked={la.breatheX}
                 onChange={(v) => updateLayerAnim(layer.id, { breatheX: v })}
+                ampValue={la.breatheXAmp}
+                ampMin={0}
+                ampMax={3}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { breatheXAmp: v })}
               />
-              <EffectToggle
+              <EffectToggleWithAmp
                 icon={<ScanLine className="h-3 w-3" />}
                 label="Scan"
                 checked={la.scan}
                 onChange={(v) => updateLayerAnim(layer.id, { scan: v })}
+                ampValue={la.scanAmp}
+                ampMin={0}
+                ampMax={2}
+                ampStep={0.05}
+                ampFormat={(v) => `${v.toFixed(2)}×`}
+                onAmpChange={(v) => updateLayerAnim(layer.id, { scanAmp: v })}
               />
             </div>
 
@@ -424,5 +556,73 @@ function EffectToggle({
         )}
       />
     </button>
+  );
+}
+
+/**
+ * EffectToggle with an inline amplitude slider that appears when the toggle is ON.
+ * v3 GAP-B fix: exposes per-layer amplitude control (was missing entirely).
+ */
+function EffectToggleWithAmp({
+  icon,
+  label,
+  checked,
+  onChange,
+  ampValue,
+  ampMin = 0,
+  ampMax = 3,
+  ampStep = 0.05,
+  ampFormat,
+  onAmpChange,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  ampValue: number;
+  ampMin?: number;
+  ampMax?: number;
+  ampStep?: number;
+  ampFormat: (v: number) => string;
+  onAmpChange: (v: number) => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-md border transition-colors",
+        checked
+          ? "border-primary/40 bg-primary/10"
+          : "border-white/5 bg-white/[0.02]"
+      )}
+    >
+      <button
+        onClick={() => onChange(!checked)}
+        className="flex w-full items-center gap-1 px-1.5 py-1 text-[10px] transition-colors"
+      >
+        <span className={checked ? "text-primary" : "text-muted-foreground"}>{icon}</span>
+        <span className={cn("flex-1 text-left", checked ? "text-foreground" : "text-muted-foreground")}>{label}</span>
+        <span
+          className={cn(
+            "h-1.5 w-1.5 rounded-full",
+            checked ? "bg-primary" : "bg-white/20"
+          )}
+        />
+      </button>
+      {checked && (
+        <div className="flex items-center gap-1.5 px-1.5 pb-1">
+          <Slider
+            value={[ampValue]}
+            min={ampMin}
+            max={ampMax}
+            step={ampStep}
+            onValueChange={(v) => onAmpChange(v[0])}
+            className="h-1 flex-1 py-0"
+          />
+          <span className="font-mono text-[8px] text-muted-foreground">
+            {ampFormat(ampValue)}
+          </span>
+        </div>
+      )}
+    </div>
   );
 }

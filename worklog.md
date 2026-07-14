@@ -4126,3 +4126,534 @@ Stage Summary:
 - The new animations compose naturally with existing ones (breathing, sway, etc.)
   because they use separate CSS @property vars that all feed into the single .alive-layer
   transform calc
+
+---
+Task ID: AUDIT-CP
+Agent: ControlPanel Auditor
+Task: Audit UI feature exposure
+
+Work Log:
+- Read worklog.md to understand prior work (PRESET-EXPANSION-v3 added 10 presets + 7 v3 animations).
+- Read source of truth files: types.ts (full AnimationConfig + LayerAnimationConfig schema), presets.ts (23 presets verified), scene-compositions.ts (6 compositions).
+- Read all 8 audit-target UI components: ControlPanel, Pipeline25DPanel, ScenePanel, CinematicPanel, EffectsPanel, HeroPanel, LayerInspector, Studio, MiniTimeline.
+- Cross-referenced store.ts to verify every updateAnimation/updateLayerAnim call site and confirm which fields are wired.
+- Verified LayersPanel exposes transform.opacity/blur/blendMode/visible/locked (so those LayerTransform fields ARE covered, just not in LayerInspector).
+- Verified AutoSetup is rendered inside AnalysisPanel (line 480), not directly in Studio — so the import at Studio.tsx:21 is dead.
+- Verified v3 animations are consumed by renderers (AliveCSS3D.tsx, AliveLayers.tsx) — they're not dead code at the engine level.
+- Verified atmospheric animations are consumed by AliveStage.tsx.
+- Verified gateWeave is consumed by HeroMode.tsx.
+- Cross-checked every AnimationConfig field against its UI exposure to enumerate dead config.
+- Cross-checked every LayerAnimationConfig field against LayerInspector exposure to find uneditable amplitudes/physics.
+
+Stage Summary:
+- 10 audit questions: 8 PASS, 2 PARTIAL (Q1 = many missing amplitudes/physics; Q3 = v3 animations are per-layer only).
+- CRITICAL GAP: v3 animations (heartbeat/vortex/ripple/zTilt/sway3d/breatheX/scan) have NO global toggle in ControlPanel — they're per-layer in LayerInspector only. Users must select each layer individually to apply them globally. (ControlPanel.tsx L79-104)
+- CRITICAL GAP: 19 amplitude sliders are uneditable — LayerInspector only exposes boolean toggles, not the matching *Amp fields (breathingAmp, swayAmp, ..., scanAmp). All amplitudes are hard-coded per-preset with no per-layer override. (LayerInspector.tsx)
+- MEDIUM GAP: Per-layer `chromatic` boolean (types.ts L166) is NOT exposed in LayerInspector. Only global `chromaticAberration` slider exists in ControlPanel.
+- MEDIUM GAP: Per-layer `inertia` (types.ts L140) is NOT exposed in LayerInspector.
+- MEDIUM GAP: Spring physics (stiffness/damping/mass — types.ts L191 + SpringPhysics interface) is completely unexposed in any UI.
+- MEDIUM GAP: `LayerTransform.zOverride` (types.ts L66) is NOT exposed in any UI — only set indirectly via drag-drop reorder.
+- LOW GAP: LayerAnimationConfig.blur and LayerAnimationConfig.opacity (types.ts L196-197) are dead fields — UI uses transform.blur/opacity instead.
+- LOW GAP: CinematicPanel (relighting, colorScript, motionBlur) is buried inside a collapsible <details> in Studio.tsx L280-290 — easy to miss.
+- LOW GAP: MiniTimeline.tsx L60 hardcodes loop durations [6.2, 8.3, 11.1, 13.7, 9.4, 5.7, 14.3, 9.7] that don't reflect actual animation cycle times (ignore durationMultiplier/phaseOffset).
+- LOW GAP: AutoSetup is imported in Studio.tsx L21 but never rendered there (it's rendered inside AnalysisPanel). Dead import.
+- Confirmed PASS: gateWeave toggle (HeroPanel L114-119), colorGrade selector complete with all 6 grades (HeroPanel L19-26), sceneComposition selector complete with all 6 (ScenePanel L27-52), atmospheric animations all 4 exposed (ScenePanel L65-92), depthFog/bloom/ACES in Pipeline25DPanel, relighting/colorScript/motionBlur in CinematicPanel, DOF settings (focusDepth/aperture/focusMode/focusLayerId) all in Pipeline25DPanel, renderMode includes all 4 modes (ControlPanel L113-138).
+
+---
+Task ID: AUDIT-UX
+Agent: UX Auditor
+Task: Audit PresetPicker + Studio UX with 23 presets; propose simplification
+
+Work Log:
+- Read /home/z/my-project/worklog.md (4128 lines) for full project context including
+  PRESET-EXPANSION-v3 task (13 → 23 presets, 12 → 19 animation forms).
+- Read /home/z/my-project/src/components/studio/PresetPicker.tsx (90 lines): flat 2-col
+  grid, "original" (v1, 8) + "Avanzados" (v2+v3, 15) sections, no search/filter/preview.
+- Read /home/z/my-project/src/components/studio/Studio.tsx (372 lines): 3-col desktop
+  layout `lg:grid-cols-[260px_minmax(0,1fr)_300px]`, mobile collapses to single col,
+  right panel has 5 tabs (animate/scene/atmosphere/hero/export), "Pipeline 2.5D +
+  Cinemático" hidden inside collapsed <details> on the animate tab.
+- Read /home/z/my-project/src/components/studio/AutoSetup.tsx (90 lines): "Dar vida"
+  button applies recommendedPreset + best scene comp + tuned intensity/speed + enables
+  entrance/parallax. Returns null when no analysis or no layers. Renders only inside
+  AnalysisPanel.tsx:480 (buried under scene-description + badges).
+- Read /home/z/my-project/src/components/studio/MiniTimeline.tsx (134 lines): real
+  play/pause + scrubbing UI, but the internal `time` state (0..1) is NOT consumed by
+  AliveStage — the playhead auto-advances via rAF but scrubbing does not seek the
+  actual animation. 8 loop durations are hardcoded [6.2,8.3,11.1,13.7,9.4,5.7,14.3,9.7]
+  regardless of active preset.
+- Read /home/z/my-project/src/components/studio/ComparisonSlider.tsx (111 lines):
+  clip-path overlay of originalUrl on top of stage, draggable handle, close button.
+  Touch target is 8px (h-2 w-2) — below 44px minimum.
+- Read /home/z/my-project/src/lib/presets.ts (985 lines): all 23 presets enumerated,
+  PresetMeta has no `category`/`mood`/`tags` field — only `v2?: boolean`.
+- Grep confirmed: NO onboarding/tour/firstRun code anywhere in /src. Only "hint"
+  references are HeroMode scroll hint + ControlPanel render-mode hint labels.
+- Grep confirmed: AutoSetup is rendered ONLY at AnalysisPanel.tsx:480, never in the
+  Studio toolbar or as a persistent action.
+
+Stage Summary:
+- 23 presets in a flat 2-col grid (8 + 15 split) is overwhelming; no category, search,
+  filter, or live preview exists.
+- MiniTimeline is decorative — scrubbing moves a fake playhead that does NOT seek
+  the actual animation phase; loop markers are hardcoded and preset-agnostic.
+- ComparisonSlider mostly aligns (stage aspect is derived from image dimensions) but
+  boundary pixels misalign due to layer overscale (1.18×) and entrance reveal; touch
+  target (8px) is too small.
+- AutoSetup ("Dar vida") exists and works but is buried at the bottom of the
+  AnalysisPanel; new users may never discover it.
+- NO onboarding flow, no first-run hints, no guided tour — the <2-min "new user
+  creates a pro animation" goal is at risk.
+- Mobile (grid-cols-1 below lg) shows AnalysisPanel → LayersPanel → LayerInspector
+  → STAGE last; user must scroll past 3 panels before seeing their animation.
+- Right-panel "Pipeline 2.5D + Cinemático" collapsed inside <details> on the animate
+  tab — core power-user controls are hidden by default.
+- Touch targets throughout the studio (12–14px icons in MiniTimeline, ComparisonSlider
+  close button) are below the 44px iOS/Android minimum.
+
+=== DETAILED FINDINGS & RECOMMENDATIONS ===
+
+(1) PRESET CATEGORIZATION (23 presets → 6 mood-based categories)
+-----------------------------------------------------------------
+Recommended scheme (each preset assigned once; categories double as filter chips):
+
+  Calm & Ethereal (6)  — slow, gentle, breathing, dreamy
+    • dream 🌙   • float 🪶   • shimmer ✨
+    • ethereal 🪽  • zen 🧘   • aurora 🌌
+
+  Cinematic (3)        — camera moves, film-like depth
+    • cinematic3d 🎬  • kenburns 🎥  • noir 🕶️
+
+  Dramatic (4)         — intense, rhythmic, cosmic
+    • pulse 💓  • cosmic ☄️  • lava 🌋  • ghost 👻
+
+  Retro & Analog (3)   — film/paper/hand-drawn texture
+    • boil ✏️  • paper 📄  • vintage 📽️
+
+  Cyberpunk & Digital (2) — glitch, neon, scanlines
+    • techno 🤖  • neon 💡
+
+  Abstract & Experimental (5) — refractive/geometric/psychedelic
+    • liquid 💧  • glass 🪞  • prism 🔮
+    • origami 🦢  • underwater 🌊
+
+  Total: 6 + 3 + 4 + 3 + 2 + 5 = 23 ✓
+
+  Implementation:
+    - Add `category: PresetCategory` to PresetMeta in src/lib/presets.ts.
+    - Add `PresetCategory` union type in src/lib/types.ts.
+    - Tag each preset with one of the 6 categories above (single tag — multi-tag adds
+      noise and complicates the filter UI).
+    - Optionally add `tags?: string[]` for secondary searchable keywords (e.g.,
+      dream → ["breathing","liquid","subtle"]) to power the search box in (2).
+
+(2) PRESET SEARCH & FILTER
+--------------------------
+  YES — both, in this order of prominence:
+    (a) Category filter chips (horizontal scroll, single-select, default = "All"):
+        [All] [Calm] [Cinematic] [Dramatic] [Retro] [Cyberpunk] [Abstract]
+    (b) Search input (below chips, with Search icon, 8px text):
+        filters by name + tagline + description + tags (case-insensitive substring).
+
+  Implementation sketch (PresetPicker.tsx):
+    const [cat, setCat] = useState<PresetCategory | "all">("all");
+    const [q, setQ] = useState("");
+    const filtered = PRESETS.filter(p =>
+      (cat === "all" || p.category === cat) &&
+      (q === "" || `${p.name} ${p.tagline} ${p.description}`.toLowerCase().includes(q.toLowerCase()))
+    );
+    - Show count "{filtered.length} / {PRESETS.length}".
+    - Empty-state: "No hay presets que coincidan" with a "Limpiar" button.
+    - Keep the 2-col grid but allow it to grow taller (sticky max-height + scroll
+      inside the picker so the rest of the animate tab stays visible).
+    - Active preset should remain visible (scrollIntoView) even when filtered out.
+
+(3) PRESET PREVIEW
+------------------
+  Current card (emoji + name + tagline, ~120×80px) is too information-poor for 23
+  options. Recommendations, in increasing order of effort/impact:
+
+  TIER A (cheap, do first):
+    - Increase card size to ~140×96, 1-col on narrow right panel (300px) — fewer
+      above-the-fold but each card legible.
+    - On hover, show full tagline + description as a tooltip (use Radix Tooltip or
+      title attribute).
+    - Add a tiny "category dot" (color-coded) in the card corner so the user
+      learns the category at a glance.
+
+  TIER B (medium):
+    - Animate the emoji on hover with a CSS micro-animation that hints at the
+      preset's character (e.g., "pulse" emoji scales 1.0↔1.08 on a 1.2s loop;
+      "neon" emoji gets text-shadow glow; "vintage" emoji gets a subtle gate-weave
+      rotate). Each preset declares a `previewClass?: string` that maps to a CSS
+      keyframe in globals.css. ~5 lines per preset.
+    - Show a small swatch row (3-4 colors) derived from `effects` + `base` so the
+      user sees "this preset uses grain + lightleak" without reading the tagline.
+
+  TIER C (premium, do later):
+    - Live preview window at the top of the picker: a 240×135 mini-AliveStage
+      running the currently-hovered preset on a small sample image (or the user's
+      own originalUrl). Reuses AliveStage with a `previewMode` prop that disables
+      heavy effects (particles, liquid shader) to keep CPU reasonable while
+      hovering through 23 options. Debounce hover-to-apply by 200ms so a quick
+      swipe doesn't trigger 23 re-renders.
+
+  Recommendation: ship TIER A + TIER B together; TIER C as a v2 enhancement.
+
+(4) STUDIO TAB NAVIGATION (right panel)
+---------------------------------------
+  Current: animate / scene / atmosphere / hero / export (5 tabs).
+
+  Issues:
+    (a) "Pipeline 2.5D + Cinemático" (Pipeline25DPanel + CinematicPanel) is buried
+        inside a collapsed <details> inside the animate tab. This is the most
+        powerful fine-tuning UI in the app — hiding it means power users can't find
+        it and casual users never discover it. Should be promoted.
+    (b) The animate tab is doing too much: presets + control panel + pipeline +
+        cinematic + (collapsed). It's already the longest tab and grows with 23
+        preset cards.
+    (c) "Atmósfera" (EffectsPanel — dust/fog/rain/lightleak/bloom/etc.) and
+        "Escena" (ScenePanel — composition templates) are conceptually adjacent
+        but split across two tabs. A user adding "fog" then wanting to switch
+        scene composition must tab-switch and lose context.
+    (d) TabButton labels are Spanish-only; no tooltips; icons alone don't convey
+        scope (e.g., Maximize2 icon for "Hero" is ambiguous).
+
+  Recommended restructure (4 tabs, flatter hierarchy):
+
+    [Animar]  [Escena y efectos]  [Hero]  [Exportar]
+
+    Animar         → PresetPicker + ControlPanel (+ Pipeline25D + Cinematic
+                     PROMOTED out of <details>, shown inline at the bottom with
+                     a subtle "Avanzado" label instead of collapsed).
+    Escena y efectos → ScenePanel + EffectsPanel stacked (or with a sub-toggle).
+    Hero           → HeroPanel (unchanged).
+    Exportar       → ExportPanel (unchanged).
+
+    Rationale: 4 tabs fit comfortably in the 300px right column without horizontal
+    scroll on desktop. Removes the hidden <details>. Groups related controls.
+    "Atmósfera" → "Escena y efectos" is a more honest label for what's inside.
+
+  Alternative (lighter touch): keep 5 tabs but rename "Atmósfera" → "Efectos" and
+  un-collapse the Pipeline25D + Cinematic block on the animate tab. Cheaper but
+  doesn't reduce tab count.
+
+(5) AUTO-SETUP ("Dar vida")
+---------------------------
+  EXISTS and WORKS correctly:
+    - Applies analysis.recommendedPreset (validated by ai.ts:116 against the 23
+      preset IDs).
+    - Picks scene composition by layer count + role presence.
+    - Tuned intensity/speed for cinematic vs dreamy presets.
+    - Enables entrance + parallax unconditionally.
+    - Toast confirmation shows preset + scene names.
+
+  UX PROBLEMS:
+    (a) Placement: rendered only at AnalysisPanel.tsx:480, INSIDE the analysis
+        result card, BELOW scene description + 3 badges + palette swatches +
+        strategy footer. New users have to scroll the left panel to find it. It's
+        the single most useful action in the app and it's the last thing visible.
+    (b) Persistence: after the user clicks it once, the button stays in the same
+        place — but they have to navigate back to the left panel to find it again
+        if they want to re-run after changing layers.
+    (c) Visibility: the button uses size="sm" with a Wand2 icon. It doesn't stand
+        out as "the easy path". A new user browsing the UI sees 23 preset cards
+        first (right panel, animate tab) and may not realize there's a one-click
+        option.
+
+  RECOMMENDATIONS:
+    - Add a SECOND, prominent AutoSetup button in the center toolbar (next to
+      ComparisonSlider), visible whenever isReady && layers.length>0. The toolbar
+      is the user's focal point after analysis. Use a filled/highlighted style
+      (bg-primary text-primary-foreground) and label "✨ Dar vida" so it reads as
+      the primary CTA.
+    - After first click, swap the toolbar button to "Re-animar" (subtle style) so
+      the user knows the auto-setup has been applied and they can re-trigger.
+    - Track `hasUsedAutoSetup` in a lightweight localStorage flag so onboarding
+      (see #9) can hide the coach mark after first use.
+
+(6) MINI-TIMELINE
+-----------------
+  FUNCTIONALLY DECORATIVE. The UI is real (play/pause/scrub buttons, rAF-driven
+  playhead, loop markers, time labels), but it does NOT control or reflect the
+  actual animation:
+
+    (a) `time` state (0..1) is internal to MiniTimeline — nothing consumes it.
+        AliveStage never receives a `seekTime` prop; scrubbing moves the playhead
+        but the animation keeps running on its own clock.
+    (b) Loop durations are hardcoded [6.2, 8.3, 11.1, 13.7, 9.4, 5.7, 14.3, 9.7]
+        regardless of the active preset or its specific amplitudes. A user on
+        "Zen" (slow) sees the same markers as "Techno" (fast) — misleading.
+    (c) The 30s window is arbitrary. Most presets' primary cycle is 5–15s; the
+        timeline shows loops that don't correspond to what's on screen.
+    (d) Play/Pause only pauses the internal clock — it does NOT pause the actual
+        AliveStage animations (breathing/sway/etc. keep running because they're
+        CSS @keyframes that don't read the `playing` state).
+
+  RECOMMENDATIONS (pick one path):
+
+    PATH A — Make it real (high effort, high value):
+      - Add `timeScale` or `playing` to the store; AliveStage reads it.
+      - Pass `playing` to AliveLayers/AliveCSS3D as a `animation-play-state:
+        paused` CSS rule when paused.
+      - Replace the 8 hardcoded loop durations with the active preset's actual
+        cycle(s) — read from a new `primaryCycleSec` field on PresetMeta.
+      - Scrubbing sets `seekTime` which translates to `animation-delay: -Xs` on
+        each layer's keyframe (works for CSS animations; doesn't work for rAF-
+        driven WebGL/KenBurns3D, which would need an elapsed-time uniform).
+
+    PATH B — Make it honest (low effort):
+      - Remove the scrubbing interaction (it's misleading).
+      - Relabel as "Loop indicator" showing the active preset's primary cycle
+        length (e.g., "6.2s breath loop") as a static info chip.
+      - Keep Play/Pause but wire it to a global `paused` state that actually
+        pauses CSS animations (single-line `animation-play-state` change).
+
+  Recommended: PATH B first (ship in a day), then PATH A as a v2 milestone.
+
+(7) COMPARISON-SLIDER
+---------------------
+  MOSTLY ALIGNS. Stage aspectRatio is derived from the original image dimensions
+  (Studio.tsx:75-77), and the slider overlay uses the same originalUrl with
+  object-cover on a container that fills the stage. Since aspect matches, cover =
+  exact fit. ✓
+
+  RESIDUAL ISSUES:
+    (a) Boundary misalignment: the animated stage applies layer overscale (1.18×
+        per RENDER-FIX-BUG B1/B2) and entrance reveal. At the divider edge, the
+        "Animado" side is zoomed ~18% vs the "Original" side, so a feature that
+        spans the divider will appear at different scales on each side. The user
+        perceives this as the divider "warping" the image.
+        FIX: temporarily disable entrance + overscale when comparison is enabled
+        (compare against the un-animated, un-zoomed composite).
+    (b) Touch target: the drag handle is `h-2 w-2` (8px). iOS HIG and Material
+        both require 44px minimum. The clickable area is the 0.5px-wide divider
+        line itself — almost impossible to grab on touch.
+        FIX: wrap the handle in an `::after` pseudo-element or an invisible
+        44×44 div with `pointer-events-auto` so the grabbable area is touch-safe
+        while the visible handle stays slim.
+    (c) Edge clamping: at position=0 or position=100, the handle is half off the
+        container. Cosmetic but looks broken.
+        FIX: clamp position to [2, 98] or inset the handle by half its width.
+    (d) Close button (X, h-3 w-3 = 12px icon in a 24px circle) is also below the
+        44px touch target. Same fix.
+    (e) No keyboard support: divider isn't keyboard-focusable. Add `tabIndex=0`
+        + arrow-key handlers (left/right by 1%, shift+arrow by 10%).
+
+(8) RIGHT-PANEL TAB CONTENT
+---------------------------
+  All 5 tabs ARE populated (no empty tab). Content quality issues:
+
+    animate     → PresetPicker + ControlPanel + collapsed Pipeline25D/Cinematic.
+                  ISSUE: too much in one tab; collapse hides power controls.
+                  See (4) for restructure.
+    scene       → ScenePanel. OK, but small panel — could merge with atmosphere.
+    atmosphere  → EffectsPanel (dust/fog/rain/lightleak/bloom/colorgrade...).
+                  OK content. Label "Atmósfera" undersells it (also has color
+                  grade, bloom, etc. — not strictly atmospheric).
+    hero        → HeroPanel. OK.
+    export      → ExportPanel. OK. Conditional on isReady.
+
+  No tab is empty. The main issue is structural (see #4) not content.
+
+(9) ONBOARDING FLOW
+-------------------
+  NONE EXISTS. Grep for onboard|tour|hint|guide|firstRun returns zero matches in
+  /src. The only "hint" strings are HeroMode's scroll hint and ControlPanel's
+  render-mode hint labels.
+
+  IMPACT ON <2-MINUTE GOAL:
+    A brand-new user must:
+      (1) Upload image                     ~10s
+      (2) Wait for VLM analysis            ~5-15s
+      (3) Choose decomposition strategy    ~5s (or accept default)
+      (4) Wait for layer separation        ~10-30s
+      (5) Discover the "Dar vida" button   ← RISK POINT (buried in left panel)
+      (6) Click it                         ~1s
+      (7) Move mouse to see parallax       ← RISK POINT (no hint to do this)
+      (8) Optionally try another preset    ← RISK POINT (no hint where they are)
+      (9) Click Export → choose format     ~10s
+     Total realistic: 90-180s if the user finds AutoSetup; 180-300s if they don't.
+
+  RECOMMENDATIONS (priority order):
+
+    (a) PROMINENT AUTO-SETUP BUTTON (see #5). Without this, the <2-min goal is
+        unreachable for users who don't read the AnalysisPanel carefully.
+
+    (b) FIRST-RUN COACH MARKS (4 steps, dismissible, localStorage flag):
+        Step 1 — After layers ready, point at the toolbar AutoSetup button:
+                 "Click ✨ Dar vida para animar tu imagen en un clic."
+        Step 2 — After AutoSetup clicked, point at the stage:
+                 "Mueve el mouse sobre la imagen para sentir el parallax."
+        Step 3 — Point at the right-panel animate tab:
+                 "Explora 23 presets creativos aquí."
+        Step 4 — Point at the Exportar tab:
+                 "Cuando te guste, exporta aquí (MP4/WebM/GIF)."
+        Use a lightweight lib (driver.js or react-joyride) OR hand-rolled
+        absolutely-positioned tooltips with a backdrop. ~1 day of work.
+
+    (c) EMPTY-STATE GUIDANCE: when no image is loaded (PreviewEmpty state in
+        Studio.tsx:364), add 3 sample-image thumbnails ("Paisaje", "Retrato",
+        "Urbano") the user can click to try the studio without uploading. The
+        samples exist (Landing.tsx references "Paisaje montañoso") — surface
+        them in the empty state too.
+
+    (d) PRESET PICKER FIRST-VISIT HINT: the first time the user opens the
+        PresetPicker, show a 1-line tip: "No sabes cuál elegir? El preset
+        recomendado está resaltado." (assuming recommendedPreset is highlighted
+        — currently it ISN'T; add a `recommended` badge on the preset card that
+        matches analysis.recommendedPreset).
+
+(10) MOBILE EXPERIENCE
+----------------------
+  Grid: `grid-cols-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)_300px]`.
+
+  CURRENT MOBILE BEHAVIOR (<1024px):
+    - Single column. Order:
+        1. aside (AnalysisPanel + LayersPanel + LayerInspector)
+        2. main  (stage + toolbar + MiniTimeline)
+        3. div.lg:hidden (mobile-only RightPanelTabs)
+    - User sees 3 panels of metadata BEFORE the animated stage. Bad.
+    - Stage appears mid-scroll; user may not realize their animation is already
+      running below the fold.
+    - Right-panel tabs render below the stage — fine for "set and forget" but
+      bad for iterative tweaking.
+    - Touch targets throughout:
+        MiniTimeline transport buttons: h-3 w-3 / h-3.5 w-3.5 (12-14px) — FAIL.
+        ComparisonSlider handle: 8px — FAIL.
+        ComparisonSlider close button: 24px circle — FAIL.
+        Toolbar undo/redo: p-1 icon (16px) — FAIL.
+        PresetCard: full-card click is OK (44px+ tall).
+        TabButton: py-1.5 (12px text) — borderline.
+
+  RECOMMENDATIONS:
+
+    (a) REORDER mobile layout: stage FIRST, then a bottom-sheet or accordion
+        containing panels. Use `order-*` Tailwind utilities or render the mobile
+        layout separately:
+          <main class="order-1">stage</main>
+          <aside class="order-2">panels (collapsible)</aside>
+        On desktop, restore the 3-col grid via `lg:order-none`.
+
+    (b) STICKY MINI-TIMELINE + TOOLBAR: on mobile, keep the toolbar + MiniTimeline
+        sticky to the top of the viewport so the user can play/pause/compare while
+        scrolling through preset cards below.
+
+    (c) BOTTOM-SHEET RIGHT PANEL: replace the inline mobile RightPanelTabs with a
+        bottom sheet (sheet up = full panel, sheet down = just the tab bar). Lets
+        the user iterate on presets without losing sight of the stage.
+
+    (d) TOUCH TARGETS: bump all interactive icons in MiniTimeline, ComparisonSlider,
+        toolbar undo/redo, and TabButton to min 36px (compromise vs the 44px HIG
+        minimum to fit the dense UI). Use `p-2` instead of `p-1` and `h-4 w-4`
+        instead of `h-3 w-3`. For the ComparisonSlider handle, add an invisible
+        44×44 wrapper.
+
+    (e) PRESET GRID on mobile: 2 cols is OK on a 360px viewport (each card ~170px)
+        but tight. Consider 1 col with horizontal scroll-snap for a more "app-like"
+        feel. Each card gets full width and is easier to read.
+
+    (f) COMPARISON-SLIDER on mobile: the divider drag is hard with one thumb.
+        Add a "tap left/right of divider to move it 10%" affordance.
+
+=== SUMMARY OF TOP 10 RECOMMENDATIONS (priority order) ===
+
+  P0 (blocks <2-min goal — ship first):
+    1. Promote AutoSetup to a prominent toolbar button (visible when isReady).
+    2. Add first-run coach marks (4 steps, dismissible, localStorage).
+    3. Add category field to PresetMeta + 6-category filter chips in PresetPicker.
+    4. Add a search input in PresetPicker (name + tagline + description).
+
+  P1 (significant UX improvement):
+    5. Reorganize right-panel tabs to 4 (animate / scene+effects / hero / export);
+       un-collapse Pipeline25D + Cinematic.
+    6. Reorder mobile layout: stage first, panels second (bottom-sheet pattern).
+    7. Increase touch targets to ≥36px on all interactive icons (44px for slider).
+
+  P2 (polish):
+    8. ComparisonSlider: disable entrance/overscale during compare; add keyboard
+       support; clamp handle position.
+    9. MiniTimeline: ship PATH B (honest loop indicator) before PATH A (real
+       scrubbing) — current scrubbing is misleading.
+   10. Preset preview TIER A+B: larger cards, hover tooltip, category dot,
+       micro-animated emoji on hover.
+
+=== FILES TOUCHED IN PROPOSAL (NONE MODIFIED — AUDIT ONLY) ===
+
+  To implement P0–P2 (when the team is ready):
+    - src/lib/types.ts              → add PresetCategory union
+    - src/lib/presets.ts            → add `category` field to all 23 PresetMeta
+    - src/components/studio/PresetPicker.tsx → search + filter chips + new card
+    - src/components/studio/Studio.tsx       → toolbar AutoSetup button + 4-tab
+                                                restructure + mobile reorder
+    - src/components/studio/MiniTimeline.tsx → honest loop indicator (PATH B)
+    - src/components/studio/ComparisonSlider.tsx → touch target + edge clamp +
+                                                   keyboard + entrance-disable
+    - src/components/studio/AutoSetup.tsx    → no logic change, just rendered in
+                                                a second location (toolbar)
+    - NEW: src/components/onboarding/CoachMarks.tsx (first-run tour)
+    - NEW: src/lib/onboarding-store.ts (localStorage flag)
+    - src/components/studio/Studio.tsx mobile layout: add `order-*` utilities
+
+No code was modified. End of audit.
+
+---
+Task ID: UX-POLISH-v3
+Agent: Z.ai Code (main)
+Task: Implement UX improvements from AUDIT-CP and AUDIT-UX
+
+Work Log:
+- Added PresetCategory type (calm/cinematic/dramatic/retro/cyberpunk/abstract) to presets.ts
+- Added `category` field to all 23 presets via Python script
+- Rebuilt PresetPicker with:
+  - Search input (filters by name + tagline + description + id)
+  - Category filter chips (6 categories + "Todos")
+  - Category color dot on each preset card
+  - "REC" badge on VLM-recommended preset
+  - Scrollable grid (max-h-420px) with custom scrollbar
+  - Empty state with "Limpiar filtros" button
+  - scrollIntoView for active preset on filter change
+- Added `toggleGlobalAnim` action to store.ts — applies a boolean to ALL layers at once
+- Added "Movimiento orgánico (global)" section to ControlPanel with 10 toggle buttons:
+  - 7 v3 animations: Heartbeat, Vortex, Ripple, Z-tilt, Sway-3D, Breathe-X, Scan
+  - 3 v2 animations promoted to global: Breath, Sway, Float
+  - Tri-state visual: all-on (primary), some-on (primary/40), none-on (muted)
+- Added EffectToggleWithAmp component to LayerInspector — shows inline amplitude
+  slider when a toggle is ON. Applied to 18 effects:
+  - v2: breathing, sway, twist, float, drift, wave, jitter, glow, hue, focus, chromatic
+  - v3: heartbeat, vortex, ripple, zTilt, sway3d, breatheX, scan
+- Added per-layer chromatic toggle (GAP-C fix — was missing entirely)
+- Added per-layer inertia slider (GAP-D fix — was missing entirely)
+- Promoted AutoSetup to prominent toolbar button (P0 fix):
+  - Styled as primary CTA (bg-primary, text-primary-foreground)
+  - Positioned first in toolbar with divider after
+  - Full AutoSetup logic (preset + scene comp + intensity/speed tuning)
+- Un-collapsed Pipeline25D + Cinematic panels (GAP-H fix):
+  - Were hidden in <details> — now always visible in Animate tab
+  - Removed ChevronRight import (no longer needed)
+- Rewrote MiniTimeline (PATH B fix):
+  - Play/Pause now ACTUALLY controls animation-play-state on all .alive-layer elements
+  - Loop markers derived from active animations (not hardcoded)
+  - Primary cycle chip shows shortest active animation duration
+- Mobile layout reorder (P1 fix):
+  - Stage is now order-1 (first) on mobile
+  - Left panel (layers) is order-2 on mobile
+  - Right panel (tabs) is order-3 on mobile
+  - Desktop order preserved via lg:order-* classes
+- Removed unused AutoSetup import from Studio.tsx (GAP-J fix)
+
+Stage Summary:
+- PresetPicker: flat 23-preset grid → searchable + categorizable (6 categories)
+- ControlPanel: 4 global toggles → 14 global toggles (10 organic motion + 4 existing)
+- LayerInspector: 12 boolean toggles → 18 toggle+amplitude controls + inertia slider + chromatic
+- MiniTimeline: decorative playhead → functional pause that actually stops CSS animations
+- AutoSetup: buried in AnalysisPanel → prominent toolbar CTA + still in AnalysisPanel
+- Pipeline25D + Cinematic: hidden in collapsed <details> → always visible
+- Mobile: stage was 4th (below 3 panels) → now 1st (immediately visible)
+- All features verified working in browser:
+  - Search "zen" → 1 result ✓
+  - Calma filter → 6 presets (Dream, Float, Shimmer, Aurora, Ethereal, Zen) ✓
+  - Pause button → 7 layers animation-play-state: paused ✓
+  - AutoSetup toolbar → visible and functional ✓
+  - v3 global toggles → visible in ControlPanel ✓
+- No console errors, no page errors, lint passes cleanly

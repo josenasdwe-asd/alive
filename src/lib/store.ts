@@ -47,6 +47,8 @@ interface AliveStore extends ProjectState {
     layerId: string,
     patch: Partial<AnimationConfig["layers"][string]>
   ) => void;
+  /** v3: toggle an organic animation across ALL layers at once */
+  toggleGlobalAnim: (field: string, enabled: boolean) => void;
   toggleEffect: (effect: EffectType) => void;
   setReducedMotion: (v: boolean) => void;
   setStrategy: (s: DecompositionStrategy) => void;
@@ -295,6 +297,16 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
         },
       },
     })),
+
+  // v3: toggle an organic animation across ALL layers at once
+  toggleGlobalAnim: (field: string, enabled: boolean) =>
+    set((s) => {
+      const layers = { ...s.animation.layers };
+      for (const id of Object.keys(layers)) {
+        layers[id] = { ...layers[id], [field]: enabled };
+      }
+      return { animation: { ...s.animation, layers } };
+    }),
 
   toggleEffect: (effect) =>
     set((s) => ({

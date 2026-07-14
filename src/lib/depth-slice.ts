@@ -248,7 +248,7 @@ export async function sliceImageByDepth(
 ): Promise<SlicedLayer[]> {
   const k = Math.max(2, Math.min(12, options.k ?? 6));
   const dilationRadius = options.dilationRadius ?? 8;  // CORRECTED: was 25 (too aggressive, covered entire image)
-  const featherSigma = options.featherSigma ?? 4;       // CORRECTED: was 10 (too soft, made layers indistinguishable)
+  const featherSigma = options.featherSigma ?? 8;       // CORRECTED: was 10 (too soft, made layers indistinguishable)
   const mode = options.mode ?? "anchor-base"; // default: base + isolated bands
 
   // Load both images at the same size (use original's dimensions)
@@ -328,18 +328,13 @@ export async function sliceImageByDepth(
 
       const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
 
-      // RENDER FIX: Premultiply alpha to eliminate colored fringes at layer edges.
-      // Without premultiplication, semi-transparent edge pixels show full-saturation
-      // foreground color → colored halos when composited over background layers.
-      // With premult: rgba = rgb * (alpha/255), so edges fade to correct blended color.
+      // Straight alpha (PNG standard) — browser handles compositing correctly
       const rgba = Buffer.alloc(W * H * 4);
       for (let i = 0; i < W * H; i++) {
-        const alpha = featheredMask[i];
-        const premult = alpha / 255;
-        rgba[i * 4] = Math.round(originalRaw[i * 3] * premult);
-        rgba[i * 4 + 1] = Math.round(originalRaw[i * 3 + 1] * premult);
-        rgba[i * 4 + 2] = Math.round(originalRaw[i * 3 + 2] * premult);
-        rgba[i * 4 + 3] = alpha;
+        rgba[i * 4] = originalRaw[i * 3];
+        rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
+        rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
+        rgba[i * 4 + 3] = featheredMask[i];
       }
 
       const pngBuffer = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })
@@ -398,15 +393,13 @@ export async function sliceImageByDepth(
 
     const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
 
-    // RENDER FIX: Premultiply alpha (same as anchor-base mode)
+    // Straight alpha (PNG standard)
     const rgba = Buffer.alloc(W * H * 4);
     for (let i = 0; i < W * H; i++) {
-      const alpha = featheredMask[i];
-      const premult = alpha / 255;
-      rgba[i * 4] = Math.round(originalRaw[i * 3] * premult);
-      rgba[i * 4 + 1] = Math.round(originalRaw[i * 3 + 1] * premult);
-      rgba[i * 4 + 2] = Math.round(originalRaw[i * 3 + 2] * premult);
-      rgba[i * 4 + 3] = alpha;
+      rgba[i * 4] = originalRaw[i * 3];
+      rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
+      rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
+      rgba[i * 4 + 3] = featheredMask[i];
     }
 
     const pngBuffer = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })

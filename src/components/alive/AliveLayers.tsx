@@ -406,7 +406,7 @@ function LayerPlane({
       initial={config.entranceEnabled ? { opacity: 0, scale: 1.08, filter: "blur(8px)" } : false}
       animate={
         config.entranceEnabled
-          ? { opacity: 1, scale: 1, filter: "blur(0px)" }
+          ? { opacity: 1, scale: 1, filter: "none" }
           : undefined
       }
       transition={

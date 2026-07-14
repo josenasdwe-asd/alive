@@ -416,8 +416,7 @@
       calc(var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px) + var(--ripple-y, 0) * var(--ripple-y-amp, 0px)),
       0
     )
-    scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02) + var(--heartbeat, 0) * var(--heartbeat-amp, 0.03) + var(--vortex, 0) * var(--vortex-amp, 0.01)))
-    scale(calc(1 + var(--breathe-x, 0) * var(--breathe-x-amp, 0.02)), 1)
+    scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02) + var(--heartbeat, 0) * var(--heartbeat-amp, 0.03) + var(--vortex, 0) * var(--vortex-amp, 0.01) + var(--breathe-x, 0) * var(--breathe-x-amp, 0.02)))
     rotate(calc(var(--sway, 0) * var(--sway-amp, 0deg) + var(--twist, 0) * var(--twist-amp, 0deg) + var(--vortex, 0) * var(--vortex-rot-amp, 0deg)))
     rotateY(calc(var(--sway-3d, 0) * var(--sway-3d-amp, 0deg)))
     rotateX(calc(var(--z-tilt, 0) * var(--z-tilt-amp, 0deg)));

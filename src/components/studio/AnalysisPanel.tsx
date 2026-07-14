@@ -56,7 +56,7 @@ export function AnalysisPanel() {
 
   const [stage, setStage] = useState<Stage>("idle");
   const [progress, setProgress] = useState(0);
-  const [kLayers, setKLayers] = useState(6);
+  const [kLayers, setKLayers] = useState(20);
 
   const previewUrl = originalDataUrl ?? originalUrl;
 
@@ -394,8 +394,8 @@ export function AnalysisPanel() {
                     </span>
                     <input
                       type="range"
-                      min={4}
-                      max={10}
+                      min={6}
+                      max={50}
                       value={kLayers}
                       onChange={(e) => setKLayers(parseInt(e.target.value))}
                       onClick={(e) => e.stopPropagation()}

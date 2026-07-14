@@ -226,7 +226,7 @@ export async function sliceImageByDepth(
   depthPath: string,
   options: SliceOptions = {}
 ): Promise<SlicedLayer[]> {
-  const k = Math.max(2, Math.min(12, options.k ?? 6));
+  const k = Math.max(2, Math.min(50, options.k ?? 20)); // v3: up to 50 layers for Awwwards-level detail
   const dilationRadius = options.dilationRadius ?? 18;  // WIDER: covers gaps when layers parallax
   const featherSigma = options.featherSigma ?? 20;      // SOFTER: smooth alpha edges, no visible seams
   const mode = options.mode ?? "anchor-base"; // default: base + isolated bands

@@ -46,23 +46,27 @@ export async function analyzeImage(dataUrl: string): Promise<SceneAnalysis> {
 
   const zai = await getZai();
 
-  const prompt = `Decompose this image into 6-8 semantic depth layers for parallax animation AND recommend a full animation configuration. Return ONLY raw JSON (no markdown, no prose):
-{"sceneDescription":"one sentence","subject":"main focal subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"short semantic name (e.g. 'Montañas', 'Lago', 'Cielo', 'Persona')","role":"background|midground|subject|foreground","depth":0..1,"description":"short phrase","extractPrompt":"precise visual description to isolate this element","suggestedAnimations":["breathing"|"sway"|"twist"|"floatY"|"driftX"|"wave"|"jitter"|"glow"|"hueDrift"|"focusPull"|"shadowDrift"|"chromatic"|"liquid"|"heartbeat"|"vortex"|"ripple"|"zTilt"|"sway3d"|"breatheX"|"scan"]}],"recommendedPreset":"dream|float|pulse|liquid|cinematic3d|shimmer|boil|kenburns|aurora|underwater|ethereal|noir|cosmic|paper|glass|vintage|techno|zen|lava|prism|ghost|origami|neon|vivo","recommendedConfig":{"renderMode":"css|css3d|webgl|kenburns3d","sceneComposition":"horizon|subject-focus|tunnel|wind|anchor-midground|free","colorGrade":"none|teal-orange|bleach-bypass|portra|blade-runner|noir-film","effects":{"fog":bool,"snow":bool,"rain":bool,"godrays":bool,"bokeh":bool,"dust":bool,"lightleak":bool,"grain":bool,"smoke":bool,"fire":bool,"embers":bool},"dofEnabled":bool,"dofFocusDepth":0..1,"relightingEnabled":bool,"relightingAzimuth":0..360,"relightingElevation":0..90,"intensity":0.5..1.5,"speed":0.5..1.5,"depthFogEnabled":bool,"bloomEnabled":bool}}
+  const prompt = `Analyze this image for a 2.5D parallax animation system. Identify ALL distinct visual elements and separate them into layers. Return ONLY raw JSON (no markdown, no prose):
+{"sceneDescription":"one sentence","subject":"main focal subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"short semantic name (e.g. 'Cielo', 'Nubes lejanas', 'Montañas', 'Niebla', 'Dragón', 'Partículas')","role":"background|midground|subject|foreground","depth":0..1,"description":"short phrase","extractPrompt":"precise visual description to isolate this element for AI extraction","suggestedAnimations":["breathing"|"sway"|"twist"|"floatY"|"driftX"|"wave"|"jitter"|"glow"|"hueDrift"|"focusPull"|"shadowDrift"|"chromatic"|"liquid"|"heartbeat"|"vortex"|"ripple"|"zTilt"|"sway3d"|"breatheX"|"scan"]}],"recommendedPreset":"dream|float|pulse|liquid|cinematic3d|shimmer|boil|kenburns|aurora|underwater|ethereal|noir|cosmic|paper|glass|vintage|techno|zen|lava|prism|ghost|origami|neon|vivo","recommendedConfig":{"renderMode":"css|css3d|webgl|kenburns3d","sceneComposition":"horizon|subject-focus|tunnel|wind|anchor-midground|free","colorGrade":"none|teal-orange|bleach-bypass|portra|blade-runner|noir-film","effects":{"fog":bool,"snow":bool,"rain":bool,"godrays":bool,"bokeh":bool,"dust":bool,"lightleak":bool,"grain":bool,"smoke":bool,"fire":bool,"embers":bool},"dofEnabled":bool,"dofFocusDepth":0..1,"relightingEnabled":bool,"relightingAzimuth":0..360,"relightingElevation":0..90,"intensity":0.5..1.5,"speed":0.5..1.5,"depthFogEnabled":bool,"bloomEnabled":bool}}
 Rules:
-- 6-8 layers ordered far→near. Exactly one "subject" (depth 0.6-0.9). Depth strictly increasing.
-- extractPrompt for each non-background layer must precisely describe that element for isolation.
-- suggestedAnimations: pick 1-3 animations that MATCH the content. Examples:
-  • Trees/plants/grass → ["sway"]
-  • Water/lake/sea/river → ["wave","liquid"]
-  • Sky/clouds → ["driftX","floatY"]
-  • Person/animal (subject) → ["breathing"]
-  • Fire/lava/sun → ["glow","heartbeat"]
-  • Buildings/architecture → ["zTilt"]
-  • Night/digital/cyber → ["scan","chromatic"]
-  • Paper/illustration → ["jitter"]
-  • Foggy/misty → ["focusPull"]
-- recommendedPreset routing: landscapes→cinematic3d/aurora/zen, portraits→ethereal/float/ghost, night/dark→noir/cosmic/neon, ocean/water→underwater/lava, dreamy→dream/ghost, urban→techno/neon/vintage, vintage/analog→vintage/paper, abstract→prism/glass/origami, fire/warm→lava, paper/illustration→paper/boil. nature/landscape→vivo.
-- recommendedConfig: choose renderMode webgl if depth parallax is key, css3d for 3D tilt scenes, css for organic. sceneComposition: horizon for landscapes, subject-focus for portraits, tunnel for perspective scenes. colorGrade: teal-orange for warm/action, bleach-bypass for dramatic, portra for skin tones, blade-runner for neon, noir-film for dark/monochrome. dofFocusDepth = subject layer's depth. relightingAzimuth/Elevation match the apparent light direction in the image. intensity/speed: calm scenes 0.7-0.9 slow, dramatic 1.2-1.4 fast.`;
+- Identify 8-15 distinct visual elements, ordered far→near. Each element gets its OWN layer.
+- Examples of elements to identify: sky, distant clouds, mountains, mid clouds, fog/mist, light glow, main subject, foreground particles, foreground elements, etc.
+- Exactly one "subject" (depth 0.6-0.9). Depth strictly increasing from 0.0 (farthest) to 1.0 (closest).
+- extractPrompt: MUST be a precise visual description that an AI image editor can use to ISOLATE this element. Include color, position, shape. Example: "the large dragon with red scales in the center of the image, breathing fire, with horns and wings spread".
+- suggestedAnimations: pick 1-3 animations that MATCH the content:
+  • Sky → ["driftX"] — clouds drift horizontally
+  • Clouds → ["driftX","floatY"] — drift and float
+  • Mountains/rocks → ["breathing"] — subtle scale pulse
+  • Trees/plants → ["sway"] — sway in wind
+  • Water/lake/river → ["wave","liquid"] — ripple
+  • Person/animal → ["breathing","sway"] — breathe + slight sway
+  • Fire/lava/sun/glow → ["glow","heartbeat"] — pulsing light
+  • Fog/mist → ["driftX","focusPull"] — drift + blur
+  • Particles/sparks → ["floatY","jitter"] — float and shimmer
+  • Buildings → ["zTilt"] — subtle 3D tilt
+  • Night/digital → ["scan","chromatic"] — CRT effect
+- recommendedPreset: nature/landscape→vivo, landscapes→aurora/zen, portraits→ethereal/float, night→noir/cosmic/neon, water→underwater/lava, fire→lava, urban→techno/neon.
+- recommendedConfig: renderMode css for organic, webgl for depth parallax. sceneComposition: horizon for landscapes, subject-focus for portraits. colorGrade matches mood. intensity/speed: calm 0.7-0.9, dramatic 1.2-1.4.`;
 
   // v3 FIX: minimal retry (1 attempt, 1s delay) — VLM is often 429,
   // retrying 3× with 2s/4s/8s causes 14s waits. Better to fail fast to fallback.
@@ -114,7 +118,7 @@ function parseAnalysis(content: string): SceneAnalysis {
       description: String(l.description ?? ""),
       extractPrompt: l.extractPrompt ? String(l.extractPrompt) : undefined,
     }))
-    .slice(0, 10);
+    .slice(0, 15); // v3: up to 15 semantic layers
 
   // ensure exactly one subject
   if (!layers.some((l: any) => l.role === "subject") && layers.length > 0) {

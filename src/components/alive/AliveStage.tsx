@@ -16,6 +16,9 @@ import { ColorGrading } from "./ColorGrading";
 import { AtmosphericAnimation } from "./AtmosphericAnimation";
 import { DepthFog } from "./DepthFog";
 import { BloomACES } from "./BloomACES";
+import { DynamicRelighting } from "./DynamicRelighting";
+import { ColorScript } from "./ColorScript";
+import { MotionBlur } from "./MotionBlur";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -184,6 +187,27 @@ export function AliveStage({
         enabled={config.bloomEnabled}
         intensity={config.bloomIntensity}
         toneMap={config.toneMapStrength}
+      />
+
+      {/* Phase 3: relighting + color script + motion blur */}
+      <DynamicRelighting
+        enabled={config.relightingEnabled && !config.reducedMotion}
+        azimuth={config.relightingAzimuth}
+        elevation={config.relightingElevation}
+        intensity={config.relightingIntensity}
+        colorTemp={config.relightingColorTemp}
+        depthUrl={depthUrl}
+      />
+      <ColorScript
+        enabled={config.colorScriptEnabled && !config.reducedMotion}
+        act={config.colorScriptAct}
+        speed={config.speed}
+      />
+      <MotionBlur
+        enabled={config.motionBlurEnabled && !config.reducedMotion}
+        strength={config.motionBlurStrength}
+        velocityX={0}
+        velocityY={0}
       />
 
       {/* Atmospheric animations (light cycle, fog, timelapse, seasonal) */}

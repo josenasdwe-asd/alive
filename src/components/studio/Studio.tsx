@@ -15,6 +15,7 @@ import { ExportPanel } from "./ExportPanel";
 import { HeroPanel } from "./HeroPanel";
 import { Pipeline25DPanel } from "./Pipeline25DPanel";
 import { ScenePanel } from "./ScenePanel";
+import { CinematicPanel } from "./CinematicPanel";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import {
   Loader2,
@@ -235,6 +236,7 @@ function RightPanelTabs({
           <PresetPicker />
           <ControlPanel />
           <Pipeline25DPanel />
+          <CinematicPanel />
         </>
       )}
       {tab === "scene" && <ScenePanel />}

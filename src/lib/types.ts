@@ -239,6 +239,20 @@ export interface AnimationConfig {
   bloomEnabled: boolean;
   bloomIntensity: number;
   toneMapStrength: number;
+
+  // === Phase 3: wow factor ===
+  /** dynamic relighting (depth as normal map) */
+  relightingEnabled: boolean;
+  relightingAzimuth: number;
+  relightingElevation: number;
+  relightingIntensity: number;
+  relightingColorTemp: number;
+  /** color script (5 acts) */
+  colorScriptEnabled: boolean;
+  colorScriptAct: number; // -1 = auto
+  /** motion blur direccional */
+  motionBlurEnabled: boolean;
+  motionBlurStrength: number;
 }
 
 /** .2p5d export format (Disguise-compatible container) */

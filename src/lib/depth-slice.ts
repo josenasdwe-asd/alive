@@ -179,13 +179,11 @@ function kmeans1d(
 /**
  * Feathered mask generation for isolated layers.
  *
- * CORRECTED: the previous approach (blur(50).threshold(1)) dilated masks
- * to cover nearly the entire image — layers weren't actually isolated.
- *
- * New approach:
- * 1. Raw binary mask (255 for this cluster, 0 elsewhere)
- * 2. Small dilation (blur + high threshold) to cover parallax gaps (5-8px)
- * 3. Light feather (3px blur) for soft edges ONLY at boundaries
+ * FIXED: the previous approach (blur + threshold) destroyed small masks
+ * and inflated large ones. This version:
+ * 1. Uses the raw binary mask directly (no threshold destruction)
+ * 2. Applies a small Gaussian blur for soft edges
+ * 3. NO threshold — preserves the actual cluster distribution
  */
 async function makeFeatheredMask(
   binaryMask: Buffer,
@@ -194,21 +192,25 @@ async function makeFeatheredMask(
   dilationRadius: number,
   featherSigma: number
 ): Promise<Buffer> {
-  // step 1: small dilation — only expand by a few px to cover parallax gaps
-  // use blur(R) + threshold(128) so only pixels CLOSE to the mask expand
-  const dilated = await sharp(binaryMask, { raw: { width, height, channels: 1 } })
-    .blur(Math.min(dilationRadius, 8)) // cap at 8px to avoid covering everything
-    .threshold(128) // high threshold: only truly dense areas stay
+  // FIXED: blur was destroying small masks (values dropped below 10).
+  // New approach: keep the raw binary mask, only feather the EDGES.
+  // 1. blur the mask slightly (2px) for anti-aliased edges
+  // 2. OR with the original mask so no pixels are lost
+  // 3. Result: original mask + soft edges
+
+  const blurred = await sharp(binaryMask, { raw: { width, height, channels: 1 } })
+    .blur(2)
     .raw()
     .toBuffer();
 
-  // step 2: light feather at edges only
-  const feathered = await sharp(dilated, { raw: { width, height, channels: 1 } })
-    .blur(Math.min(featherSigma, 4)) // cap at 4px for crisp edges
-    .raw()
-    .toBuffer();
+  // OR: any pixel that was 255 in the original stays 255
+  // pixels near edges get a gradient from the blur
+  const result = Buffer.alloc(width * height);
+  for (let i = 0; i < width * height; i++) {
+    result[i] = Math.max(binaryMask[i], blurred[i]);
+  }
 
-  return feathered;
+  return result;
 }
 
 /**
@@ -225,8 +227,8 @@ export async function sliceImageByDepth(
   options: SliceOptions = {}
 ): Promise<SlicedLayer[]> {
   const k = Math.max(2, Math.min(12, options.k ?? 6));
-  const dilationRadius = options.dilationRadius ?? 25; // CALIBRATED: was 18, now 25 (covers parallax gaps better)
-  const featherSigma = options.featherSigma ?? 10;     // CALIBRATED: was 6, now 10 (softer edges, less visible seams)
+  const dilationRadius = options.dilationRadius ?? 8;  // CORRECTED: was 25 (too aggressive, covered entire image)
+  const featherSigma = options.featherSigma ?? 4;       // CORRECTED: was 10 (too soft, made layers indistinguishable)
   const mode = options.mode ?? "anchor-base"; // default: base + isolated bands
 
   // Load both images at the same size (use original's dimensions)

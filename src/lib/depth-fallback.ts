@@ -4,13 +4,11 @@ import { saveGeneratedImage } from "./image-utils";
 
 /**
  * Deterministic fallback depth map generation when the AI image-edit API
- * is rate-limited. Uses luminance + vertical gradient as a depth heuristic:
- *  - brighter pixels tend to be closer (heuristic from CPIF depth datasets)
- *  - bottom of image tends to be closer (ground plane assumption)
- *  - heavy bilateral blur to smooth noise
+ * is rate-limited. Uses luminance + vertical gradient as a depth heuristic.
  *
- * This is NOT as accurate as Depth Anything V2, but it produces a usable
- * depth map that the K-means slicer can decompose into reasonable bands.
+ * CORRECTED: added double normalise() for maximum contrast — without this,
+ * dark/night images produce depth maps with almost no contrast and K-means
+ * can't separate bands properly.
  */
 export async function generateDeterministicDepth(
   imagePath: string
@@ -19,31 +17,32 @@ export async function generateDeterministicDepth(
   const W = meta.width ?? 1024;
   const H = meta.height ?? 1024;
 
-  // load original as grayscale luminance
+  // load original as grayscale luminance WITH histogram equalization
   const lum = await sharp(imagePath)
     .resize(W, H, { fit: "cover" })
     .greyscale()
-    .normalise()
+    .normalise() // stretch histogram to full 0-255 range
     .raw()
     .toBuffer();
 
-  // build depth: 0.4 * luminance + 0.6 * vertical_gradient (bottom = near)
+  // build depth: luminance + vertical gradient
   const depth = Buffer.alloc(W * H);
   for (let y = 0; y < H; y++) {
-    // vertical gradient: top (y=0) = far (40), bottom (y=H-1) = near (215)
-    const vGrad = 40 + (y / H) * 175;
+    // wider range (30-225 vs 40-215) for better K-means separation
+    const vGrad = 30 + (y / H) * 195;
     for (let x = 0; x < W; x++) {
       const idx = y * W + x;
       const lumVal = lum[idx];
-      // blend: luminance contributes 35%, vertical gradient 65%
-      const d = Math.round(lumVal * 0.35 + vGrad * 0.65);
+      // more luminance weight (40% vs 35%) so bright objects pop forward
+      const d = Math.round(lumVal * 0.40 + vGrad * 0.60);
       depth[idx] = Math.max(0, Math.min(255, d));
     }
   }
 
-  // bilateral-like smoothing: gaussian blur to remove speckles
+  // smooth + contrast stretch for maximum K-means separability
   const smoothed = await sharp(depth, { raw: { width: W, height: H, channels: 1 } })
-    .blur(4)
+    .blur(3)
+    .normalise() // second pass: stretch the combined depth histogram
     .png()
     .toBuffer();
 
@@ -53,8 +52,6 @@ export async function generateDeterministicDepth(
 
 /**
  * Deterministic fallback background plate when AI inpainting is unavailable.
- * Blurs the original heavily — simulates "background behind subject" when
- * the subject layer shifts. Not perfect but prevents gaps.
  */
 export async function generateDeterministicBackground(
   imagePath: string

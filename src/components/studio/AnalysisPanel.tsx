@@ -508,6 +508,7 @@ function StrategyCard({
   badge,
   desc,
   extra,
+  disabled,
 }: {
   active: boolean;
   onClick: () => void;

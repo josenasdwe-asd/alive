@@ -255,11 +255,12 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
     if (fromIdx < 0 || toIdx < 0 || fromIdx === toIdx) return;
     const [moved] = layers.splice(fromIdx, 1);
     layers.splice(toIdx, 0, moved);
-    // assign zOverride based on new array position so reordering is visually reflected
-    layers.forEach((l, i) => {
-      l.transform = { ...l.transform, zOverride: i * 10 };
-    });
-    set({ layers });
+    // create NEW objects (don't mutate shared references)
+    const newLayers = layers.map((l, i) => ({
+      ...l,
+      transform: { ...l.transform, zOverride: i * 10 },
+    }));
+    set({ layers: newLayers });
   },
 
   selectLayer: (id) => set({ selectedLayerId: id }),

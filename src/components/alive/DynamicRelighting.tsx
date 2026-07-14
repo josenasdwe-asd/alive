@@ -60,6 +60,7 @@ export function DynamicRelighting({
     let tempCanvas: HTMLCanvasElement | null = null;
     let tempCtx: CanvasRenderingContext2D | null = null;
     let depthData: ImageData | null = null;
+    let lightData: ImageData | null = null; // pre-allocated, reused per frame
     let lastDepthUrl = "";
 
     const setup = () => {
@@ -113,8 +114,10 @@ export function DynamicRelighting({
       const sampleW = depthData.width;
       const sampleH = depthData.height;
 
-      // compute lighting
-      const lightData = tempCtx.createImageData(sampleW, sampleH);
+      // reuse pre-allocated lightData (avoid 256KB allocation per frame)
+      if (!lightData) {
+        lightData = tempCtx.createImageData(sampleW, sampleH);
+      }
       const warmR = 255, warmG = 220, warmB = 160;
       const coolR = 180, coolG = 200, coolB = 255;
       const lr = warmR + (coolR - warmR) * p.colorTemp;

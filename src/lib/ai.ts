@@ -84,7 +84,7 @@ function parseAnalysis(content: string): SceneAnalysis {
 
   // ensure exactly one subject
   if (!layers.some((l: any) => l.role === "subject") && layers.length > 0) {
-    layers[Math.min(layers.length - 1, layers.length - 2)].role = "subject";
+    layers[Math.max(0, layers.length - 2)].role = "subject";
   }
 
   const validPresets = [

@@ -64,9 +64,47 @@ export async function saveGeneratedImage(
   return { filename, url: `/uploads/${filename}` };
 }
 
+/**
+ * Sanitize a filename label to prevent path traversal.
+ * Only allows lowercase alphanumeric and hyphens.
+ */
+export function sanitizeFilename(label: string): string {
+  return label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 30) || "element";
+}
+
+/**
+ * Resolve a URL path safely within the public/uploads directory.
+ * Throws if the path escapes the uploads directory.
+ */
+export function safeResolvePath(url: string): string {
+  const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+  const PUBLIC_DIR = path.join(process.cwd(), "public");
+
+  // Only allow paths starting with /uploads/
+  if (!url.startsWith("/uploads/")) {
+    // also allow direct /uploads paths for depth maps etc
+    const normalized = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
+    const resolved = path.resolve(PUBLIC_DIR, normalized);
+    if (!resolved.startsWith(PUBLIC_DIR + path.sep)) {
+      throw new Error("Invalid path: escapes public directory");
+    }
+    return resolved;
+  }
+
+  const normalized = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
+  const resolved = path.resolve(PUBLIC_DIR, normalized);
+  if (!resolved.startsWith(PUBLIC_DIR + path.sep)) {
+    throw new Error("Invalid path: escapes public directory");
+  }
+  return resolved;
+}
+
 export async function readImageAsDataUrl(url: string): Promise<string> {
-  // url is like /uploads/xxx.jpg
-  const filepath = path.join(process.cwd(), "public", url);
+  const filepath = safeResolvePath(url);
   const buf = await fs.readFile(filepath);
   const ext = path.extname(filepath).toLowerCase();
   const mime =

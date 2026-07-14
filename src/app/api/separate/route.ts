@@ -8,7 +8,7 @@ import {
   generateDeterministicDepth,
   generateDeterministicBackground,
 } from "@/lib/depth-fallback";
-import { readImageAsDataUrl, saveGeneratedImage } from "@/lib/image-utils";
+import { readImageAsDataUrl, saveGeneratedImage, sanitizeFilename } from "@/lib/image-utils";
 import path from "path";
 
 export const runtime = "nodejs";
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
       const results = await Promise.allSettled(
         batch.map(async (t) => {
           const buf = await extractElement(dataUrl, t.extractPrompt!);
-          const r = await saveGeneratedImage(buf, `layer-${t.name.toLowerCase().replace(/\s+/g, "-")}`);
+          const r = await saveGeneratedImage(buf, sanitizeFilename(`layer-${t.name}`));
           return { layerName: t.name, ...r };
         })
       );

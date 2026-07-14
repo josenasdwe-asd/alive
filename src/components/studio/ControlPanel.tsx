@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 export function ControlPanel() {
   const config = useAliveStore((s) => s.animation);
   const updateAnimation = useAliveStore((s) => s.updateAnimation);
+  const depthMapUrl = useAliveStore((s) => s.depthMapUrl);
 
   return (
     <section className="glass rounded-xl p-3">
@@ -126,14 +127,14 @@ export function ControlPanel() {
               onClick={() => updateAnimation({ renderMode: "webgl" })}
               label="Depth"
               hint="Shader"
-              disabled={!useAliveStore.getState().depthMapUrl}
+              disabled={!depthMapUrl}
             />
             <ModeButton
               active={config.renderMode === "kenburns3d"}
               onClick={() => updateAnimation({ renderMode: "kenburns3d" })}
               label="3D KB"
               hint="Point cloud"
-              disabled={!useAliveStore.getState().depthMapUrl}
+              disabled={!depthMapUrl}
             />
           </div>
 

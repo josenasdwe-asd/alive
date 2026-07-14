@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    // Whitelist extensions — never trust file.name from client
+    const ALLOWED_EXTS = ["jpg", "jpeg", "png", "webp", "gif"];
+    const rawExt = (file.name.split(".").pop() || "").toLowerCase();
+    const ext = ALLOWED_EXTS.includes(rawExt) ? rawExt : "jpg";
     const result = await saveUpload(buffer, ext);
 
     return NextResponse.json({

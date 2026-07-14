@@ -214,7 +214,7 @@ function drawParticle(ctx: CanvasRenderingContext2D, part: Particle) {
     }
     case "ember": {
       ctx.globalCompositeOperation = "screen";
-      ctx.fillStyle = `hsla(${part.hue}, 100%, 65%, ${part.alpha})`;
+      ctx.fillStyle = `hsla(${part.hue}, 100%, 65%, ${finalAlpha})`;
       ctx.shadowBlur = 8;
       ctx.shadowColor = `hsla(${part.hue}, 100%, 50%, 1)`;
       ctx.beginPath();
@@ -223,7 +223,7 @@ function drawParticle(ctx: CanvasRenderingContext2D, part: Particle) {
       break;
     }
     case "dust": {
-      ctx.fillStyle = `rgba(255,240,200,${part.alpha})`;
+      ctx.fillStyle = `rgba(255,240,200,${finalAlpha})`;
       ctx.shadowBlur = 3;
       ctx.shadowColor = "rgba(255,240,200,0.8)";
       ctx.beginPath();
@@ -232,14 +232,14 @@ function drawParticle(ctx: CanvasRenderingContext2D, part: Particle) {
       break;
     }
     case "snow": {
-      ctx.fillStyle = `rgba(255,255,255,${part.alpha})`;
+      ctx.fillStyle = `rgba(255,255,255,${finalAlpha})`;
       ctx.beginPath();
       ctx.arc(part.x, part.y, part.size, 0, Math.PI * 2);
       ctx.fill();
       break;
     }
     case "rain": {
-      ctx.strokeStyle = `rgba(180,200,255,${part.alpha})`;
+      ctx.strokeStyle = `rgba(180,200,255,${finalAlpha})`;
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(part.x, part.y);

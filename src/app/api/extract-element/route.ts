@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractElement } from "@/lib/ai";
-import { readImageAsDataUrl, saveGeneratedImage } from "@/lib/image-utils";
-import path from "path";
+import { readImageAsDataUrl, saveGeneratedImage, sanitizeFilename } from "@/lib/image-utils";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -9,21 +8,24 @@ export const maxDuration = 120;
 export async function POST(req: NextRequest) {
   try {
     const { url, element } = await req.json();
-    if (!url || !element) {
+    if (!url || !element || typeof url !== "string" || typeof element !== "string") {
       return NextResponse.json(
-        { error: "url and element required" },
+        { error: "url and element required (strings)" },
+        { status: 400 }
+      );
+    }
+    if (element.length > 500) {
+      return NextResponse.json(
+        { error: "element description too long" },
         { status: 400 }
       );
     }
 
-    const safeUrl = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
-    const dataUrl = await readImageAsDataUrl(safeUrl);
+    const dataUrl = await readImageAsDataUrl(url);
 
     const buf = await extractElement(dataUrl, element);
-    const r = await saveGeneratedImage(
-      buf,
-      `custom-${element.toLowerCase().replace(/\s+/g, "-").slice(0, 20)}`
-    );
+    const safeLabel = sanitizeFilename(`custom-${element}`);
+    const r = await saveGeneratedImage(buf, safeLabel);
 
     return NextResponse.json({ success: true, url: r.url, filename: r.filename });
   } catch (err: any) {

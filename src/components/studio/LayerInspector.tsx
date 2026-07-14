@@ -13,6 +13,12 @@ import {
   Aperture,
   Waves,
   Zap,
+  Heart,
+  Disc3,
+  Radio,
+  Box,
+  ScanLine,
+  Activity,
 } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { Label } from "@/components/ui/label";
@@ -225,6 +231,59 @@ export function LayerInspector() {
                 label="Sombra"
                 checked={la.shadowDrift}
                 onChange={(v) => updateLayerAnim(layer.id, { shadowDrift: v })}
+              />
+            </div>
+
+            {/* v3 animations — new creative motion forms */}
+            <div className="flex items-center gap-1.5 pt-1">
+              <div className="h-px flex-1 bg-white/5" />
+              <span className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                v3
+              </span>
+              <div className="h-px flex-1 bg-white/5" />
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <EffectToggle
+                icon={<Heart className="h-3 w-3" />}
+                label="Heartbeat"
+                checked={la.heartbeat}
+                onChange={(v) => updateLayerAnim(layer.id, { heartbeat: v })}
+              />
+              <EffectToggle
+                icon={<Disc3 className="h-3 w-3" />}
+                label="Vortex"
+                checked={la.vortex}
+                onChange={(v) => updateLayerAnim(layer.id, { vortex: v })}
+              />
+              <EffectToggle
+                icon={<Radio className="h-3 w-3" />}
+                label="Ripple"
+                checked={la.ripple}
+                onChange={(v) => updateLayerAnim(layer.id, { ripple: v })}
+              />
+              <EffectToggle
+                icon={<Box className="h-3 w-3" />}
+                label="Z-tilt"
+                checked={la.zTilt}
+                onChange={(v) => updateLayerAnim(layer.id, { zTilt: v })}
+              />
+              <EffectToggle
+                icon={<RotateCw className="h-3 w-3" />}
+                label="Sway-3D"
+                checked={la.sway3d}
+                onChange={(v) => updateLayerAnim(layer.id, { sway3d: v })}
+              />
+              <EffectToggle
+                icon={<Activity className="h-3 w-3" />}
+                label="Breathe-X"
+                checked={la.breatheX}
+                onChange={(v) => updateLayerAnim(layer.id, { breatheX: v })}
+              />
+              <EffectToggle
+                icon={<ScanLine className="h-3 w-3" />}
+                label="Scan"
+                checked={la.scan}
+                onChange={(v) => updateLayerAnim(layer.id, { scan: v })}
               />
             </div>
 

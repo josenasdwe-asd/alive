@@ -33,8 +33,8 @@ export async function analyzeImage(dataUrl: string): Promise<SceneAnalysis> {
   const zai = await getZai();
 
   const prompt = `Decompose this image into 6-8 semantic depth layers for parallax animation. Return ONLY raw JSON (no markdown, no prose):
-{"sceneDescription":"one sentence","subject":"main focal subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"short name","role":"background|midground|subject|foreground","depth":0..1,"description":"short phrase","extractPrompt":"precise visual description to isolate this element"}],"recommendedPreset":"dream|float|pulse|liquid|cinematic3d|shimmer|boil|kenburns|aurora|underwater|ethereal|noir|cosmic"}
-Rules: 6-8 layers ordered far→near. Exactly one "subject" (depth 0.6-0.9). Depth strictly increasing. extractPrompt for each non-background layer must precisely describe that element for isolation. Preset: landscapes→cinematic3d/aurora, portraits→ethereal/float, night→cosmic, dark→noir, ocean→underwater, dreamy→dream.`;
+{"sceneDescription":"one sentence","subject":"main focal subject","mood":"1-3 words","palette":["#hex","#hex","#hex","#hex"],"layers":[{"name":"short name","role":"background|midground|subject|foreground","depth":0..1,"description":"short phrase","extractPrompt":"precise visual description to isolate this element"}],"recommendedPreset":"dream|float|pulse|liquid|cinematic3d|shimmer|boil|kenburns|aurora|underwater|ethereal|noir|cosmic|paper|glass|vintage|techno|zen|lava|prism|ghost|origami|neon"}
+Rules: 6-8 layers ordered far→near. Exactly one "subject" (depth 0.6-0.9). Depth strictly increasing. extractPrompt for each non-background layer must precisely describe that element for isolation. Preset routing: landscapes→cinematic3d/aurora/zen, portraits→ethereal/float/ghost, night/dark→noir/cosmic/neon, ocean/water→underwater/lava, dreamy→dream/ghost, urban→techno/neon/vintage, vintage/analog→vintage/paper, abstract→prism/glass/origami, fire/warm→lava, paper/illustration→paper/boil.`;
 
   const response = await zai.chat.completions.createVision({
     messages: [
@@ -101,6 +101,17 @@ function parseAnalysis(content: string): SceneAnalysis {
     "ethereal",
     "noir",
     "cosmic",
+    // v3 presets
+    "paper",
+    "glass",
+    "vintage",
+    "techno",
+    "zen",
+    "lava",
+    "prism",
+    "ghost",
+    "origami",
+    "neon",
   ];
   const preset = validPresets.includes(parsed.recommendedPreset)
     ? parsed.recommendedPreset

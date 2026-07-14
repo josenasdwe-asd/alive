@@ -40,6 +40,14 @@ const DURATIONS = {
   hue: 28,
   focus: 14.3,
   shadow: 9.7,
+  // NEW v3 animation durations (seconds)
+  heartbeat: 2.4, // quick lub-dub then rest
+  vortex: 16.5, // slow hypnotic spiral
+  ripple: 7.2, // medium radial wave
+  zTilt: 12.1, // slow 3D card tilt
+  sway3d: 10.4, // medium 3D turn
+  breatheX: 5.3, // horizontal breath (slightly faster than vertical)
+  scan: 3.8, // CRT scanline sweep
 };
 
 const BLEND_CSS: Record<BlendMode, string> = {
@@ -266,6 +274,14 @@ function LayerPlane({
   const hueDur = (DURATIONS.hue / Math.max(0.2, speed)).toFixed(2);
   const focusDur = (DURATIONS.focus / Math.max(0.2, speed)).toFixed(2);
   const shadowDur = (DURATIONS.shadow / Math.max(0.2, speed)).toFixed(2);
+  // NEW v3 durations
+  const heartbeatDur = (DURATIONS.heartbeat / Math.max(0.2, speed)).toFixed(2);
+  const vortexDur = (DURATIONS.vortex / Math.max(0.2, speed)).toFixed(2);
+  const rippleDur = (DURATIONS.ripple / Math.max(0.2, speed)).toFixed(2);
+  const zTiltDur = (DURATIONS.zTilt / Math.max(0.2, speed)).toFixed(2);
+  const sway3dDur = (DURATIONS.sway3d / Math.max(0.2, speed)).toFixed(2);
+  const breatheXDur = (DURATIONS.breatheX / Math.max(0.2, speed)).toFixed(2);
+  const scanDur = (DURATIONS.scan / Math.max(0.2, speed)).toFixed(2);
 
   const animations: string[] = [];
   const ampVars: Record<string, string | number> = {};
@@ -315,6 +331,37 @@ function LayerPlane({
     if (layerAnim.shadowDrift) {
       animations.push(`alive-shadow ${shadowDur}s ease-in-out infinite`);
       ampVars["--shadow-amp"] = `${4 * intensity}px`;
+    }
+    // NEW v3 animations
+    if (layerAnim.heartbeat) {
+      animations.push(`alive-heartbeat ${heartbeatDur}s ease-in-out infinite`);
+      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity;
+    }
+    if (layerAnim.vortex) {
+      animations.push(`alive-vortex ${vortexDur}s ease-in-out infinite`);
+      ampVars["--vortex-amp"] = layerAnim.vortexAmp * intensity * 0.5;
+      ampVars["--vortex-rot-amp"] = `${layerAnim.vortexRotAmp * intensity}deg`;
+    }
+    if (layerAnim.ripple) {
+      animations.push(`alive-ripple ${rippleDur}s ease-in-out infinite`);
+      ampVars["--ripple-x-amp"] = `${layerAnim.rippleAmp * intensity}px`;
+      ampVars["--ripple-y-amp"] = `${layerAnim.rippleAmp * intensity * 0.6}px`;
+    }
+    if (layerAnim.zTilt) {
+      animations.push(`alive-z-tilt ${zTiltDur}s ease-in-out infinite`);
+      ampVars["--z-tilt-amp"] = `${layerAnim.zTiltAmp * intensity}deg`;
+    }
+    if (layerAnim.sway3d) {
+      animations.push(`alive-sway-3d ${sway3dDur}s ease-in-out infinite`);
+      ampVars["--sway-3d-amp"] = `${layerAnim.sway3dAmp * intensity}deg`;
+    }
+    if (layerAnim.breatheX) {
+      animations.push(`alive-breathe-x ${breatheXDur}s ease-in-out infinite`);
+      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity;
+    }
+    if (layerAnim.scan) {
+      animations.push(`alive-scan ${scanDur}s linear infinite`);
+      ampVars["--scan-amp"] = layerAnim.scanAmp * intensity;
     }
   }
 

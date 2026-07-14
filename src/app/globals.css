@@ -240,6 +240,16 @@
 @property --shadow-x { syntax: "<number>"; inherits: false; initial-value: 0; }
 @property --shadow-y { syntax: "<number>"; inherits: false; initial-value: 0; }
 
+/* NEW v3 animation custom properties */
+@property --heartbeat { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --vortex { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --ripple-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --ripple-y { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --z-tilt { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --scan { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --breathe-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --sway-3d { syntax: "<number>"; inherits: false; initial-value: 0; }
+
 /* ===== "Alive" animation keyframes — all animate 0→1 or -1→1 (amplitude via CSS vars) ===== */
 @keyframes alive-breath {
   0%, 100% { --breath: 0; }
@@ -295,6 +305,67 @@
   50% { --shadow-x: -1; --shadow-y: -1; }
 }
 
+/* ===== NEW v3 animation keyframes — more creative motion forms ===== */
+
+/* Heartbeat: asymmetric double-thump pulse (lub-dub) like a real heart.
+   Two quick beats followed by a rest — much more organic than symmetric breathing. */
+@keyframes alive-heartbeat {
+  0%, 100% { --heartbeat: 0; }
+  10% { --heartbeat: 1; }
+  20% { --heartbeat: 0.3; }
+  30% { --heartbeat: 0.9; }
+  40% { --heartbeat: 0; }
+  100% { --heartbeat: 0; }
+}
+
+/* Vortex: spiral rotation that scales in and out — creates a hypnotic
+   "pulled into the scene" feeling. Combined with scale for true spiral. */
+@keyframes alive-vortex {
+  0% { --vortex: -1; }
+  25% { --vortex: 0.5; }
+  50% { --vortex: 1; }
+  75% { --vortex: -0.5; }
+  100% { --vortex: -1; }
+}
+
+/* Ripple: radial wave displacement — like a stone dropped in water.
+   X and Y offset in a circular phase pattern. */
+@keyframes alive-ripple {
+  0% { --ripple-x: 0; --ripple-y: 0; }
+  25% { --ripple-x: 1; --ripple-y: 0.5; }
+  50% { --ripple-x: 0; --ripple-y: 1; }
+  75% { --ripple-x: -1; --ripple-y: 0.5; }
+  100% { --ripple-x: 0; --ripple-y: 0; }
+}
+
+/* Z-tilt: oscillating perspective tilt — the layer rocks back and forth
+   in 3D space (rotateX) like a card held at an angle. */
+@keyframes alive-z-tilt {
+  0%, 100% { --z-tilt: -1; }
+  50% { --z-tilt: 1; }
+}
+
+/* Scan: CRT/VHS scanline sweep — a brightness band travels vertically.
+   Used with mix-blend-mode: overlay for authentic retro feel. */
+@keyframes alive-scan {
+  0% { --scan: -1; }
+  100% { --scan: 1; }
+}
+
+/* Breathe-x: horizontal-only breathing (asymmetric to vertical breath).
+   Creates a "stretching wide" feeling distinct from uniform scale. */
+@keyframes alive-breathe-x {
+  0%, 100% { --breathe-x: 0; }
+  50% { --breathe-x: 1; }
+}
+
+/* Sway-3d: 3D rotateY oscillation — the layer turns its face left/right
+   like a hanging picture. Distinct from 2D sway (which is rotateZ). */
+@keyframes alive-sway-3d {
+  0%, 100% { --sway-3d: -1; }
+  50% { --sway-3d: 1; }
+}
+
 @keyframes shimmer-sweep {
   0% { transform: translateX(-120%) skewX(-15deg); }
   100% { transform: translateX(220%) skewX(-15deg); }
@@ -337,18 +408,23 @@
  * naturally (parent transform × child transform) so no conflict.
  */
 .alive-layer {
+  /* v3: transform-style preserve-3d so rotateX/rotateY (z-tilt, sway-3d) work */
+  transform-style: preserve-3d;
   /* organic transform ONLY — animated vars (0..1) × amplitude vars (set by JS) */
   transform: translate3d(
-      calc(var(--drift-x, 0) * var(--drift-x-amp, 0px) + var(--wave-x, 0) * var(--wave-x-amp, 0px) + var(--jitter-x, 0) * var(--jitter-x-amp, 0px)),
-      calc(var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px)),
+      calc(var(--drift-x, 0) * var(--drift-x-amp, 0px) + var(--wave-x, 0) * var(--wave-x-amp, 0px) + var(--jitter-x, 0) * var(--jitter-x-amp, 0px) + var(--ripple-x, 0) * var(--ripple-x-amp, 0px)),
+      calc(var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px) + var(--ripple-y, 0) * var(--ripple-y-amp, 0px)),
       0
     )
-    scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02)))
-    rotate(calc(var(--sway, 0) * var(--sway-amp, 0deg) + var(--twist, 0) * var(--twist-amp, 0deg)));
+    scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02) + var(--heartbeat, 0) * var(--heartbeat-amp, 0.03) + var(--vortex, 0) * var(--vortex-amp, 0.01)))
+    scale(calc(1 + var(--breathe-x, 0) * var(--breathe-x-amp, 0.02)), 1)
+    rotate(calc(var(--sway, 0) * var(--sway-amp, 0deg) + var(--twist, 0) * var(--twist-amp, 0deg) + var(--vortex, 0) * var(--vortex-rot-amp, 0deg)))
+    rotateY(calc(var(--sway-3d, 0) * var(--sway-3d-amp, 0deg)))
+    rotateX(calc(var(--z-tilt, 0) * var(--z-tilt-amp, 0deg)));
   transform-origin: center;
   filter:
     blur(calc(var(--focus, 0) * var(--focus-amp, 0px) + var(--layer-blur, 0px)))
-    brightness(calc(1 + var(--glow, 0) * var(--glow-amp, 0) * 0.25))
+    brightness(calc(1 + var(--glow, 0) * var(--glow-amp, 0) * 0.25 + var(--scan, 0) * var(--scan-amp, 0) * 0.3))
     drop-shadow(calc(var(--shadow-x, 0) * var(--shadow-amp, 4px)) calc(var(--shadow-y, 0) * var(--shadow-amp, 4px)) 12px rgba(0,0,0,0.35))
     hue-rotate(calc(var(--hue, 0) * var(--hue-amp, 360deg)));
   will-change: transform, filter;
@@ -376,6 +452,10 @@
 }
 
 /* ===== Editor selection ring (on the user-transform wrapper, not .alive-layer) ===== */
+.alive-layer-wrapper {
+  /* v3: preserve-3d so child rotateX/rotateY (z-tilt, sway-3d) render in 3D space */
+  transform-style: preserve-3d;
+}
 .alive-layer-wrapper.selected::after {
   content: "";
   position: absolute;

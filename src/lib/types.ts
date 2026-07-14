@@ -112,7 +112,18 @@ export type PresetId =
   | "underwater"
   | "ethereal"
   | "noir"
-  | "cosmic";
+  | "cosmic"
+  // new v3 presets (creative expansion)
+  | "paper"
+  | "glass"
+  | "vintage"
+  | "techno"
+  | "zen"
+  | "lava"
+  | "prism"
+  | "ghost"
+  | "origami"
+  | "neon";
 
 export interface SpringPhysics {
   stiffness: number; // 1..200
@@ -154,6 +165,23 @@ export interface LayerAnimationConfig {
   shadowDrift: boolean; // drop-shadow moves opposite
   chromatic: boolean; // per-layer RGB split
   chromaticAmp: number;
+
+  // NEW v3 effects — more creative motion forms
+  heartbeat: boolean; // asymmetric double-thump pulse (lub-dub)
+  heartbeatAmp: number;
+  vortex: boolean; // spiral rotation + scale (hypnotic pull)
+  vortexAmp: number; // scale amplitude
+  vortexRotAmp: number; // rotation amplitude in deg
+  ripple: boolean; // radial wave displacement (stone in water)
+  rippleAmp: number; // px max offset
+  zTilt: boolean; // 3D rotateX oscillation (card tilt)
+  zTiltAmp: number; // deg max tilt
+  sway3d: boolean; // 3D rotateY oscillation (hanging picture)
+  sway3dAmp: number; // deg max turn
+  breatheX: boolean; // horizontal-only breathing
+  breatheXAmp: number;
+  scan: boolean; // CRT scanline brightness sweep
+  scanAmp: number;
 
   // === liquid (SVG) ===
   liquid: boolean;
@@ -373,6 +401,22 @@ export const DEFAULT_LAYER_ANIM: Omit<LayerAnimationConfig, "layerId"> = {
   shadowDrift: false,
   chromatic: false,
   chromaticAmp: 1.5,
+  // v3 defaults — all off, sensible amplitudes
+  heartbeat: false,
+  heartbeatAmp: 1,
+  vortex: false,
+  vortexAmp: 0.5,
+  vortexRotAmp: 8,
+  ripple: false,
+  rippleAmp: 4,
+  zTilt: false,
+  zTiltAmp: 3,
+  sway3d: false,
+  sway3dAmp: 4,
+  breatheX: false,
+  breatheXAmp: 1,
+  scan: false,
+  scanAmp: 0.5,
   liquid: false,
   liquidScale: 8,
   spring: DEFAULT_SPRING,

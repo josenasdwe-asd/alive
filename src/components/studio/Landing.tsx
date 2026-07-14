@@ -27,8 +27,8 @@ const FEATURES = [
   },
   {
     icon: MousePointer2,
-    title: "3 modos de render",
-    desc: "CSS multiplane · CSS 3D estereoscópico (translateZ real) · WebGL2 shader.",
+    title: "4 modos de render",
+    desc: "CSS multiplane · CSS 3D estereoscópico · WebGL2 depth shader · 3D Ken Burns point cloud.",
   },
   {
     icon: Cpu,
@@ -42,8 +42,8 @@ const FEATURES = [
   },
   {
     icon: Droplets,
-    title: "12 efectos orgánicos",
-    desc: "Respira, balancea, twist, flota, onda, jitter, glow, hue, focus, sombra…",
+    title: "19 efectos orgánicos",
+    desc: "Respira, balancea, twist, flota, onda, jitter, glow, hue, focus, sombra, heartbeat, vortex, ripple, z-tilt, sway-3d, breathe-x, scan…",
   },
   {
     icon: Sparkles,
@@ -158,17 +158,17 @@ export function Landing() {
       <section className="px-4 py-12 sm:px-6">
         <div className="mx-auto max-w-6xl">
           <h2 className="mb-2 text-center text-2xl font-semibold tracking-tight">
-            13 presets soñadores
+            23 presets creativos
           </h2>
           <p className="mx-auto mb-8 max-w-md text-center text-sm text-muted-foreground">
             Cada preset combina múltiples animaciones sutiles con duraciones
             primas para que nunca se sincronicen — la clave del efecto "vivo".
           </p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
             {PRESETS.map((p) => (
               <div
                 key={p.id}
-                className="rounded-xl border border-white/5 bg-white/[0.02] p-4"
+                className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-colors hover:border-white/15 hover:bg-white/[0.04]"
               >
                 <div className="text-2xl">{p.emoji}</div>
                 <h3 className="mt-2 text-sm font-medium">{p.name}</h3>

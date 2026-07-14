@@ -4066,3 +4066,63 @@ Stage Summary:
   in K-means mode; SLIC has 1 edge-case empty layer) ✓
 - The "alive" effect (breathing, sway, etc.) is now ACTUALLY VISIBLE — was completely
   silent before due to the inline transform override bug ✓
+
+---
+Task ID: PRESET-EXPANSION-v3
+Agent: Z.ai Code (main)
+Task: Add 10 new creative presets + 7 new animation forms
+
+Work Log:
+- Added 7 NEW organic animation forms to globals.css:
+  1. Heartbeat (alive-heartbeat): asymmetric double-thump pulse (lub-dub) like a real heart.
+     Two quick beats then rest — much more organic than symmetric breathing.
+  2. Vortex (alive-vortex): spiral rotation + scale for hypnotic "pulled into scene" feel.
+  3. Ripple (alive-ripple): radial wave displacement (stone in water) — X and Y in circular phase.
+  4. Z-tilt (alive-z-tilt): 3D rotateX oscillation — layer rocks back/forth like a tilted card.
+  5. Sway-3D (alive-sway-3d): 3D rotateY oscillation — layer turns face left/right like hanging picture.
+  6. Breathe-X (alive-breathe-x): horizontal-only breathing (asymmetric to vertical breath).
+  7. Scan (alive-scan): CRT/VHS scanline brightness sweep for retro feel.
+- Added 8 @property declarations for the new animated vars + 7 @keyframes.
+- Updated .alive-layer transform to compose all new animations:
+  translate3d (with ripple) → scale (breath + heartbeat + vortex) → scaleX (breathe-x)
+  → rotate (sway + twist + vortex) → rotateY (sway-3d) → rotateX (z-tilt)
+- Updated .alive-layer filter to add scan brightness modulation.
+- Added transform-style: preserve-3d to .alive-layer AND .alive-layer-wrapper so the new
+  rotateX/rotateY animations render in true 3D space (not flattened).
+- Added 10 NEW high-quality creative presets (v3):
+  1. Paper (📄): jitter + grain + breathing → analog paper tremble
+  2. Glass (🪞): chromatic + z-tilt + sway-3d → refracting glass
+  3. Vintage (📽️): gate weave + grain + scanlines + light leak → 8mm film
+  4. Techno (🤖): heartbeat + scan + jitter + chromatic → cyberpunk glitch
+  5. Zen (🧘): ultra-slow breathing + sway → meditative minimalism
+  6. Lava (🌋): liquid + hue drift + glow + wave + embers → flowing magma
+  7. Prism (🔮): extreme hue drift + chromatic + ripple + sway-3d → rainbow refraction
+  8. Ghost (👻): hue drift + focus pull + drift + fog → spectral apparition
+  9. Origami (🦢): z-tilt + sway-3d + twist → paper folding 3D (uses css3d mode)
+  10. Neon (💡): extreme glow + chromatic + hue drift + scan → cyberpunk neon
+- Each preset has carefully tuned amplitude + phase combos for distinct aesthetic.
+- Updated types.ts: added 10 new PresetId values + 7 new LayerAnimationConfig fields
+  (heartbeat, vortex, ripple, zTilt, sway3d, breatheX, scan) with sensible defaults.
+- Updated DEFAULT_LAYER_ANIM with all new fields.
+- Updated AliveLayers.tsx: added 7 new DURATIONS + 7 new animation ampVar blocks.
+- Updated AliveCSS3D.tsx: same parity (all 7 new animations added).
+- Updated presets.ts buildAnimationFromPreset: gateWeave now comes from preset.base.
+- Updated ai.ts: VLM prompt now knows about all 23 presets with smart routing rules
+  (landscapes→zen, urban→techno/neon, fire→lava, abstract→prism/glass/origami, etc.).
+- Updated LayerInspector.tsx: added "v3" section with 7 new EffectToggle controls
+  (Heart, Disc3, Radio, Box, RotateCw, Activity, ScanLine icons).
+- Updated Landing.tsx: "23 presets creativos", "4 modos de render", "19 efectos orgánicos".
+
+Stage Summary:
+- Total presets: 13 → 23 (10 new creative v3 presets added)
+- Total organic animations: 12 → 19 (7 new motion forms added)
+- All new animations verified working via browser inspection:
+  - Techno: alive-heartbeat + alive-scan active, --heartbeat-amp=1.04, --scan-amp=0.78 ✓
+  - Origami: alive-z-tilt + alive-sway-3d active, transform-style: preserve-3d ✓
+  - Lava: alive-breath + alive-sway + alive-wave + alive-glow + alive-hue ✓
+  - Neon: alive-glow (amp 1.35) + alive-hue, scan on depth>0.4 layers ✓
+- No console errors, no page errors across all preset tests
+- Lint passes cleanly, dev server compiles without errors
+- The new animations compose naturally with existing ones (breathing, sway, etc.)
+  because they use separate CSS @property vars that all feed into the single .alive-layer
+  transform calc

@@ -237,7 +237,10 @@ export function AnalysisPanel() {
       if (!analysis) throw new Error("No analysis");
 
       setProgress(75);
-      // Call /api/segment which does inpainting + extraction
+      // Call /api/segment with 120s timeout (extraction takes time)
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 120000);
+
       const res = await fetchWithRetry("/api/segment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -246,7 +249,12 @@ export function AnalysisPanel() {
           subject: analysis.subject,
           layers: analysis.layers,
         }),
+        signal: controller.signal,
+      }).catch((err: any) => {
+        if (err.name === "AbortError") throw new Error("Timeout: la extracción tardó demasiado. Intenta con menos capas.");
+        throw err;
       });
+      clearTimeout(timeout);
 
       setProgress(90);
 
@@ -371,11 +379,17 @@ export function AnalysisPanel() {
       <PanelShell title="Analizando imagen" icon={<ScanSearch className="h-4 w-4" />}>
         <div className="space-y-3">
           <div className="relative overflow-hidden rounded-lg">
-            <img
-              src={previewUrl}
-              alt="Analizando"
-              className="aspect-video w-full object-cover"
-            />
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Analizando"
+                className="aspect-video w-full object-cover"
+              />
+            ) : (
+              <div className="flex aspect-video items-center justify-center bg-white/[0.02]">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-2 left-2 flex items-center gap-1.5 text-xs text-white/90">
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -417,7 +431,9 @@ export function AnalysisPanel() {
                 ? "K-means 1D + dilatación morfológica…"
                 : strategy === "slic"
                   ? "SLIC superpixels + clustering semántico…"
-                  : "Extrayendo elementos con IA…"}
+                  : strategy === "ai-extract"
+                    ? "Inpaintando fondo + extrayendo elementos con IA (puede tardar 1-2 min)…"
+                    : "Extrayendo elementos con IA…"}
             </li>
           </ul>
           <p className="text-[11px] text-muted-foreground/70">

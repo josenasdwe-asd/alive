@@ -3282,3 +3282,40 @@ Stage Summary:
 - Priorización en 4 fases (impacto inmediato → wow factor → pulido)
 - Cada técnica tiene su base matemática/algorítmica especificada
 - Foco en el problema principal del usuario: capas semánticas reales (no bandas de profundidad)
+
+---
+Task ID: RADICAL-IMPROVEMENTS-FINAL
+Agent: Z.ai Code (main)
+Task: Radical improvements — audio-reactive, motion engine, adaptive quality
+
+Work Log:
+- RECOVERED: motion-engine.ts was lost — recreated with all functions:
+  spring physics, FM breathing, AM envelope, 2D simplex noise, motion prediction,
+  inertia field, velocity motion blur, audio-reactive motion, cubic Bézier easing
+- RECOVERED: use-gyroscope.ts, use-adaptive-quality.ts hooks recreated
+- NEW: Audio-reactive motion system (use-audio-reactive.ts):
+  - Web Audio API AnalyserNode (fftSize 1024, smoothing 0.8)
+  - Bass/mid/treble frequency band extraction
+  - Beat detection (rolling average, 1.3× threshold, 200ms cooldown)
+  - Beat intensity decay (0.92/frame)
+  - Mic input or audio file upload
+- NEW: AudioReactiveOverlay component — RAF loop reads window.__aliveAudio
+  and writes CSS vars (--audio-scale, --audio-breath, --audio-sway, --audio-glow,
+  --audio-brightness) to all .alive-layer elements in real-time
+- NEW: AudioReactivePanel UI — mic/file buttons, live frequency bars,
+  sensitivity slider, beat indicator
+- NEW: CSS integration — .alive-layer transform now multiplies by --audio-scale
+  and adds --audio-breath to breathing, --audio-sway to rotation, --audio-glow
+  to brightness. Defaults to no effect when audio is off.
+- FIXED: /api/upload endpoint was missing (404 error). Created route with
+  FormData handling + saveUpload integration.
+- PUSHED: All changes pushed to git (commit f98edc2)
+
+Stage Summary:
+- Audio-reactive: layers pulse to music beats (bass→scale, mid→rotate, treble→drift)
+- Motion engine: full mathematical functions (spring, FM, simplex, inertia, prediction)
+- Adaptive quality: device tier detection + off-screen pause
+- Gyroscope: mobile tilt parallax (hook ready)
+- 7 layers render correctly, audio panel visible in Animate tab
+- No critical errors, lint clean
+- All pushed to https://github.com/josenasdwe-asd/alive.git (commit f98edc2)

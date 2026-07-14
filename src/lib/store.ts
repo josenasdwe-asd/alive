@@ -229,7 +229,7 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
       ...layer,
       id: newId,
       name: `${layer.name} copy`,
-      transform: { ...layer.transform, x: layer.transform.x + 20, y: layer.transform.y + 20 },
+      transform: { ...layer.transform, x: layer.transform.x + 20, y: layer.transform.y + 20, zOverride: undefined },
     };
     const layers = [...get().layers, newLayer];
     const anim = get().animation;

@@ -393,7 +393,7 @@ function LayerPlane({
         data-layer-id={layer.id}
         style={
           {
-            transform: `translate3d(${t.x}px, ${t.y}px, 0) scale(${userScale}) rotate(${t.rotation}deg)`,
+            transform: `scale(${userScale}) rotate(${t.rotation}deg)`,
             animationDelay: phaseDelay,
             animation: animations.join(", ") || undefined,
             filter: useLiquid ? `url(#${liquidFilterId})` : undefined,

@@ -367,10 +367,14 @@
   to { transform: rotate(360deg); }
 }
 
-/* utility to apply the stacked transform from custom properties */
+/* utility to apply the organic animations from custom properties.
+ * NOTE: the transform here is for organic animations ONLY (breathing, sway, etc).
+ * The user transform (x, y, scale, rotation) is applied by the middle wrapper via framer-motion.
+ * The inner .alive-layer only handles organic animation + filter effects.
+ */
 .alive-layer {
-  transform: translate3d(var(--px, 0px), var(--py, 0px), 0)
-    translate3d(
+  /* organic transform — separate from user transform (which is on the parent) */
+  transform: translate3d(
       calc(var(--drift-x, 0px) + var(--wave-x, 0px) + var(--jitter-x, 0px)),
       calc(var(--float-y, 0px) + var(--jitter-y, 0px)),
       0

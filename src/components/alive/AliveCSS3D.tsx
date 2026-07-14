@@ -117,6 +117,7 @@ export function AliveCSS3D({
           key={layer.id}
           layer={layer}
           index={i}
+          total={sorted.length}
           zRange={zRange}
           config={config}
           liquidFilterId={liquidFilterId}
@@ -132,6 +133,7 @@ export function AliveCSS3D({
 interface CSS3DLayerProps {
   layer: ImageLayer;
   index: number;
+  total: number;
   zRange: number;
   config: AnimationConfig;
   liquidFilterId?: string;
@@ -143,6 +145,7 @@ interface CSS3DLayerProps {
 function CSS3DLayer({
   layer,
   index,
+  total,
   zRange,
   config,
   liquidFilterId,
@@ -200,11 +203,29 @@ function CSS3DLayer({
 
   const useLiquid =
     layerAnim.liquid && config.liquidEnabled && liquidFilterId;
-  const layerBlur = t.blur + layerAnim.blur;
+
+  // === DOF (same calibration as AliveLayers) ===
+  let dofBlur = 0;
+  if (config.dofEnabled && !config.reducedMotion) {
+    const focusDepth = config.focusMode === "object" && config.focusLayerId
+      ? (config.layers[config.focusLayerId] ? layer.depth : config.focusDepth)
+      : config.focusDepth;
+    const dist = Math.abs(layer.depth - focusDepth);
+    dofBlur = dist * config.aperture * 12;
+  }
+
+  const layerBlur = t.blur + layerAnim.blur + dofBlur;
   ampVars["--layer-blur"] = `${layerBlur}px`;
 
-  const overscale = (1.15 + layer.depth * 0.05) * t.scale;
+  // === Scale-with-depth (same as AliveLayers) ===
+  const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
+  const overscale = (1.15 + layer.depth * 0.05) * depthScale * t.scale;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
+
+  // entrance reveal (same calibration as AliveLayers)
+  const entranceDelay = config.entranceEnabled
+    ? layer.depth * 0.08 * Math.min(total, 4)
+    : 0;
 
   return (
     // OUTER: 3D position (translateZ) + blend + opacity

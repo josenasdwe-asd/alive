@@ -21,6 +21,8 @@ import { ComparisonSlider } from "./ComparisonSlider";
 import { NaturalLanguageAnimate } from "./NaturalLanguageAnimate";
 import { QualityScore } from "./QualityScore";
 import { ProjectPanel } from "./ProjectPanel";
+import { ExportVideoPanel } from "./ExportVideoPanel";
+import { FlowFieldOverlay } from "@/components/alive/FlowFieldOverlay";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useUndoRedo } from "@/hooks/use-undo-redo";
 import { useProjectPersistence } from "@/hooks/use-project-persistence";
@@ -38,6 +40,7 @@ import {
   Undo2,
   Redo2,
   Wand2,
+  Wind,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -70,6 +73,7 @@ export function Studio() {
   const [editorMode, setEditorMode] = useState(false);
   const [rightTab, setRightTab] = useState<RightTab>("animate");
   const [restored, setRestored] = useState(false);
+  const [flowFieldEnabled, setFlowFieldEnabled] = useState(false);
 
   useKeyboardShortcuts(editorMode, setEditorMode);
   const undoRedo = useUndoRedo();
@@ -139,6 +143,10 @@ export function Studio() {
                       selectedLayerId={selectedLayerId}
                     />
                   )}
+                  {/* v3 VANGUARDIA: Flow field drawing overlay */}
+                  {flowFieldEnabled && (
+                    <FlowFieldOverlay enabled={flowFieldEnabled} onToggle={() => setFlowFieldEnabled(false)} />
+                  )}
                 </>
               ) : (
                 <PreviewLoading previewUrl={previewUrl} status={status} />
@@ -174,6 +182,21 @@ export function Studio() {
               </button>
 
               <ComparisonSlider />
+
+              {/* v3 VANGUARDIA: Flow field toggle */}
+              <button
+                onClick={() => setFlowFieldEnabled(!flowFieldEnabled)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-colors",
+                  flowFieldEnabled
+                    ? "border-primary/50 bg-primary/15 text-primary"
+                    : "border-white/5 text-muted-foreground hover:text-foreground"
+                )}
+                title="Flow field: dibuja flechas para movimiento direccional"
+              >
+                <Wind className="h-3 w-3" />
+                Flow
+              </button>
 
               <div className="h-4 w-px bg-white/10" />
 
@@ -318,6 +341,9 @@ function RightPanelTabs({
       {tab === "export" && isReady && (
         <>
           <ProjectPanel />
+          <section className="glass rounded-xl p-3">
+            <ExportVideoPanel />
+          </section>
           <ExportPanel />
         </>
       )}

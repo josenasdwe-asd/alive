@@ -56,11 +56,29 @@ export function DynamicRelighting({
     let raf = 0;
     let startT = performance.now();
 
+    // cache temp canvas and depth data (avoid allocating every frame)
+    let tempCanvas: HTMLCanvasElement | null = null;
+    let tempCtx: CanvasRenderingContext2D | null = null;
+    let depthData: ImageData | null = null;
+    let lastDepthUrl = "";
+
     const setup = () => {
       depthImg = new Image();
       depthImg.crossOrigin = "anonymous";
       depthImg.onload = () => {
         resize();
+        // pre-allocate temp canvas
+        const sampleW = 256;
+        const sampleH = Math.round((canvas.height / canvas.width) * 256);
+        tempCanvas = document.createElement("canvas");
+        tempCanvas.width = sampleW;
+        tempCanvas.height = sampleH;
+        tempCtx = tempCanvas.getContext("2d");
+        if (tempCtx) {
+          tempCtx.drawImage(depthImg, 0, 0, sampleW, sampleH);
+          depthData = tempCtx.getImageData(0, 0, sampleW, sampleH);
+        }
+        lastDepthUrl = depthUrl;
         render();
       };
       depthImg.src = depthUrl;
@@ -90,17 +108,10 @@ export function DynamicRelighting({
       const ly = Math.cos(lightEl) * Math.sin(lightAz);
       const lz = Math.sin(lightEl);
 
-      // draw depth map to a temp canvas at higher res for sampling
-      // CALIBRATED: was 128, now 256 (less pixelated when upscaled)
-      const sampleW = 256;
-      const sampleH = Math.round((H / W) * 256);
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = sampleW;
-      tempCanvas.height = sampleH;
-      const tempCtx = tempCanvas.getContext("2d");
-      if (!tempCtx) return;
-      tempCtx.drawImage(depthImg, 0, 0, sampleW, sampleH);
-      const depthData = tempCtx.getImageData(0, 0, sampleW, sampleH);
+      // use cached depth data (no allocation per frame)
+      if (!tempCtx || !depthData || !tempCanvas) return;
+      const sampleW = depthData.width;
+      const sampleH = depthData.height;
 
       // compute lighting
       const lightData = tempCtx.createImageData(sampleW, sampleH);

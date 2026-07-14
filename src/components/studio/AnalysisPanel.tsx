@@ -374,6 +374,7 @@ export function AnalysisPanel() {
               <StrategyCard
                 active={false}
                 onClick={runDepthSlice}
+                disabled={stage === "decomposing"}
                 icon={<Cpu className="h-4 w-4" />}
                 title="Quick Mode"
                 badge="⚡ Validación · 3s"
@@ -402,6 +403,7 @@ export function AnalysisPanel() {
               <StrategyCard
                 active={false}
                 onClick={runAiExtract}
+                disabled={stage === "decomposing"}
                 icon={<Sparkles className="h-4 w-4" />}
                 title="PRO Mode"
                 badge="🎯 Producción · 15s"
@@ -411,6 +413,7 @@ export function AnalysisPanel() {
               <StrategyCard
                 active={false}
                 onClick={runSlic}
+                disabled={stage === "decomposing"}
                 icon={<LayersIcon className="h-4 w-4" />}
                 title="SLIC Semántico"
                 badge="🧬 Superpixels · 5s"
@@ -513,10 +516,12 @@ function StrategyCard({
   badge: string;
   desc: string;
   extra?: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={cn(
         "group flex w-full flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition-all hover:border-primary/40 hover:bg-primary/5",
         active ? "border-primary bg-primary/10" : "border-white/8 bg-white/[0.02]"

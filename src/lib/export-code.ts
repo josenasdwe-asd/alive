@@ -194,33 +194,17 @@ interface ExportPlane {
 }
 
 function buildExportPlanes(params: ExportParams): ExportPlane[] {
-  const { layers, originalUrl, backgroundUrl, foregroundUrl } = params;
-  const planes: ExportPlane[] = [];
-  const bgLayer = layers.find((l) => l.role === "background");
-  if (backgroundUrl)
-    planes.push({
-      layerId: bgLayer?.id ?? "bg",
-      depth: bgLayer?.depth ?? 0.1,
-      url: backgroundUrl,
-      alt: "Background",
-    });
-  const subjectLayer = layers.find((l) => l.role === "subject");
-  planes.push({
-    layerId: subjectLayer?.id ?? "subject",
-    depth: subjectLayer?.depth ?? 0.6,
-    url: originalUrl,
-    alt: "Main image",
-  });
-  if (foregroundUrl) {
-    const fgLayer = layers.find((l) => l.role === "foreground");
-    planes.push({
-      layerId: fgLayer?.id ?? "fg",
-      depth: fgLayer?.depth ?? 0.95,
-      url: foregroundUrl,
-      alt: "Foreground",
-    });
-  }
-  return planes;
+  const { layers } = params;
+  // export ALL real layers (sorted back→front), skip invisible and empty
+  return [...layers]
+    .filter((l) => l.transform.visible && l.url)
+    .sort((a, b) => a.depth - b.depth)
+    .map((l) => ({
+      layerId: l.id,
+      depth: l.depth,
+      url: l.url,
+      alt: l.name,
+    }));
 }
 
 /**

@@ -52,7 +52,12 @@ export function UploadZone() {
         // Upload to server
         const fd = new FormData();
         fd.append("file", file);
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        let res: Response;
+        try {
+          res = await fetch("/api/upload", { method: "POST", body: fd });
+        } catch (fetchErr: any) {
+          throw new Error("No se pudo conectar al servidor. Recarga la página e intenta de nuevo.");
+        }
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || "Upload failed");
 
@@ -82,9 +87,13 @@ export function UploadZone() {
       try {
         toast.info(`Cargando ejemplo: ${label}…`);
         // Download via server proxy to avoid CORS/NetworkError
-        // The server fetches the external URL and returns the image
-        const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
-        if (!proxyRes.ok) throw new Error("No se pudo descargar la imagen");
+        let proxyRes: Response;
+        try {
+          proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
+        } catch (fetchErr: any) {
+          throw new Error("No se pudo conectar al servidor. Recarga la página e intenta de nuevo.");
+        }
+        if (!proxyRes.ok) throw new Error("No se pudo descargar la imagen de ejemplo");
         const blob = await proxyRes.blob();
         const file = new File([blob], "example.jpg", { type: "image/jpeg" });
         await handleFile(file);

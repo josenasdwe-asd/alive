@@ -93,9 +93,9 @@ export function AnalysisPanel() {
         return data;
       } catch (err: any) {
         lastErr = err;
-        // NetworkError — don't retry, just fail immediately with clear message
-        if (err.name === "TypeError" && err.message?.includes("NetworkError")) {
-          throw new Error("Error de red. Verifica tu conexión y recarga la página.");
+        // NetworkError / fetch failed — server might be restarting (hot reload)
+        if (err.name === "TypeError" || err.message?.includes("NetworkError") || err.message?.includes("fetch")) {
+          throw new Error("No se pudo conectar al servidor. Recarga la página e intenta de nuevo.");
         }
         if (err.name === "AbortError") {
           lastErr = new Error("Tiempo agotado. El servidor tardó demasiado. Recarga e intenta de nuevo.");

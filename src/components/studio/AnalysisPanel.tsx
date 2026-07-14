@@ -76,9 +76,12 @@ export function AnalysisPanel() {
     let lastErr: any;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        // Add 30s timeout for each attempt
+        // NO timeout for /api/segment (needs up to 2 min for AI extraction)
+        // 60s timeout for everything else
+        const isSegment = url.includes("/api/segment");
+        const timeoutMs = isSegment ? 180000 : 60000;
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 30000);
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
         const res = await fetch(url, { ...opts, signal: controller.signal });
         clearTimeout(timeout);
 
@@ -90,11 +93,15 @@ export function AnalysisPanel() {
         return data;
       } catch (err: any) {
         lastErr = err;
+        // NetworkError — don't retry, just fail immediately with clear message
+        if (err.name === "TypeError" && err.message?.includes("NetworkError")) {
+          throw new Error("Error de red. Verifica tu conexión y recarga la página.");
+        }
         if (err.name === "AbortError") {
-          lastErr = new Error("Tiempo agotado. El servidor tardó demasiado.");
+          lastErr = new Error("Tiempo agotado. El servidor tardó demasiado. Recarga e intenta de nuevo.");
           break;
         }
-        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429") || err?.name === "TypeError";
+        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429");
         if (attempt < maxRetries && isRetryable) {
           const delay = 1500 + Math.random() * 500;
           setProgress((p) => Math.max(p, 15 + attempt * 10));
@@ -102,7 +109,7 @@ export function AnalysisPanel() {
         }
       }
     }
-    throw lastErr ?? new Error("Request failed after retries");
+    throw lastErr ?? new Error("Request failed");
   }
 
   async function runAnalyze() {
@@ -243,10 +250,7 @@ export function AnalysisPanel() {
       if (!analysis) throw new Error("No analysis");
 
       setProgress(75);
-      // Call /api/segment with 120s timeout (extraction takes time)
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 120000);
-
+      // Call /api/segment (fetchWithRetry handles timeout: 180s for segment)
       const res = await fetchWithRetry("/api/segment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -255,12 +259,7 @@ export function AnalysisPanel() {
           subject: analysis.subject,
           layers: analysis.layers,
         }),
-        signal: controller.signal,
-      }).catch((err: any) => {
-        if (err.name === "AbortError") throw new Error("Timeout: la extracción tardó demasiado. Intenta con menos capas.");
-        throw err;
       });
-      clearTimeout(timeout);
 
       setProgress(90);
 

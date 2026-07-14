@@ -3,11 +3,11 @@ import ZAI from "z-ai-web-dev-sdk";
 import fs from "fs/promises";
 import path from "path";
 import type { SceneAnalysis } from "./types";
+import { getZai as getZaiBase, withRetry, enqueue, getCached, setCached, hashKey, generateWithCache } from "./ai-resilient";
 
-let _zaiPromise: Promise<Awaited<ReturnType<typeof ZAI.create>>> | null = null;
-async function getZai() {
-  if (!_zaiPromise) _zaiPromise = ZAI.create();
-  return _zaiPromise;
+// Re-export getZai for backwards compatibility
+export async function getZai() {
+  return getZaiBase();
 }
 
 /** Read a local image file as base64 data URL */
@@ -35,6 +35,15 @@ export async function imageToDataUrl(filePath: string): Promise<string> {
  * relighting, intensity, speed) for one-click professional setup.
  */
 export async function analyzeImage(dataUrl: string): Promise<SceneAnalysis> {
+  // v3 FIX: cache VLM analysis results so repeated calls (re-analysis, re-upload)
+  // don't hit the API and trigger 429 rate limits.
+  const cacheKey = `analyze:${hashKey(dataUrl.substring(0, 200))}`;
+  const cached = getCached<SceneAnalysis>(cacheKey);
+  if (cached) {
+    console.log("[ai] analyze cache hit — skipping API call");
+    return cached;
+  }
+
   const zai = await getZai();
 
   const prompt = `Decompose this image into 6-8 semantic depth layers for parallax animation AND recommend a full animation configuration. Return ONLY raw JSON (no markdown, no prose):
@@ -55,21 +64,26 @@ Rules:
 - recommendedPreset routing: landscapes→cinematic3d/aurora/zen, portraits→ethereal/float/ghost, night/dark→noir/cosmic/neon, ocean/water→underwater/lava, dreamy→dream/ghost, urban→techno/neon/vintage, vintage/analog→vintage/paper, abstract→prism/glass/origami, fire/warm→lava, paper/illustration→paper/boil.
 - recommendedConfig: choose renderMode webgl if depth parallax is key, css3d for 3D tilt scenes, css for organic. sceneComposition: horizon for landscapes, subject-focus for portraits, tunnel for perspective scenes. colorGrade: teal-orange for warm/action, bleach-bypass for dramatic, portra for skin tones, blade-runner for neon, noir-film for dark/monochrome. dofFocusDepth = subject layer's depth. relightingAzimuth/Elevation match the apparent light direction in the image. intensity/speed: calm scenes 0.7-0.9 slow, dramatic 1.2-1.4 fast.`;
 
-  const response = await zai.chat.completions.createVision({
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: prompt },
-          { type: "image_url", image_url: { url: dataUrl } },
-        ],
-      },
-    ],
-    thinking: { type: "disabled" },
-  });
+  // v3 FIX: use queued + retried execution to handle 429 errors
+  const response = await enqueue(() => withRetry(() =>
+    zai.chat.completions.createVision({
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: dataUrl } },
+          ],
+        },
+      ],
+      thinking: { type: "disabled" },
+    })
+  ));
 
   const content = response.choices[0]?.message?.content ?? "";
-  return parseAnalysis(content);
+  const result = parseAnalysis(content);
+  setCached(cacheKey, result);
+  return result;
 }
 
 function parseAnalysis(content: string): SceneAnalysis {
@@ -191,45 +205,55 @@ function parseAnalysis(content: string): SceneAnalysis {
 /**
  * Generate the inpainted background plate (subject removed) via image-edit.
  * This is the key asset for parallax — when the original shifts, this fills the gap.
+ *
+ * v3 FIX: now uses cached + queued + retried execution to handle 429 errors.
  */
 export async function generateBackgroundPlate(
   dataUrl: string,
   subject: string
 ): Promise<Buffer> {
-  const zai = await getZai();
-  const prompt = `Remove the ${subject} from this image completely. Inpaint the background naturally and seamlessly where the ${subject} used to be, so the scene looks like the ${subject} was never there. Keep every other element — sky, ground, background objects, lighting, colors — identical to the original. Photorealistic seamless inpainting, no artifacts, no text, no blur. The result must be the same scene with the ${subject} gone.`;
+  const cacheKey = `bg:${hashKey(dataUrl.substring(0, 100), subject)}`;
+  return generateWithCache(cacheKey, async () => {
+    const zai = await getZai();
+    const prompt = `Remove the ${subject} from this image completely. Inpaint the background naturally and seamlessly where the ${subject} used to be, so the scene looks like the ${subject} was never there. Keep every other element — sky, ground, background objects, lighting, colors — identical to the original. Photorealistic seamless inpainting, no artifacts, no text, no blur. The result must be the same scene with the ${subject} gone.`;
 
-  const response = await zai.images.generations.edit({
-    prompt,
-    images: [{ url: dataUrl }],
-    size: "1024x1024",
+    const response = await zai.images.generations.edit({
+      prompt,
+      images: [{ url: dataUrl }],
+      size: "1024x1024",
+    });
+
+    const b64 = response.data?.[0]?.base64;
+    if (!b64) throw new Error("No image returned from background generation");
+    return Buffer.from(b64, "base64");
   });
-
-  const b64 = response.data?.[0]?.base64;
-  if (!b64) throw new Error("No image returned from background generation");
-  return Buffer.from(b64, "base64");
 }
 
 /**
  * Generate a grayscale depth map (white=near, black=far) via image-edit.
  * Used for WebGL displacement-mode parallax and for masking the subject in CSS mode.
+ *
+ * v3 FIX: now uses cached + queued + retried execution to handle 429 errors.
  */
 export async function generateDepthMap(
   dataUrl: string,
   subject: string
 ): Promise<Buffer> {
-  const zai = await getZai();
-  const prompt = `Convert this image into a clean grayscale depth map. White (#ffffff) represents pixels closest to the camera, black (#000000) represents the farthest background. The ${subject} must be the brightest area (closest). Smooth gradients between depth regions, no harsh noise, no text, no labels. Pure grayscale depth visualization, like a 3D depth pass from a CGI render.`;
+  const cacheKey = `depth:${hashKey(dataUrl.substring(0, 100), subject)}`;
+  return generateWithCache(cacheKey, async () => {
+    const zai = await getZai();
+    const prompt = `Convert this image into a clean grayscale depth map. White (#ffffff) represents pixels closest to the camera, black (#000000) represents the farthest background. The ${subject} must be the brightest area (closest). Smooth gradients between depth regions, no harsh noise, no text, no labels. Pure grayscale depth visualization, like a 3D depth pass from a CGI render.`;
 
-  const response = await zai.images.generations.edit({
-    prompt,
-    images: [{ url: dataUrl }],
-    size: "1024x1024",
+    const response = await zai.images.generations.edit({
+      prompt,
+      images: [{ url: dataUrl }],
+      size: "1024x1024",
+    });
+
+    const b64 = response.data?.[0]?.base64;
+    if (!b64) throw new Error("No image returned from depth generation");
+    return Buffer.from(b64, "base64");
   });
-
-  const b64 = response.data?.[0]?.base64;
-  if (!b64) throw new Error("No image returned from depth generation");
-  return Buffer.from(b64, "base64");
 }
 
 /**

@@ -289,7 +289,7 @@ function LayerPlane({
   if (!config.reducedMotion) {
     if (layerAnim.breathing) {
       animations.push(`alive-breath ${breathDur}s ease-in-out infinite`);
-      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity;
+      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity * 0.02;
     }
     if (layerAnim.sway) {
       animations.push(`alive-sway ${swayDur}s ease-in-out infinite`);
@@ -335,11 +335,11 @@ function LayerPlane({
     // NEW v3 animations
     if (layerAnim.heartbeat) {
       animations.push(`alive-heartbeat ${heartbeatDur}s ease-in-out infinite`);
-      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity;
+      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity * 0.03;
     }
     if (layerAnim.vortex) {
       animations.push(`alive-vortex ${vortexDur}s ease-in-out infinite`);
-      ampVars["--vortex-amp"] = layerAnim.vortexAmp * intensity * 0.5;
+      ampVars["--vortex-amp"] = layerAnim.vortexAmp * intensity * 0.5 * 0.01;
       ampVars["--vortex-rot-amp"] = `${layerAnim.vortexRotAmp * intensity}deg`;
     }
     if (layerAnim.ripple) {
@@ -357,7 +357,7 @@ function LayerPlane({
     }
     if (layerAnim.breatheX) {
       animations.push(`alive-breathe-x ${breatheXDur}s ease-in-out infinite`);
-      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity;
+      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity * 0.02;
     }
     if (layerAnim.scan) {
       animations.push(`alive-scan ${scanDur}s linear infinite`);

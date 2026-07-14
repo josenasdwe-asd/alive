@@ -216,7 +216,7 @@ function CSS3DLayer({
     // calc actually reads were never set, so 4 of 5 animations were doubly dead.
     if (layerAnim.breathing) {
       animations.push(`alive-breath ${breathDur}s ease-in-out infinite`);
-      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity;
+      ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity * 0.02;
     }
     if (layerAnim.sway) {
       animations.push(`alive-sway ${swayDur}s ease-in-out infinite`);
@@ -264,11 +264,11 @@ function CSS3DLayer({
     // v3 animations — parity with AliveLayers
     if (layerAnim.heartbeat) {
       animations.push(`alive-heartbeat ${heartbeatDur}s ease-in-out infinite`);
-      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity;
+      ampVars["--heartbeat-amp"] = layerAnim.heartbeatAmp * intensity * 0.03;
     }
     if (layerAnim.vortex) {
       animations.push(`alive-vortex ${vortexDur}s ease-in-out infinite`);
-      ampVars["--vortex-amp"] = layerAnim.vortexAmp * intensity * 0.5;
+      ampVars["--vortex-amp"] = layerAnim.vortexAmp * intensity * 0.5 * 0.01;
       ampVars["--vortex-rot-amp"] = `${layerAnim.vortexRotAmp * intensity}deg`;
     }
     if (layerAnim.ripple) {
@@ -286,7 +286,7 @@ function CSS3DLayer({
     }
     if (layerAnim.breatheX) {
       animations.push(`alive-breathe-x ${breatheXDur}s ease-in-out infinite`);
-      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity;
+      ampVars["--breathe-x-amp"] = layerAnim.breatheXAmp * intensity * 0.02;
     }
     if (layerAnim.scan) {
       animations.push(`alive-scan ${scanDur}s linear infinite`);

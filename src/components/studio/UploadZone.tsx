@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { UploadCloud, ImagePlus, Loader2, Sparkles } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { toast } from "sonner";
@@ -28,6 +28,18 @@ export function UploadZone() {
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // v3 FIX: Auto-recover from stuck "Procesando..." state
+  // If uploading is true for more than 60s, force reset
+  useEffect(() => {
+    if (!uploading) return;
+    const timeout = setTimeout(() => {
+      setUploading(false);
+      setStatus("idle");
+      toast.error("El procesamiento tardó demasiado. Recarga la página e intenta de nuevo.");
+    }, 60000);
+    return () => clearTimeout(timeout);
+  }, [uploading, setStatus]);
 
   const handleFile = useCallback(
     async (file: File) => {

@@ -215,9 +215,6 @@ export function AliveStage({
 
       <EffectOverlays effects={config.effects ?? {}} speed={config.speed} />
 
-      {/* v3 VANGUARDIA: Flow field motion — directional pixel flow from drawn arrows */}
-      <FlowFieldRenderer imageUrl={originalUrl} enabled={showFlowField} />
-
       <ColorGrading grade={config.colorGrade} intensity={1} />
 
       {/* Depth fog volumétrico + Bloom/ACES — gated by adaptive quality */}

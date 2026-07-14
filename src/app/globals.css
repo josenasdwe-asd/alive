@@ -410,10 +410,10 @@
 .alive-layer {
   /* v3: transform-style preserve-3d so rotateX/rotateY (z-tilt, sway-3d) work */
   transform-style: preserve-3d;
-  /* organic transform ONLY — animated vars (0..1) × amplitude vars (set by JS) */
+  /* organic transform ONLY — animated vars (0..1) × amplitude vars (set by JS) + flow field */
   transform: translate3d(
-      calc(var(--drift-x, 0) * var(--drift-x-amp, 0px) + var(--wave-x, 0) * var(--wave-x-amp, 0px) + var(--jitter-x, 0) * var(--jitter-x-amp, 0px) + var(--ripple-x, 0) * var(--ripple-x-amp, 0px)),
-      calc(var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px) + var(--ripple-y, 0) * var(--ripple-y-amp, 0px)),
+      calc(var(--flow-x, 0px) + var(--drift-x, 0) * var(--drift-x-amp, 0px) + var(--wave-x, 0) * var(--wave-x-amp, 0px) + var(--jitter-x, 0) * var(--jitter-x-amp, 0px) + var(--ripple-x, 0) * var(--ripple-x-amp, 0px)),
+      calc(var(--flow-y, 0px) + var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px) + var(--ripple-y, 0) * var(--ripple-y-amp, 0px)),
       0
     )
     scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02) + var(--heartbeat, 0) * var(--heartbeat-amp, 0.03) + var(--vortex, 0) * var(--vortex-amp, 0.01) + var(--breathe-x, 0) * var(--breathe-x-amp, 0.02)))

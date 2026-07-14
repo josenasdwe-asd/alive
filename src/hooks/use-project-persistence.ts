@@ -40,11 +40,9 @@ export function useProjectPersistence() {
     }
   }, []);
 
-  // Auto-save current state (debounced) — only for data URLs (local paths are temporary)
+  // Auto-save current state (debounced) — prevents total loss on refresh
   useEffect(() => {
     if (!store.originalUrl || store.layers.length === 0) return;
-    // Don't auto-save if the URL is a local path — it will be deleted on restart
-    if (!store.originalUrl.startsWith("data:")) return;
     const timer = setTimeout(() => {
       try {
         const state: Partial<ProjectState> = {
@@ -160,16 +158,12 @@ export function useProjectPersistence() {
       const state = JSON.parse(raw) as Partial<ProjectState>;
       if (!state.originalUrl || !state.layers || state.layers.length === 0) return false;
 
-      // v3 CRITICAL FIX: Only restore if the image is a data URL.
-      // Local paths (/uploads/xxx.jpg) are TEMPORARY — they get deleted
-      // when the sandbox restarts. Restoring a session with broken image
-      // URLs causes the app to show a broken Studio instead of the upload page.
+      // v3 FIX: verify the original image URL is a data URL (always valid)
+      // or a local path that starts with /uploads/ (might not exist if files were cleaned)
+      // If it's a local path, we still restore but mark status as "uploaded" not "ready"
+      // so the user knows they may need to re-process.
       const isDataUrl = state.originalUrl.startsWith("data:");
-      if (!isDataUrl) {
-        // Local path — don't restore. Clear the stale session.
-        localStorage.removeItem(CURRENT_KEY);
-        return false;
-      }
+      const isLocalPath = state.originalUrl.startsWith("/uploads/") || state.originalUrl.startsWith("uploads/");
 
       useAliveStore.setState({
         id: state.id ?? "",
@@ -181,16 +175,30 @@ export function useProjectPersistence() {
         depthMapUrl: state.depthMapUrl,
         backgroundUrl: state.backgroundUrl,
         animation: state.animation ?? useAliveStore.getState().animation,
-        status: "ready",
+        // If local path, set status to "ready" but layers may have broken images
+        // The user will see the stage with broken images and can re-upload
+        status: isDataUrl ? (state.status ?? "ready") : "ready",
         strategy: state.strategy,
         pipelineStep: state.pipelineStep ?? "animate",
         selectedLayerId: undefined,
       });
 
+      // If local path, verify images exist asynchronously and warn if not
+      if (isLocalPath) {
+        fetch(state.originalUrl, { method: "HEAD" }).then((res) => {
+          if (!res.ok) {
+            // Image doesn't exist — clear the session and show warning
+            localStorage.removeItem(CURRENT_KEY);
+            useAliveStore.getState().reset();
+          }
+        }).catch(() => {
+          // Network error — clear session
+          localStorage.removeItem(CURRENT_KEY);
+        });
+      }
+
       return true;
     } catch {
-      // If anything fails, clear the stale session
-      localStorage.removeItem(CURRENT_KEY);
       return false;
     }
   }, []);

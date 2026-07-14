@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useRef, useState } from "react";
 import { UploadCloud, ImagePlus, Loader2, Sparkles } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { toast } from "sonner";
@@ -43,19 +43,24 @@ export function UploadZone() {
       try {
         const fd = new FormData();
         fd.append("file", file);
-
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || "Upload failed");
 
-        setOriginal({
-          id: data.id,
-          url: data.url,
-          width: data.width,
-          height: data.height,
-        });
+        // also create a local data URL for instant preview
+        const reader = new FileReader();
+        reader.onload = () => {
+          setOriginal({
+            id: data.id,
+            url: data.url,
+            width: data.width,
+            height: data.height,
+            dataUrl: reader.result as string,
+          });
+        };
+        reader.readAsDataURL(file);
 
-        toast.success("Imagen cargada — analizando…");
+        toast.success("Imagen cargada — analizando profundidad…");
       } catch (err: any) {
         toast.error(err?.message ?? "Error al subir la imagen");
         setStatus("error", err?.message);
@@ -71,13 +76,12 @@ export function UploadZone() {
       setUploading(true);
       try {
         toast.info(`Cargando ejemplo: ${label}…`);
-        const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
-        if (!proxyRes.ok) throw new Error("No se pudo descargar la imagen de ejemplo");
-        const blob = await proxyRes.blob();
+        const res = await fetch(url);
+        const blob = await res.blob();
         const file = new File([blob], "example.jpg", { type: "image/jpeg" });
         await handleFile(file);
-      } catch (err: any) {
-        toast.error(err?.message ?? "No se pudo cargar el ejemplo");
+      } catch {
+        toast.error("No se pudo cargar el ejemplo");
         setUploading(false);
       }
     },

@@ -31,15 +31,18 @@ export async function POST(req: NextRequest) {
       const analysis = await analyzeImage(dataUrl);
       return NextResponse.json({ success: true, analysis });
     } catch (vlmErr: any) {
-      // VLM failed (429, truncated JSON, timeout, etc.)
-      // Always return a fallback so the user can proceed
-      console.warn("[analyze] VLM failed, using fallback:", vlmErr?.message?.substring(0, 80));
-      const fallback = buildFallbackAnalysis();
-      return NextResponse.json({
-        success: true,
-        analysis: fallback,
-        fallback: true,
-      });
+      // VLM failed (likely 429 rate limit) — return a deterministic fallback
+      // so the user can still proceed with Depth Slice (which only needs a depth map)
+      const msg = String(vlmErr?.message ?? "");
+      if (msg.includes("429") || msg.includes("Too many requests")) {
+        const fallback = buildFallbackAnalysis();
+        return NextResponse.json({
+          success: true,
+          analysis: fallback,
+          fallback: true,
+        });
+      }
+      throw vlmErr;
     }
   } catch (err: any) {
     console.error("[analyze] error", err);

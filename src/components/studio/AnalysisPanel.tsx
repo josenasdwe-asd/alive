@@ -76,15 +76,8 @@ export function AnalysisPanel() {
     let lastErr: any;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        // Dynamic timeout: segment=180s, analyze=120s, everything else=60s
-        const isSegment = url.includes("/api/segment");
-        const isAnalyze = url.includes("/api/analyze");
-        const timeoutMs = isSegment ? 180000 : isAnalyze ? 120000 : 60000;
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), timeoutMs);
-        const res = await fetch(url, { ...opts, signal: controller.signal });
-        clearTimeout(timeout);
-
+        const res = await fetch(url, opts);
+        // Only retry on gateway errors and rate limiting — NOT on 4xx client errors
         if (res.status === 502 || res.status === 503 || res.status === 504 || res.status === 429) {
           throw new Error(`Gateway ${res.status} — reintentando…`);
         }
@@ -93,23 +86,17 @@ export function AnalysisPanel() {
         return data;
       } catch (err: any) {
         lastErr = err;
-        // NetworkError / fetch failed — server might be restarting (hot reload)
-        if (err.name === "TypeError" || err.message?.includes("NetworkError") || err.message?.includes("fetch")) {
-          throw new Error("No se pudo conectar al servidor. Recarga la página e intenta de nuevo.");
-        }
-        if (err.name === "AbortError") {
-          lastErr = new Error("Tiempo agotado. El servidor tardó demasiado. Recarga e intenta de nuevo.");
-          break;
-        }
-        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429");
+        // Don't retry on 4xx (except 429) — these are permanent failures
+        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429") || err?.name === "TypeError"; // network errors
         if (attempt < maxRetries && isRetryable) {
+          // v3 FIX: reduced from 3s/6s/9s to 1.5s — fail fast to fallback
           const delay = 1500 + Math.random() * 500;
           setProgress((p) => Math.max(p, 15 + attempt * 10));
           await new Promise((r) => setTimeout(r, delay));
         }
       }
     }
-    throw lastErr ?? new Error("Request failed");
+    throw lastErr ?? new Error("Request failed after retries");
   }
 
   async function runAnalyze() {
@@ -250,7 +237,7 @@ export function AnalysisPanel() {
       if (!analysis) throw new Error("No analysis");
 
       setProgress(75);
-      // Call /api/segment (fetchWithRetry handles timeout: 180s for segment)
+      // Call /api/segment which does inpainting + extraction
       const res = await fetchWithRetry("/api/segment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -384,17 +371,11 @@ export function AnalysisPanel() {
       <PanelShell title="Analizando imagen" icon={<ScanSearch className="h-4 w-4" />}>
         <div className="space-y-3">
           <div className="relative overflow-hidden rounded-lg">
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Analizando"
-                className="aspect-video w-full object-cover"
-              />
-            ) : (
-              <div className="flex aspect-video items-center justify-center bg-white/[0.02]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            )}
+            <img
+              src={previewUrl}
+              alt="Analizando"
+              className="aspect-video w-full object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             <div className="absolute bottom-2 left-2 flex items-center gap-1.5 text-xs text-white/90">
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -436,9 +417,7 @@ export function AnalysisPanel() {
                 ? "K-means 1D + dilatación morfológica…"
                 : strategy === "slic"
                   ? "SLIC superpixels + clustering semántico…"
-                  : strategy === "ai-extract"
-                    ? "Inpaintando fondo + extrayendo elementos con IA (puede tardar 1-2 min)…"
-                    : "Extrayendo elementos con IA…"}
+                  : "Extrayendo elementos con IA…"}
             </li>
           </ul>
           <p className="text-[11px] text-muted-foreground/70">

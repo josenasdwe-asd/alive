@@ -16,7 +16,7 @@ export function Footer() {
           <Heart className="h-3 w-3 fill-primary text-primary" />
           usando VLM, image-edit, WebGL2 y SVG filters
           <span className="ml-2 rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">
-            v3.7
+            v3.8
           </span>
         </p>
       </div>

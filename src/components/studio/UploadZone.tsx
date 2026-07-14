@@ -29,18 +29,6 @@ export function UploadZone() {
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // v3 FIX: Auto-recover from stuck "Procesando..." state
-  // If uploading is true for more than 60s, force reset
-  useEffect(() => {
-    if (!uploading) return;
-    const timeout = setTimeout(() => {
-      setUploading(false);
-      setStatus("idle");
-      toast.error("El procesamiento tardó demasiado. Recarga la página e intenta de nuevo.");
-    }, 60000);
-    return () => clearTimeout(timeout);
-  }, [uploading, setStatus]);
-
   const handleFile = useCallback(
     async (file: File) => {
       if (!file.type.startsWith("image/")) {
@@ -53,33 +41,13 @@ export function UploadZone() {
       }
       setUploading(true);
       try {
-        // Upload to server FIRST (more reliable than FileReader)
         const fd = new FormData();
         fd.append("file", file);
 
-        // Add timeout to upload
-        const uploadController = new AbortController();
-        const uploadTimeout = setTimeout(() => uploadController.abort(), 30000);
-
-        let res: Response;
-        try {
-          res = await fetch("/api/upload", {
-            method: "POST",
-            body: fd,
-            signal: uploadController.signal,
-          });
-        } catch (fetchErr: any) {
-          if (fetchErr.name === "AbortError") {
-            throw new Error("El upload tardó demasiado. Intenta con una imagen más pequeña.");
-          }
-          throw new Error("No se pudo conectar al servidor. Recarga la página e intenta de nuevo.");
-        }
-        clearTimeout(uploadTimeout);
-
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.error || "Upload failed");
 
-        // Set original with server URL (no FileReader needed — avoids hanging)
         setOriginal({
           id: data.id,
           url: data.url,
@@ -103,23 +71,7 @@ export function UploadZone() {
       setUploading(true);
       try {
         toast.info(`Cargando ejemplo: ${label}…`);
-        // Download via server proxy with timeout
-        const proxyController = new AbortController();
-        const proxyTimeout = setTimeout(() => proxyController.abort(), 15000);
-
-        let proxyRes: Response;
-        try {
-          proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`, {
-            signal: proxyController.signal,
-          });
-        } catch (fetchErr: any) {
-          if (fetchErr.name === "AbortError") {
-            throw new Error("La descarga tardó demasiado. Intenta de nuevo.");
-          }
-          throw new Error("No se pudo conectar al servidor. Recarga la página.");
-        }
-        clearTimeout(proxyTimeout);
-
+        const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(url)}`);
         if (!proxyRes.ok) throw new Error("No se pudo descargar la imagen de ejemplo");
         const blob = await proxyRes.blob();
         const file = new File([blob], "example.jpg", { type: "image/jpeg" });

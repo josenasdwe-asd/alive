@@ -30,6 +30,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
+import { SCENE_MAP } from "@/lib/scene-compositions";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -87,6 +88,7 @@ export function LayersPanel() {
     updateLayerTransform,
     addLayer,
     originalUrl,
+    animation,
   } = useAliveStore();
 
   const [extracting, setExtracting] = useState(false);
@@ -205,11 +207,16 @@ export function LayersPanel() {
           strategy={verticalListSortingStrategy}
         >
           <ul className="scroll-thin max-h-[280px] space-y-1 overflow-y-auto pr-0.5">
-            {sorted.map((layer) => (
+            {sorted.map((layer) => {
+              const sceneComp = animation.sceneComposition;
+              const scene = sceneComp ? SCENE_MAP[sceneComp as keyof typeof SCENE_MAP] : null;
+              const isAnchor = scene ? scene.isAnchor(layer, 0, sorted.length) : false;
+              return (
               <SortableLayerRow
                 key={layer.id}
                 layer={layer}
                 selected={selectedLayerId === layer.id}
+                isAnchor={isAnchor}
                 onSelect={() => selectLayer(layer.id)}
                 onToggleVisible={() =>
                   updateLayerTransform(layer.id, {
@@ -231,7 +238,8 @@ export function LayersPanel() {
                   updateLayerTransform(layer.id, { blendMode: v as BlendMode })
                 }
               />
-            ))}
+              );
+            })}
           </ul>
         </SortableContext>
       </DndContext>
@@ -248,6 +256,7 @@ export function LayersPanel() {
 interface RowProps {
   layer: ImageLayer;
   selected: boolean;
+  isAnchor?: boolean;
   onSelect: () => void;
   onToggleVisible: () => void;
   onToggleLock: () => void;
@@ -259,7 +268,7 @@ interface RowProps {
 }
 
 function SortableLayerRow(props: RowProps) {
-  const { layer, selected } = props;
+  const { layer, selected, isAnchor } = props;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: layer.id });
 
@@ -320,6 +329,11 @@ function SortableLayerRow(props: RowProps) {
             >
               {ROLE_LABELS[layer.role] ?? layer.role}
             </span>
+            {isAnchor && (
+              <span className="rounded bg-amber-500/20 px-1 py-px text-[8px] font-medium uppercase tracking-wide text-amber-300" title="Capa anclada (sin parallax)">
+                ancla
+              </span>
+            )}
           </div>
           <div className="mt-0.5 h-0.5 w-full overflow-hidden rounded-full bg-white/5">
             <div

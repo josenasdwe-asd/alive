@@ -37,18 +37,21 @@ export const SCENE_COMPOSITIONS: SceneComposition[] = [
     name: "Horizonte",
     emoji: "🌅",
     desc: "El cielo se mueve, el suelo te ancla. Clásico de paisajes.",
-    isAnchor: (l) => l.depth < 0.35, // background/sky is anchor
-    parallaxMultiplier: (l) => (l.depth < 0.35 ? 0 : l.depth),
+    // anchor: bottom 40% of depth range (ground/floor stays still)
+    isAnchor: (l) => l.depth < 0.2,
+    parallaxMultiplier: (l) => (l.depth < 0.2 ? 0 : l.depth * 1.2),
   },
   {
     id: "subject-focus",
     name: "Sujeto ancla",
     emoji: "👤",
     desc: "El sujeto permanece quieto, fondo y frente se mueven. Ideal para retratos.",
-    isAnchor: (l) => l.role === "subject" || (l.depth > 0.4 && l.depth < 0.7),
+    // anchor: the layer closest to depth 0.5 (the subject)
+    isAnchor: (l, _i, _total) => l.depth > 0.4 && l.depth < 0.65,
     parallaxMultiplier: (l) => {
-      if (l.role === "subject") return 0;
-      return Math.abs(l.depth - 0.5) * 2; // far and near move most
+      if (l.depth > 0.4 && l.depth < 0.65) return 0;
+      // far and near layers move most — parabola centered at 0.5
+      return Math.abs(l.depth - 0.5) * 2.5;
     },
   },
   {
@@ -56,10 +59,12 @@ export const SCENE_COMPOSITIONS: SceneComposition[] = [
     name: "Túnel",
     emoji: "🌀",
     desc: "El centro queda fijo, los bordes se mueven hacia dentro. Sensación de inmersión.",
-    isAnchor: (l, i, total) => i === Math.floor(total / 2),
-    parallaxMultiplier: (l, i, total) => {
-      const center = Math.floor(total / 2);
-      return Math.abs(i - center) / total;
+    // anchor: the middle layer by DEPTH (not array index — more reliable)
+    isAnchor: (l) => l.depth > 0.4 && l.depth < 0.6,
+    parallaxMultiplier: (l) => {
+      if (l.depth > 0.4 && l.depth < 0.6) return 0;
+      // layers further from center move more
+      return Math.abs(l.depth - 0.5) * 2;
     },
   },
   {
@@ -67,8 +72,9 @@ export const SCENE_COMPOSITIONS: SceneComposition[] = [
     name: "Viento",
     emoji: "🍃",
     desc: "El primer plano se balancea, el fondo permanece. Naturaleza viva.",
-    isAnchor: (l) => l.depth < 0.4,
-    parallaxMultiplier: (l) => (l.depth < 0.4 ? 0.1 : l.depth * 1.5),
+    // anchor: far layers (background stays still, foreground sways)
+    isAnchor: (l) => l.depth < 0.35,
+    parallaxMultiplier: (l) => (l.depth < 0.35 ? 0 : (l.depth - 0.35) * 2),
   },
   {
     id: "anchor-midground",
@@ -78,7 +84,7 @@ export const SCENE_COMPOSITIONS: SceneComposition[] = [
     isAnchor: (l) => l.depth > 0.35 && l.depth < 0.65,
     parallaxMultiplier: (l) => {
       if (l.depth > 0.35 && l.depth < 0.65) return 0;
-      return l.depth < 0.35 ? 0.5 : 1;
+      return l.depth < 0.35 ? 0.5 : 1.2;
     },
   },
   {
@@ -113,9 +119,12 @@ export function applySceneComposition(
   const scene = SCENE_MAP[sceneId] ?? SCENE_MAP.free;
   const result: Record<string, Partial<LayerAnimationConfig>> = {};
 
-  layers.forEach((layer, i) => {
-    const anchor = scene.isAnchor(layer, i, layers.length);
-    const mult = scene.parallaxMultiplier(layer, i, layers.length);
+  // sort layers by depth so index-based logic works correctly
+  const sorted = [...layers].sort((a, b) => a.depth - b.depth);
+
+  sorted.forEach((layer, i) => {
+    const anchor = scene.isAnchor(layer, i, sorted.length);
+    const mult = scene.parallaxMultiplier(layer, i, sorted.length);
 
     if (anchor) {
       // anchors: no parallax, subtle breathing only
@@ -129,14 +138,22 @@ export function applySceneComposition(
         driftX: false,
       };
     } else {
-      // drifters: full parallax scaled by multiplier
+      // drifters: parallax + organic effects scaled by multiplier
+      const isWind = sceneId === "wind";
+      const isTunnel = sceneId === "tunnel";
       result[layer.id] = {
-        parallaxStrength: baseParallax * mult,
+        parallaxStrength: Math.round(baseParallax * mult),
         mouseVelocityInfluence: 0.3 * mult,
         breathing: true,
         breathingAmp: 0.5 + mult * 0.5,
-        sway: mult > 0.5,
-        swayAmp: mult * 0.6,
+        // sway: always for wind (front sways), for others only if mult is high
+        sway: isWind ? true : mult > 0.5,
+        swayAmp: isWind ? 1.0 : mult * 0.6,
+        // floatY: tunnel layers float inward, others float if mult is high
+        floatY: isTunnel || mult > 0.7,
+        floatAmp: isTunnel ? 0.8 : mult * 0.5,
+        driftX: mult > 0.6,
+        driftAmp: mult * 0.4,
       };
     }
   });

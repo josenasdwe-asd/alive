@@ -23,6 +23,7 @@ import { QualityScore } from "./QualityScore";
 import { ProjectPanel } from "./ProjectPanel";
 import { ExportVideoPanel } from "./ExportVideoPanel";
 import { FlowFieldOverlay } from "@/components/alive/FlowFieldOverlay";
+import { PaintOnImage } from "@/components/alive/PaintOnImage";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useUndoRedo } from "@/hooks/use-undo-redo";
 import { useProjectPersistence } from "@/hooks/use-project-persistence";
@@ -41,6 +42,7 @@ import {
   Redo2,
   Wand2,
   Wind,
+  Brush,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -74,6 +76,7 @@ export function Studio() {
   const [rightTab, setRightTab] = useState<RightTab>("animate");
   const [restored, setRestored] = useState(false);
   const [flowFieldEnabled, setFlowFieldEnabled] = useState(false);
+  const [paintEnabled, setPaintEnabled] = useState(false);
 
   useKeyboardShortcuts(editorMode, setEditorMode);
   const undoRedo = useUndoRedo();
@@ -147,6 +150,10 @@ export function Studio() {
                   {flowFieldEnabled && (
                     <FlowFieldOverlay enabled={flowFieldEnabled} onToggle={() => setFlowFieldEnabled(false)} />
                   )}
+                  {/* v3 RADICAL: Paint on image — click to modify animation */}
+                  {paintEnabled && (
+                    <PaintOnImage enabled={paintEnabled} onToggle={() => setPaintEnabled(false)} />
+                  )}
                 </>
               ) : (
                 <PreviewLoading previewUrl={previewUrl} status={status} />
@@ -196,6 +203,21 @@ export function Studio() {
               >
                 <Wind className="h-3 w-3" />
                 Flow
+              </button>
+
+              {/* v3 RADICAL: Paint on image — modify animation by clicking */}
+              <button
+                onClick={() => setPaintEnabled(!paintEnabled)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition-colors",
+                  paintEnabled
+                    ? "border-primary/50 bg-primary/15 text-primary"
+                    : "border-white/5 text-muted-foreground hover:text-foreground"
+                )}
+                title="Pintar: modifica la animación clickeando la imagen"
+              >
+                <Brush className="h-3 w-3" />
+                Pintar
               </button>
 
               <div className="h-4 w-px bg-white/10" />

@@ -223,7 +223,7 @@ export const PRESETS: PresetMeta[] = [
       shimmerEnabled: false,
       chromaticAberration: 1.8,
       vignette: 0.4,
-      renderMode: "webgl",
+      renderMode: "css",
       mouseSmoothing: 0.05,
     },
   },

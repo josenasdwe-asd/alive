@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import {
   generateBackgroundPlate,
   generateDepthMap,
@@ -40,27 +41,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const safeUrl = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
+    // Sanitize URL path (keep as relative URL, not full path — readImageAsDataUrl handles resolution)
+    const safeUrl = url.replace(/^\/+/, "").replace(/(\.\.(\/|\\|$))+/g, "");
     const dataUrl = await readImageAsDataUrl(safeUrl);
     const originalPath = path.join(process.cwd(), "public", safeUrl);
+
+    // Get original image dimensions so we can resize AI-generated assets to match
+    // CRITICAL FIX (C3): AI depth map is forced to 1024x1024 by the API, which
+    // misaligns with non-square color images. Resize depth map to original dims.
+    const originalMeta = await sharp(originalPath).metadata();
+    const origW = originalMeta.width ?? 1024;
+    const origH = originalMeta.height ?? 1024;
 
     // Phase 1: try AI for bg + depth, fallback to deterministic on 429
     const out: Record<string, { url: string; filename: string } | null> = {};
 
-    // depth map
+    // depth map — resize AI output to match original aspect ratio
     try {
       const buf = await generateDepthMap(dataUrl, subject);
-      const r = await saveGeneratedImage(buf, "depth");
+      // resize to exact original dimensions (fit: fill to avoid letterboxing)
+      const resizedDepth = await sharp(buf)
+        .resize(origW, origH, { fit: "fill" })
+        .png()
+        .toBuffer();
+      const r = await saveGeneratedImage(resizedDepth, "depth");
       out.depth = { url: r.url, filename: r.filename };
     } catch (e: any) {
       console.warn("[separate] AI depth failed, using deterministic fallback", e?.message);
       out.depth = await generateDeterministicDepth(originalPath);
     }
 
-    // background plate
+    // background plate — resize AI output to match original aspect ratio
     try {
       const buf = await generateBackgroundPlate(dataUrl, subject);
-      const r = await saveGeneratedImage(buf, "bg");
+      const resizedBg = await sharp(buf)
+        .resize(origW, origH, { fit: "fill" })
+        .png()
+        .toBuffer();
+      const r = await saveGeneratedImage(resizedBg, "bg");
       out.background = { url: r.url, filename: r.filename };
     } catch (e: any) {
       console.warn("[separate] AI bg failed, using deterministic fallback", e?.message);
@@ -98,7 +116,12 @@ export async function POST(req: NextRequest) {
       const results = await Promise.allSettled(
         batch.map(async (t) => {
           const buf = await extractElement(dataUrl, t.extractPrompt!);
-          const r = await saveGeneratedImage(buf, sanitizeFilename(`layer-${t.name}`));
+          // resize extracted element to original aspect ratio too
+          const resizedEl = await sharp(buf)
+            .resize(origW, origH, { fit: "fill" })
+            .png()
+            .toBuffer();
+          const r = await saveGeneratedImage(resizedEl, sanitizeFilename(`layer-${t.name}`));
           return { layerName: t.name, ...r };
         })
       );

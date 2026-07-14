@@ -27,7 +27,10 @@ interface AliveStageProps {
   backgroundUrl?: string;
   depthUrl?: string;
   framed?: boolean;
+  /** Tailwind aspect class (e.g. "aspect-[16/10]"). Ignored if aspectRatio is set. */
   aspectClass?: string;
+  /** Numeric aspect ratio (width/height). Takes precedence over aspectClass. */
+  aspectRatio?: number;
   editorMode?: boolean;
   selectedLayerId?: string;
   onSelectLayer?: (id: string) => void;
@@ -45,6 +48,7 @@ export function AliveStage({
   depthUrl,
   framed = false,
   aspectClass = "aspect-[16/10]",
+  aspectRatio,
   editorMode = false,
   selectedLayerId,
   onSelectLayer,
@@ -71,9 +75,11 @@ export function AliveStage({
 
   return (
     <div
-      className={`relative w-full ${aspectClass} overflow-hidden rounded-xl bg-black ${
+      data-alive-stage="true"
+      className={`relative w-full ${aspectRatio ? "" : aspectClass} overflow-hidden rounded-xl bg-black ${
         framed ? "ring-1 ring-white/10" : ""
       }`}
+      style={aspectRatio ? { aspectRatio: String(aspectRatio) } : undefined}
     >
       <div className="absolute inset-0 checker opacity-30" />
 
@@ -214,13 +220,17 @@ export function AliveStage({
       <AtmosphericAnimation type="timelapse" enabled={config.atmoTimelapse && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
       <AtmosphericAnimation type="seasonal" enabled={config.atmoSeasonal && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />
 
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-        style={vignetteStyle}
-      />
+      {/* CRITICAL FIX (H3, H4): vignette and chromatic overlays are ALREADY applied
+       * inside the WebGL/KenBurns3D shaders. Skip the CSS overlays to prevent doubling. */}
+      {!canWebGL && !canKenBurns3D && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+          style={vignetteStyle}
+        />
+      )}
 
-      {config.chromaticAberration > 0 && !canWebGL && (
+      {config.chromaticAberration > 0 && !canWebGL && !canKenBurns3D && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 mix-blend-screen"

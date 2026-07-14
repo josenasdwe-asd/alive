@@ -342,7 +342,10 @@ function LayerPlane({
 
   // === Scale-with-depth: layers auto-scale based on Z (Disguise "Scale with depth") ===
   const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
-  const overscale = (1.08 + layer.depth * 0.04) * depthScale;
+  // CALIBRATED (BUG B1 fix): bumped from 1.08 to 1.18 base + intensity-aware extra
+  // Old: (1.08 + depth*0.04) — insufficient at extreme mouse+velocity (max parallax 43px > 36px tolerance)
+  // New: (1.18 + depth*0.06) + intensity*0.04 — front layer 1.24×+intensity, back 1.18×+intensity
+  const overscale = (1.18 + layer.depth * 0.06 + intensity * 0.04) * depthScale;
   const userScale = t.scale * overscale;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
@@ -394,14 +397,24 @@ function LayerPlane({
           willChange: "transform",
         }}
       >
-      {/* INNER content — user transform (plain CSS, moveable controls this) */}
-      {/* The .alive-layer class applies breathing/sway/etc via @property */}
+      {/* USER TRANSFORM wrapper — moveable target (BUG F fix)
+       * Previously: inline `transform: scale() rotate()` on .alive-layer OVERRODE the
+       * CSS organic-animation transform, disabling ALL 7 transform anims.
+       * Now: user transform (x, y, scale, rotation) lives HERE on a separate wrapper.
+       * The .alive-layer child handles ONLY organic animation transform via CSS calc.
+       * Parent transform × child transform = composed user × organic (natural CSS). */}
       <div
-        className={`alive-layer absolute inset-0 ${selected ? "selected" : ""}`}
         data-layer-id={layer.id}
+        className={`alive-layer-wrapper absolute inset-0 ${selected ? "selected" : ""}`}
+        style={{
+          transform: `translate3d(${t.x}px, ${t.y}px, 0) scale(${userScale}) rotate(${t.rotation}deg)`,
+        }}
+      >
+      {/* ORGANIC ANIMATION layer — CSS calc transform (breathing/sway/twist/float/drift/wave/jitter) + filter */}
+      <div
+        className="alive-layer absolute inset-0"
         style={
           {
-            transform: `scale(${userScale}) rotate(${t.rotation}deg)`,
             animationDelay: phaseDelay,
             animation: animations.join(", ") || undefined,
             filter: useLiquid ? `url(#${liquidFilterId})` : undefined,
@@ -417,6 +430,7 @@ function LayerPlane({
             draggable={false}
           />
         ) : null}
+      </div>
       </div>
       </motion.div>
     </motion.div>

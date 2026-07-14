@@ -329,12 +329,15 @@
 }
 
 /* utility to apply the organic animations from custom properties.
- * NOTE: the transform here is for organic animations ONLY (breathing, sway, etc).
- * The user transform (x, y, scale, rotation) is applied by the middle wrapper via framer-motion.
- * The inner .alive-layer only handles organic animation + filter effects.
+ * CRITICAL FIX (BUG F): the user transform (x, y, scale, rotation) now lives on a
+ * SEPARATE parent wrapper (the moveable target). The .alive-layer ONLY handles
+ * organic animation transform + filter. Previously the inline `transform: scale() rotate()`
+ * on .alive-layer OVERRODE this entire calc, silently disabling ALL organic animations
+ * (breathing, sway, twist, float, drift, wave, jitter). The parent wrapper composes
+ * naturally (parent transform × child transform) so no conflict.
  */
 .alive-layer {
-  /* organic transform — animated vars (0..1) × amplitude vars (set by JS) */
+  /* organic transform ONLY — animated vars (0..1) × amplitude vars (set by JS) */
   transform: translate3d(
       calc(var(--drift-x, 0) * var(--drift-x-amp, 0px) + var(--wave-x, 0) * var(--wave-x-amp, 0px) + var(--jitter-x, 0) * var(--jitter-x-amp, 0px)),
       calc(var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px)),
@@ -372,8 +375,8 @@
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
-/* ===== Editor selection ring ===== */
-.alive-layer.selected::after {
+/* ===== Editor selection ring (on the user-transform wrapper, not .alive-layer) ===== */
+.alive-layer-wrapper.selected::after {
   content: "";
   position: absolute;
   inset: -2px;
@@ -381,6 +384,7 @@
   border-radius: inherit;
   pointer-events: none;
   box-shadow: 0 0 0 1px oklch(0.7 0.15 165 / 30%), 0 0 20px oklch(0.7 0.15 165 / 40%);
+  z-index: 10;
 }
 
 /* ===== Editor canvas handles ===== */

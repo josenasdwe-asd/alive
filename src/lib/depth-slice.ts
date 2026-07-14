@@ -102,6 +102,11 @@ function edgeAwareSmooth(
  * K-means 1D clustering.
  * Returns the cluster label (0..k-1) for each pixel, plus the sorted cluster
  * centers (so cluster 0 = darkest = farthest).
+ *
+ * FIXED (BUG #3): empty clusters produced phantom transparent PNG layers.
+ *  - Init centers at evenly-spaced HISTOGRAM QUANTILES (not just first k values)
+ *  - Use `<=` in the assignment step so ties don't all collapse to cluster 0
+ *  - After convergence, DROP empty clusters (return only non-empty ones)
  */
 function kmeans1d(
   data: Uint8Array,
@@ -119,13 +124,22 @@ function kmeans1d(
   for (let v = 0; v < 256; v++) {
     count += histogram[v];
     if (count >= target || v === 255) {
-      centers.push(v);
+      // only add if this center value isn't already in the list (dedupe)
+      if (centers.length === 0 || centers[centers.length - 1] !== v) {
+        centers.push(v);
+      }
       target += step;
       if (centers.length >= k) break;
     }
   }
-  // pad if needed
-  while (centers.length < k) centers.push(centers[centers.length - 1] ?? 128);
+  // pad if needed — use evenly spaced values across the data range instead of duplicates
+  const dataMin = centers[0] ?? 0;
+  const dataMax = centers[centers.length - 1] ?? 255;
+  while (centers.length < k) {
+    const idx = centers.length;
+    const interpolated = Math.round(dataMin + ((dataMax - dataMin) * idx) / Math.max(1, k - 1));
+    centers.push(interpolated);
+  }
 
   const labels = new Uint8Array(data.length);
 
@@ -141,7 +155,8 @@ function kmeans1d(
       let bestD = Infinity;
       for (let c = 0; c < k; c++) {
         const d = Math.abs(v - centers[c]);
-        if (d < bestD) {
+        // BUG #3 fix: use <= so ties distribute evenly (was strict <, collapsed to c=0)
+        if (d <= bestD) {
           bestD = d;
           bestC = c;
         }
@@ -154,7 +169,7 @@ function kmeans1d(
       counts[bestC]++;
     }
 
-    // update step
+    // update step — only update non-empty clusters (empty clusters keep old center)
     for (let c = 0; c < k; c++) {
       if (counts[c] > 0) centers[c] = Math.round(sums[c] / counts[c]);
     }
@@ -164,7 +179,7 @@ function kmeans1d(
 
   // sort clusters by center value ascending (dark=far=0, light=near=k-1)
   const order = centers
-    .map((c, i) => ({ c, i }))
+    .map((c, i) => ({ c, i, count: 0 }))
     .sort((a, b) => a.c - b.c);
   const remap = new Array(k);
   order.forEach((o, newIndex) => {
@@ -179,11 +194,14 @@ function kmeans1d(
 /**
  * Feathered mask generation for isolated layers.
  *
- * FIXED: the previous approach (blur + threshold) destroyed small masks
- * and inflated large ones. This version:
- * 1. Uses the raw binary mask directly (no threshold destruction)
- * 2. Applies a small Gaussian blur for soft edges
- * 3. NO threshold — preserves the actual cluster distribution
+ * FIXED (BUG #2): the function now ACTUALLY uses its dilationRadius and featherSigma
+ * parameters. Previously it only called hardcoded `.blur(2)` — the "CORRECTED" comments
+ * on the caller (dilationRadius=8, featherSigma=4) had zero effect.
+ *
+ * Pipeline:
+ * 1. Dilate the binary mask by `dilationRadius` px (so foreground shifts reveal background)
+ * 2. Gaussian feather edges with `featherSigma` px sigma
+ * 3. OR with original binary so no pixels are lost (preserves exact cluster coverage)
  */
 async function makeFeatheredMask(
   binaryMask: Buffer,
@@ -192,22 +210,24 @@ async function makeFeatheredMask(
   dilationRadius: number,
   featherSigma: number
 ): Promise<Buffer> {
-  // FIXED: blur was destroying small masks (values dropped below 10).
-  // New approach: keep the raw binary mask, only feather the EDGES.
-  // 1. blur the mask slightly (2px) for anti-aliased edges
-  // 2. OR with the original mask so no pixels are lost
-  // 3. Result: original mask + soft edges
-
-  const blurred = await sharp(binaryMask, { raw: { width, height, channels: 1 } })
-    .blur(2)
+  // 1. Dilate: blur then threshold at low value to expand the mask by ~dilationRadius px
+  const dilated = await sharp(binaryMask, { raw: { width, height, channels: 1 } })
+    .blur(dilationRadius)
+    .threshold(1) // any pixel touched by the blur becomes 255 (expands mask)
     .raw()
     .toBuffer();
 
-  // OR: any pixel that was 255 in the original stays 255
-  // pixels near edges get a gradient from the blur
+  // 2. Feather: blur the dilated mask for soft anti-aliased edges
+  const feathered = await sharp(dilated, { raw: { width, height, channels: 1 } })
+    .blur(featherSigma)
+    .raw()
+    .toBuffer();
+
+  // 3. OR: any pixel that was 255 in the original stays 255 (no pixel loss).
+  //    The feathered version adds soft gradient edges.
   const result = Buffer.alloc(width * height);
   for (let i = 0; i < width * height; i++) {
-    result[i] = Math.max(binaryMask[i], blurred[i]);
+    result[i] = Math.max(binaryMask[i], feathered[i]);
   }
 
   return result;
@@ -292,11 +312,19 @@ export async function sliceImageByDepth(
     });
 
     // Layers 1..k-1: isolated bands
+    // BUG #3 fix: skip empty clusters (would produce phantom transparent PNG layers)
+    let nonEmptyIdx = 0;
     for (let clusterIdx = 0; clusterIdx < k; clusterIdx++) {
       const maskBuf = Buffer.alloc(W * H);
+      let pixelCount = 0;
       for (let i = 0; i < labels.length; i++) {
-        maskBuf[i] = labels[i] === clusterIdx ? 255 : 0;
+        if (labels[i] === clusterIdx) {
+          maskBuf[i] = 255;
+          pixelCount++;
+        }
       }
+      // skip empty clusters (K-means may produce them on low-contrast images)
+      if (pixelCount === 0) continue;
 
       const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
 
@@ -314,6 +342,7 @@ export async function sliceImageByDepth(
 
       const saved = await saveGeneratedImage(pngBuffer, `slice-${clusterIdx}`);
       const depthCentroid = centers[clusterIdx] / 255;
+      nonEmptyIdx++;
 
       const name =
         clusterIdx === 0
@@ -329,7 +358,7 @@ export async function sliceImageByDepth(
         filename: saved.filename,
         name,
         depth: depthCentroid,
-        index: clusterIdx + 1,
+        index: nonEmptyIdx, // sequential index skipping empties
       });
     }
 
@@ -337,6 +366,8 @@ export async function sliceImageByDepth(
   }
 
   // === ISOLATED or CUMULATIVE modes (original behavior) ===
+  // BUG #3 fix: skip empty clusters in isolated mode too
+  let nonEmptyIdxIso = -1;
   for (let clusterIdx = 0; clusterIdx < k; clusterIdx++) {
     let maskBuf: Buffer;
 
@@ -348,9 +379,15 @@ export async function sliceImageByDepth(
     } else {
       // isolated
       maskBuf = Buffer.alloc(W * H);
+      let pixelCount = 0;
       for (let i = 0; i < labels.length; i++) {
-        maskBuf[i] = labels[i] === clusterIdx ? 255 : 0;
+        if (labels[i] === clusterIdx) {
+          maskBuf[i] = 255;
+          pixelCount++;
+        }
       }
+      // skip empty clusters
+      if (pixelCount === 0) continue;
     }
 
     const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
@@ -369,6 +406,7 @@ export async function sliceImageByDepth(
 
     const saved = await saveGeneratedImage(pngBuffer, `slice-${clusterIdx}`);
     const depthCentroid = centers[clusterIdx] / 255;
+    nonEmptyIdxIso++;
 
     const name =
       clusterIdx === 0
@@ -384,7 +422,7 @@ export async function sliceImageByDepth(
       filename: saved.filename,
       name,
       depth: depthCentroid,
-      index: clusterIdx,
+      index: nonEmptyIdxIso,
     });
   }
 

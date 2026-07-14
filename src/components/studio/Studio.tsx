@@ -52,6 +52,8 @@ export function Studio() {
     error,
     selectedLayerId,
     heroMode,
+    width,
+    height,
     selectLayer,
     updateLayerTransform,
     setHeroMode,
@@ -66,6 +68,13 @@ export function Studio() {
 
   const previewUrl = originalDataUrl ?? originalUrl;
   const isReady = status === "ready";
+
+  // BUG A1 FIX: derive stage aspect from the original image dimensions instead of
+  // hardcoding 16:10. Portrait/square images no longer get cropped to landscape.
+  // Clamp to reasonable bounds so extreme ratios (e.g. panoramas) don't break layout.
+  const stageAspect = width > 0 && height > 0
+    ? Math.max(0.5, Math.min(2.5, width / height))
+    : 16 / 10;
 
   // Hero mode = full-viewport overlay
   if (heroMode && isReady) {
@@ -96,7 +105,7 @@ export function Studio() {
                     backgroundUrl={backgroundUrl}
                     depthUrl={depthMapUrl}
                     framed
-                    aspectClass="aspect-[16/10]"
+                    aspectRatio={stageAspect}
                     editorMode={editorMode}
                     selectedLayerId={selectedLayerId}
                     onSelectLayer={(id) => selectLayer(id || undefined)}

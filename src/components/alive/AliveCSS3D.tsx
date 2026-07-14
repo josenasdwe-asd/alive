@@ -31,6 +31,12 @@ const DURATIONS = {
   twist: 11.3,
   float: 11.1,
   drift: 13.7,
+  wave: 9.4,
+  jitter: 0.18,
+  glow: 5.7,
+  hue: 28,
+  focus: 14.3,
+  shadow: 9.7,
 };
 
 const BLEND_CSS: Record<BlendMode, string> = {
@@ -174,6 +180,12 @@ function CSS3DLayer({
   const twistDur = (DURATIONS.twist / Math.max(0.2, speed)).toFixed(2);
   const floatDur = (DURATIONS.float / Math.max(0.2, speed)).toFixed(2);
   const driftDur = (DURATIONS.drift / Math.max(0.2, speed)).toFixed(2);
+  const waveDur = (DURATIONS.wave / Math.max(0.2, speed)).toFixed(2);
+  const jitterDur = DURATIONS.jitter.toFixed(3);
+  const glowDur = (DURATIONS.glow / Math.max(0.2, speed)).toFixed(2);
+  const hueDur = (DURATIONS.hue / Math.max(0.2, speed)).toFixed(2);
+  const focusDur = (DURATIONS.focus / Math.max(0.2, speed)).toFixed(2);
+  const shadowDur = (DURATIONS.shadow / Math.max(0.2, speed)).toFixed(2);
 
   // === BUG FIX #1: respect visibility ===
   if (!t.visible) return null;
@@ -182,25 +194,56 @@ function CSS3DLayer({
   const ampVars: Record<string, string | number> = {};
 
   if (!config.reducedMotion) {
+    // BUG C2 FIX: all ampVars now use the `-amp` suffix to match globals.css.
+    // Previously: --sway, --twist, --float-y, --drift-x (without -amp) — these
+    // overrode the animated 0→1 @property vars AND the amplitude vars the CSS
+    // calc actually reads were never set, so 4 of 5 animations were doubly dead.
     if (layerAnim.breathing) {
       animations.push(`alive-breath ${breathDur}s ease-in-out infinite`);
       ampVars["--breath-amp"] = layerAnim.breathingAmp * intensity;
     }
     if (layerAnim.sway) {
       animations.push(`alive-sway ${swayDur}s ease-in-out infinite`);
-      ampVars["--sway"] = `${layerAnim.swayAmp * intensity * 0.5}deg`;
+      ampVars["--sway-amp"] = `${layerAnim.swayAmp * intensity * 0.5}deg`;
     }
     if (layerAnim.twist) {
       animations.push(`alive-twist ${twistDur}s ease-in-out infinite`);
-      ampVars["--twist"] = `${layerAnim.twistAmp * intensity}deg`;
+      ampVars["--twist-amp"] = `${layerAnim.twistAmp * intensity}deg`;
     }
     if (layerAnim.floatY) {
       animations.push(`alive-float-y ${floatDur}s ease-in-out infinite`);
-      ampVars["--float-y"] = `${layerAnim.floatAmp * 6 * intensity}px`;
+      ampVars["--float-y-amp"] = `${layerAnim.floatAmp * 6 * intensity}px`;
     }
     if (layerAnim.driftX) {
       animations.push(`alive-drift-x ${driftDur}s ease-in-out infinite`);
-      ampVars["--drift-x"] = `${layerAnim.driftAmp * 4 * intensity}px`;
+      ampVars["--drift-x-amp"] = `${layerAnim.driftAmp * 4 * intensity}px`;
+    }
+    // BUG D1 FIX: added the 6 missing organic animations (wave, jitter, glow,
+    // hueDrift, focusPull, shadowDrift) — parity with AliveLayers.
+    if (layerAnim.wave) {
+      animations.push(`alive-wave ${waveDur}s ease-in-out infinite`);
+      ampVars["--wave-x-amp"] = `${layerAnim.waveAmp * 8 * intensity}px`;
+    }
+    if (layerAnim.jitter) {
+      animations.push(`alive-jitter ${jitterDur}s steps(1) infinite`);
+      ampVars["--jitter-x-amp"] = `${layerAnim.jitterAmp * 1.5 * intensity}px`;
+      ampVars["--jitter-y-amp"] = `${layerAnim.jitterAmp * 1.5 * intensity}px`;
+    }
+    if (layerAnim.glow) {
+      animations.push(`alive-glow ${glowDur}s ease-in-out infinite`);
+      ampVars["--glow-amp"] = layerAnim.glowAmp * intensity;
+    }
+    if (layerAnim.hueDrift) {
+      animations.push(`alive-hue ${hueDur}s linear infinite`);
+      ampVars["--hue-amp"] = `${layerAnim.hueDriftAmp * intensity}deg`;
+    }
+    if (layerAnim.focusPull) {
+      animations.push(`alive-focus ${focusDur}s ease-in-out infinite`);
+      ampVars["--focus-amp"] = `${layerAnim.focusAmp * intensity}px`;
+    }
+    if (layerAnim.shadowDrift) {
+      animations.push(`alive-shadow ${shadowDur}s ease-in-out infinite`);
+      ampVars["--shadow-amp"] = `${4 * intensity}px`;
     }
   }
 
@@ -223,29 +266,46 @@ function CSS3DLayer({
   const layerBlur = t.blur + layerAnim.blur + dofBlur;
   ampVars["--layer-blur"] = `${layerBlur}px`;
 
-  // === Scale-with-depth (same as AliveLayers) ===
+  // === Scale-with-depth + perspective compensation (BUG B2 FIX) ===
+  // Old: overscale = (1.15 + depth*0.05) × depthScale × t.scale
+  //   back layer (depth=0, translateZ=-400, perspective=1200) shrinks to 0.75× on screen
+  //   → effective 1.15×0.75 = 0.86× < 1.0 → EDGE GAPS when container rotates.
+  // New: divide by perspective factor so back layers compensate for shrink.
   const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
-  const overscale = (1.15 + layer.depth * 0.05) * depthScale * t.scale;
+  const perspectiveFactor = config.perspective / (config.perspective - translateZ);
+  const overscale = ((1.18 + layer.depth * 0.06 + intensity * 0.04) * depthScale * t.scale) * perspectiveFactor;
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
-  // entrance reveal (same calibration as AliveLayers)
+  // entrance reveal (same calibration as AliveLayers) — BUG D2 FIX: now actually applied
   const entranceDelay = config.entranceEnabled
     ? layer.depth * 0.08 * Math.min(total, 4)
     : 0;
 
   return (
-    // OUTER: 3D position (translateZ) + blend + opacity
-    <div
+    // OUTER: 3D position (translateZ) + blend + opacity + entrance reveal
+    <motion.div
       className="absolute inset-0"
+      initial={config.entranceEnabled ? { opacity: 0, scale: 1.08, filter: "blur(8px)" } : false}
+      animate={
+        config.entranceEnabled
+          ? { opacity: 1, scale: 1, filter: "blur(0px)" }
+          : undefined
+      }
+      transition={
+        config.entranceEnabled
+          ? { duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: entranceDelay }
+          : undefined
+      }
       style={{
         transform: `translateZ(${translateZ}px)`,
         transformStyle: "preserve-3d",
         mixBlendMode: BLEND_CSS[t.blendMode],
-        opacity: t.opacity * layerAnim.opacity,
+        opacity: config.entranceEnabled ? undefined : t.opacity * layerAnim.opacity,
         zIndex,
         isolation: t.blendMode !== "normal" ? "isolate" : undefined,
         pointerEvents: editorMode ? "auto" : "none",
         cursor: editorMode ? (selected ? "move" : "pointer") : "default",
+        willChange: "transform, filter",
       }}
       onPointerDown={(e) => {
         if (editorMode) {
@@ -254,29 +314,38 @@ function CSS3DLayer({
         }
       }}
     >
-      {/* INNER: user transform + organic animations */}
+      {/* USER TRANSFORM wrapper — moveable target (BUG F fix, same as AliveLayers)
+       * User transform lives HERE on a separate wrapper. The .alive-layer child
+       * handles ONLY organic animation transform via CSS calc. Parent × child = composed. */}
       <div
-        className={`alive-layer absolute inset-0 ${selected ? "selected" : ""}`}
         data-layer-id={layer.id}
-        style={
-          {
-            transform: `translate3d(${t.x}px, ${t.y}px, 0) scale(${overscale}) rotate(${t.rotation}deg)`,
-            animationDelay: phaseDelay,
-            animation: animations.join(", ") || undefined,
-            filter: useLiquid ? `url(#${liquidFilterId})` : undefined,
-            ...ampVars,
-          } as React.CSSProperties
-        }
+        className={`alive-layer-wrapper absolute inset-0 ${selected ? "selected" : ""}`}
+        style={{
+          transform: `translate3d(${t.x}px, ${t.y}px, 0) scale(${overscale}) rotate(${t.rotation}deg)`,
+        }}
       >
-        {layer.url ? (
-          <img
-            src={layer.url}
-            alt={layer.name}
-            className="h-full w-full object-cover select-none"
-            draggable={false}
-          />
-        ) : null}
+        {/* ORGANIC ANIMATION layer — CSS calc transform + filter */}
+        <div
+          className="alive-layer absolute inset-0"
+          style={
+            {
+              animationDelay: phaseDelay,
+              animation: animations.join(", ") || undefined,
+              filter: useLiquid ? `url(#${liquidFilterId})` : undefined,
+              ...ampVars,
+            } as React.CSSProperties
+          }
+        >
+          {layer.url ? (
+            <img
+              src={layer.url}
+              alt={layer.name}
+              className="h-full w-full object-cover select-none"
+              draggable={false}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

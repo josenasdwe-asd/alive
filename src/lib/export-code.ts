@@ -58,7 +58,7 @@ export function generateHtml(params: ExportParams): string {
         3
       )}" data-parallax="${pxToMove.toFixed(2)}" style="z-index:${
         10 + i
-      }; transform: scale(${overscale.toFixed(3)}); ${liquidFilter} animation: ${
+      }; --overscale: ${overscale.toFixed(3)}; ${liquidFilter} animation: ${
         anims.join(", ") || "none"
       };">
         <img src="${p.url}" alt="${p.alt}" />
@@ -124,9 +124,10 @@ ${Array.from({ length: 16 })
     position: absolute; inset: 0;
     transform-origin: center;
     will-change: transform, filter;
+    /* BUG F fix: overscale via CSS var (not inline transform) so the organic calc below is preserved */
     transform: translate3d(var(--px,0px), var(--py,0px), 0)
       translate3d(var(--drift-x,0px), var(--float-y,0px), 0)
-      scale(calc(1 + var(--breath,0) * var(--breath-amp,0.02)))
+      scale(calc(var(--overscale, 1.08) * (1 + var(--breath,0) * var(--breath-amp,0.02))))
       rotate(var(--sway,0deg));
   }
   .alive-stage .alive-layer img { width: 100%; height: 100%; object-fit: cover; display: block; }

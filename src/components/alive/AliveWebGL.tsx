@@ -34,25 +34,61 @@ uniform float uTime;
 uniform float uIntensity;
 uniform float uChroma;
 uniform float uVignette;
+uniform float uImgAspect;   // image width / height
+uniform float uStageAspect; // canvas width / height
 
 // simple hash noise for subtle organic shimmer
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
 
+// CRITICAL FIX (C1): remap UV with "cover" semantics so the image fills the stage
+// without stretching. Computes the visible UV range and scales offset accordingly.
+vec2 coverUv(vec2 uv, float imgA, float stageA) {
+  if (imgA <= 0.0 || stageA <= 0.0) return uv;
+  float scale;
+  vec2 offset;
+  if (imgA > stageA) {
+    // image is wider than stage — crop horizontally (pillarbox)
+    scale = stageA / imgA;
+    offset = vec2((1.0 - scale) * 0.5, 0.0);
+  } else {
+    // image is taller than stage — crop vertically (letterbox)
+    scale = imgA / stageA;
+    offset = vec2(0.0, (1.0 - scale) * 0.5);
+  }
+  return uv * scale + offset;
+}
+
 void main() {
-  vec4 d = texture(uDepth, vUv);
+  // remap UV to cover the stage (prevents stretching on non-square images)
+  vec2 imgUv = coverUv(vUv, uImgAspect, uStageAspect);
+
+  vec4 d = texture(uDepth, imgUv);
   float depth = d.r;
 
-  // parallax offset
-  vec2 mouseOff = uMouse * depth * 0.07 * uIntensity;
-  float breath = sin(uTime * 0.6) * 0.004 * uIntensity * (0.5 + depth);
+  // parallax offset (in cover-UV space — scaled by the cover factor)
+  float coverScale = (uImgAspect > uStageAspect) ? (uStageAspect / uImgAspect) : (uImgAspect / uStageAspect);
+  vec2 mouseOff = uMouse * depth * 0.07 * uIntensity * coverScale;
+  float breath = sin(uTime * 0.6) * 0.004 * uIntensity * (0.5 + depth) * coverScale;
   vec2 offset = mouseOff + vec2(breath, breath * 0.6);
 
-  // sample image
-  vec4 imgColor = texture(uImage, vUv + offset);
-  vec3 color = imgColor.rgb;
-  float a = imgColor.a;
+  // CRITICAL FIX (M4): clamp the effective UV to prevent edge smearing
+  vec2 sampleUv = clamp(imgUv + offset, vec2(0.001), vec2(0.999));
+
+  // CRITICAL FIX (H2): chromatic aberration — RGB split scaled by depth (more on near objects)
+  vec3 color;
+  if (uChroma > 0.0) {
+    float chromaAmt = uChroma * 0.002 * (0.5 + depth * 0.5);
+    float r = texture(uImage, sampleUv + vec2(chromaAmt, 0.0)).r;
+    float g = texture(uImage, sampleUv).g;
+    float b = texture(uImage, sampleUv - vec2(chromaAmt, 0.0)).b;
+    color = vec3(r, g, b);
+  } else {
+    vec4 imgColor = texture(uImage, sampleUv);
+    color = imgColor.rgb;
+  }
+  float a = texture(uImage, sampleUv).a;
 
   // vignette
   if (uVignette > 0.0) {
@@ -155,6 +191,12 @@ export function AliveWebGL({
     const uIntensity = gl.getUniformLocation(prog, "uIntensity");
     const uChroma = gl.getUniformLocation(prog, "uChroma");
     const uVignette = gl.getUniformLocation(prog, "uVignette");
+    // CRITICAL FIX (C1): aspect-ratio uniforms for cover-UV mapping
+    const uImgAspect = gl.getUniformLocation(prog, "uImgAspect");
+    const uStageAspect = gl.getUniformLocation(prog, "uStageAspect");
+
+    // track image natural dimensions (set when texture loads)
+    let imgAspect = 1.0;
 
     // textures
     const makeTex = () => {
@@ -195,6 +237,10 @@ export function AliveWebGL({
         if (cancelled) return;
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        // CRITICAL FIX (C1): capture natural dimensions for aspect-ratio-aware UV mapping
+        if (img.naturalWidth && img.naturalHeight) {
+          imgAspect = img.naturalWidth / img.naturalHeight;
+        }
         done();
       };
       img.onerror = () => {};
@@ -269,6 +315,9 @@ export function AliveWebGL({
       gl.uniform1f(uIntensity, p.intensity);
       gl.uniform1f(uChroma, p.chromaticAberration);
       gl.uniform1f(uVignette, p.vignette);
+      // CRITICAL FIX (C1): set aspect-ratio uniforms for cover-UV mapping
+      gl.uniform1f(uImgAspect, imgAspect);
+      gl.uniform1f(uStageAspect, canvas.width > 0 && canvas.height > 0 ? canvas.width / canvas.height : 1.0);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
       raf = requestAnimationFrame(render);
@@ -297,14 +346,6 @@ export function AliveWebGL({
         ref={canvasRef}
         className="h-full w-full"
         style={{ display: "block" }}
-      />
-      {/* fallback: show original image behind canvas while textures load */}
-      { }
-      <img
-        src={imageUrl}
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full -z-10 object-cover opacity-0"
       />
     </div>
   );

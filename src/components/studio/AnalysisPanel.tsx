@@ -184,7 +184,7 @@ export function AnalysisPanel() {
 
   async function runSlic() {
     setStage("decomposing");
-    setStrategy("depth-slice");
+    setStrategy("slic");
     setProgress(70);
     try {
       if (!depthMapUrl) {
@@ -326,13 +326,17 @@ export function AnalysisPanel() {
               <Loader2 className="h-3 w-3 animate-spin text-primary" />
               {strategy === "depth-slice"
                 ? "K-means 1D + dilatación morfológica…"
-                : "Extrayendo elementos con IA…"}
+                : strategy === "slic"
+                  ? "SLIC superpixels + clustering semántico…"
+                  : "Extrayendo elementos con IA…"}
             </li>
           </ul>
           <p className="text-[11px] text-muted-foreground/70">
             {strategy === "depth-slice"
               ? "Rebanando el mapa de profundidad en bandas con clustering matemático. Determinístico y rápido."
-              : "Cada elemento se aísla individualmente con image-edit. Más lento pero semánticamente preciso."}
+              : strategy === "slic"
+                ? "Segmentando por color+posición+profundidad. Capas semánticas reales: solo nubes, solo montañas, solo suelo."
+                : "Cada elemento se aísla individualmente con image-edit. Más lento pero semánticamente preciso."}
           </p>
         </div>
       </PanelShell>
@@ -469,7 +473,7 @@ export function AnalysisPanel() {
             <CheckCircle2 className="h-3 w-3 text-primary" />
             <span>
               {layers.length} capas · estrategia{" "}
-              {strategy === "depth-slice" ? "Depth Slice" : "AI Extract"}
+              {strategy === "depth-slice" ? "Depth Slice" : strategy === "slic" ? "SLIC" : "AI Extract"}
             </span>
           </div>
           <div className="pt-1">

@@ -31,13 +31,18 @@ uniform float uTime;
 uniform float uIntensity;
 uniform float uScroll;    // 0..1 scroll progress
 uniform float uReducedMotion;
+uniform float uImgAspect;   // image width / height
+uniform float uStageAspect; // canvas width / height
 
 void main() {
   vUv = aUv;
   // sample depth at this vertex's UV
   float depth = texture(uDepth, aUv).r;
-  // invert: white=near in our depth maps, but for Z we want far=negative
-  float z = (depth - 0.5) * -2.0; // -1 (near) .. +1 (far)
+  // CRITICAL FIX (C4): depth convention is white=near (depth=1), black=far (depth=0).
+  // Camera is at z=+1.5. Near objects should have HIGHER z (closer to camera).
+  // Old (inverted): z = (depth - 0.5) * -2.0 → depth=1 gave z=-1 (far) — WRONG.
+  // New: z = (depth - 0.5) * 2.0 → depth=1 gives z=+1 (near) — CORRECT.
+  float z = (depth - 0.5) * 2.0; // -1 (far) .. +1 (near)
 
   // breathing: subtle scale pulse
   float breath = sin(uTime * 0.6) * 0.01 * uIntensity * (1.0 - uReducedMotion);
@@ -45,8 +50,19 @@ void main() {
   // camera dolly: move towards the scene as scroll progresses
   float dolly = uScroll * 0.8 * uIntensity;
 
-  // vertex position in 3D
-  vec3 pos = vec3(aPos * (1.0 + breath), z * 0.5 - dolly);
+  // CRITICAL FIX (C2): aspect-ratio-aware plane scaling (cover semantics).
+  // Scale the plane so the image fills the stage without stretching.
+  // If image wider than stage: fill height, crop width (planeW > visibleW).
+  // If image taller than stage: fill width, crop height (planeH > visibleH).
+  vec2 aspectScale;
+  if (uImgAspect > uStageAspect) {
+    aspectScale = vec2(uImgAspect / uStageAspect, 1.0);
+  } else {
+    aspectScale = vec2(1.0, uStageAspect / uImgAspect);
+  }
+
+  // vertex position in 3D (scaled by aspect for cover, by breath for organic pulse)
+  vec3 pos = vec3(aPos * aspectScale * (1.0 + breath), z * 0.5 - dolly);
 
   gl_Position = uProj * uView * vec4(pos, 1.0);
 }`;
@@ -222,6 +238,12 @@ export function AliveKenBurns3D({
     const uReducedMotion = gl.getUniformLocation(prog, "uReducedMotion");
     const uChroma = gl.getUniformLocation(prog, "uChroma");
     const uVignette = gl.getUniformLocation(prog, "uVignette");
+    // CRITICAL FIX (C2): aspect uniforms for cover-aware plane scaling
+    const uImgAspect = gl.getUniformLocation(prog, "uImgAspect");
+    const uStageAspect = gl.getUniformLocation(prog, "uStageAspect");
+
+    // track image natural aspect (set when texture loads)
+    let imgAspect = 1.0;
 
     // textures
     const makeTex = () => {
@@ -241,21 +263,29 @@ export function AliveKenBurns3D({
     const depthTex = makeTex();
 
 
+    // CRITICAL FIX (H6): loadTex now returns a cancel function (was missing —
+    // post-unmount image loads hit deleted textures causing silent GL errors)
     const loadTex = (url: string, tex: WebGLTexture, done: () => void) => {
       const img = new Image();
-      
+      let cancelled = false;
       img.onload = () => {
+        if (cancelled) return;
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        // CRITICAL FIX (C2): capture natural aspect for cover-aware plane scaling
+        if (img.naturalWidth && img.naturalHeight) {
+          imgAspect = img.naturalWidth / img.naturalHeight;
+        }
         done();
       };
-      img.onerror = () => console.warn("tex load failed", url);
+      img.onerror = () => { if (!cancelled) console.warn("tex load failed", url); };
       img.src = url;
+      return () => { cancelled = true; };
     };
 
-    // load textures
-    loadTex(imageUrl, imageTex, () => {});
-    loadTex(depthUrl, depthTex, () => {});
+    // load textures (capture cancel functions for cleanup)
+    const cancelImage = loadTex(imageUrl, imageTex, () => {});
+    const cancelDepth = loadTex(depthUrl, depthTex, () => {});
 
     // mouse for subtle parallax tilt
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -288,8 +318,8 @@ export function AliveKenBurns3D({
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
-    // projection matrix (perspective)
-    const proj = perspective(45, canvas.width / canvas.height, 0.01, 10);
+    // CRITICAL FIX (H1): projection matrix is now recomputed EVERY FRAME inside render
+    // (was computed ONCE outside the loop → stale on resize → image stretched on window/orientation change)
 
     // render loop
     let raf = 0;
@@ -337,6 +367,9 @@ export function AliveKenBurns3D({
       gl.bindTexture(gl.TEXTURE_2D, depthTex);
       gl.uniform1i(uDepth, 1);
 
+      // H1 FIX: recompute projection every frame with current canvas dimensions
+      const stageAspect = canvas.width > 0 && canvas.height > 0 ? canvas.width / canvas.height : 1.0;
+      const proj = perspective(45, stageAspect, 0.01, 10);
       gl.uniformMatrix4fv(uProj, false, proj);
       gl.uniformMatrix4fv(uView, false, view);
       gl.uniform1f(uTime, p.reducedMotion ? 0 : t * p.speed);
@@ -345,6 +378,9 @@ export function AliveKenBurns3D({
       gl.uniform1f(uReducedMotion, p.reducedMotion ? 1 : 0);
       gl.uniform1f(uChroma, p.chromaticAberration);
       gl.uniform1f(uVignette, p.vignette);
+      // C2 FIX: set aspect uniforms for cover-aware plane scaling
+      gl.uniform1f(uImgAspect, imgAspect);
+      gl.uniform1f(uStageAspect, stageAspect);
 
       gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
       raf = requestAnimationFrame(render);
@@ -356,6 +392,9 @@ export function AliveKenBurns3D({
       ro.disconnect();
       container.removeEventListener("pointermove", onMove);
       container.removeEventListener("pointerleave", onLeave);
+      // H6 FIX: cancel in-flight image loads before deleting textures
+      cancelImage();
+      cancelDepth();
       gl.deleteProgram(prog);
       gl.deleteShader(vs);
       gl.deleteShader(fs);

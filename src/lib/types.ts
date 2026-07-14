@@ -17,7 +17,8 @@ export type LayerSource =
 
 export type DecompositionStrategy =
   | "depth-slice" // mathematical K-means slicing (fast, deterministic)
-  | "ai-extract"; // per-element AI extraction (thorough, slower)
+  | "ai-extract" // per-element AI extraction (thorough, slower)
+  | "slic"; // SLIC superpixel segmentation (semantic regions)
 
 export type PipelineStep =
   | "upload"

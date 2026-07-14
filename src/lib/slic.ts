@@ -210,21 +210,49 @@ export async function sliceWithSlic(
   });
 
   // Layers 1..k: each semantic region
+  // BUG fix: skip empty layers (some SLIC seeds die during iterations → 0 pixels → empty mask)
+  let nonEmptySlicIdx = 0;
   for (let layerIdx = 0; layerIdx < k; layerIdx++) {
-    // build mask at low res, then upscale
+    // build mask at low res — count pixels to detect empty layers
     const maskLow = Buffer.alloc(SW * SH);
+    let pixelCount = 0;
     for (let i = 0; i < SW * SH; i++) {
-      maskLow[i] = finalLabels[i] === layerIdx ? 255 : 0;
+      if (finalLabels[i] === layerIdx) {
+        maskLow[i] = 255;
+        pixelCount++;
+      }
     }
+    // skip empty layers (SLIC seeds may die during iterations, leaving 0 pixels)
+    if (pixelCount === 0) continue;
 
-    // upscale mask to full resolution
-    const maskFull = await sharp(maskLow, { raw: { width: SW, height: SH, channels: 1 } })
+    // CRITICAL FIX (same as depth-slice.ts makeFeatheredMask):
+    // The previous pipeline `.blur(dilationRadius).threshold(1).blur(dilationRadius/2)`
+    // was DESTRUCTIVE — `.threshold(1)` collapses any pixel with value ≥1 to 255,
+    // inflating each mask by ~12 low-res px ≈ 64 full-res px on a 1024px image.
+    // This made all SLIC layers overlap heavily (blurry duplicates instead of clean
+    // isolated semantic regions).
+    // New approach: upscale raw binary mask, blur for soft edges, OR with original
+    // so no pixels are lost (preserves exact cluster coverage + feathered edges).
+    const maskUpscaled = await sharp(maskLow, { raw: { width: SW, height: SH, channels: 1 } })
       .resize(W, H, { fit: "cover" })
-      .blur(dilationRadius) // feather edges
-      .threshold(1)
-      .blur(dilationRadius / 2) // soft feather
+      .blur(dilationRadius / 2) // soft feather (was blur + threshold + blur)
       .raw()
       .toBuffer();
+
+    // OR: any pixel that was 255 in the upscaled-binary stays 255
+    // (we need to re-upscale the binary without blur to get the crisp mask, then OR)
+    // BUG fix: use NEAREST interpolation to preserve exact pixel coverage (LANCZOS3
+    // smooths sparse masks down to zero, producing empty layers)
+    const maskBinary = await sharp(maskLow, { raw: { width: SW, height: SH, channels: 1 } })
+      .resize(W, H, { fit: "cover", kernel: sharp.kernel.nearest })
+      .raw()
+      .toBuffer();
+
+    const maskFull = Buffer.alloc(W * H);
+    for (let i = 0; i < W * H; i++) {
+      // preserve crisp binary coverage, add soft feather from blur
+      maskFull[i] = Math.max(maskBinary[i], maskUpscaled[i]);
+    }
 
     // composite: original RGB × mask alpha
     const rgba = Buffer.alloc(W * H * 4);
@@ -251,6 +279,7 @@ export async function sliceWithSlic(
       }
     }
     const depthCentroid = dCount > 0 ? dSum / dCount / 255 : 0.5;
+    nonEmptySlicIdx++;
 
     const name =
       layerIdx === 0
@@ -266,7 +295,7 @@ export async function sliceWithSlic(
       filename: saved.filename,
       name,
       depth: depthCentroid,
-      index: layerIdx + 1,
+      index: nonEmptySlicIdx,
     });
   }
 

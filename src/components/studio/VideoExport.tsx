@@ -30,8 +30,10 @@ export function VideoExport({ duration = 5, fps = 30 }: VideoExportProps) {
   const handleRecord = async () => {
     // find the MAIN stage canvas (not relighting/particle canvases)
     // the main canvas is the largest one inside the stage container
+    // BUG A1 fix: stage now uses data-alive-stage attribute (was class selector that broke
+    // when aspect ratio became inline-style driven)
     const stageDiv = document.querySelector(
-      "[class*='aspect-[16/10]']"
+      "[data-alive-stage='true']"
     ) as HTMLElement;
     const allCanvases = (stageDiv || document).querySelectorAll("canvas");
     let canvas: HTMLCanvasElement | null = null;

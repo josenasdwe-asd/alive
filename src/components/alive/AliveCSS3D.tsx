@@ -179,12 +179,15 @@ function CSS3DLayer({
   const intensity = config.intensity;
   const translateZ = (layer.depth - 0.5) * zRange;
 
+  // HARMONIC ratios so layers NEVER sync
+  const HARMONIC = [1.0, 1.618, 2.414, 3.303, 4.791, 6.404, 8.284, 10.445, 12.896, 15.652];
+  const h = HARMONIC[index % HARMONIC.length];
   const dm = layerAnim.durationMultiplier;
   const speed = config.speed * dm;
   const phaseDelay = `-${(layerAnim.phaseOffset * 6).toFixed(2)}s`;
 
-  const breathDur = (DURATIONS.breath / Math.max(0.2, speed)).toFixed(2);
-  const swayDur = (DURATIONS.sway / Math.max(0.2, speed)).toFixed(2);
+  const breathDur = (DURATIONS.breath * h / Math.max(0.2, speed)).toFixed(2);
+  const swayDur = (DURATIONS.sway * h / Math.max(0.2, speed)).toFixed(2);
   const twistDur = (DURATIONS.twist / Math.max(0.2, speed)).toFixed(2);
   const floatDur = (DURATIONS.float / Math.max(0.2, speed)).toFixed(2);
   const driftDur = (DURATIONS.drift / Math.max(0.2, speed)).toFixed(2);

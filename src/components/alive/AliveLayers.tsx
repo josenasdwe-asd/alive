@@ -259,21 +259,25 @@ function LayerPlane({
   if (!t.visible) return null;
 
   // durations
+  // durations — each layer gets a HARMONIC ratio so animations NEVER sync
+  // Layer 0: 1.0×, Layer 1: 1.618× (golden), Layer 2: 2.414× (silver), etc.
+  const HARMONIC = [1.0, 1.618, 2.414, 3.303, 4.791, 6.404, 8.284, 10.445, 12.896, 15.652];
+  const h = HARMONIC[index % HARMONIC.length];
   const dm = layerAnim.durationMultiplier;
   const speed = config.speed * dm;
   const phaseDelay = `-${(layerAnim.phaseOffset * 6).toFixed(2)}s`;
 
-  const breathDur = (DURATIONS.breath / Math.max(0.2, speed)).toFixed(2);
-  const swayDur = (DURATIONS.sway / Math.max(0.2, speed)).toFixed(2);
-  const twistDur = (DURATIONS.twist / Math.max(0.2, speed)).toFixed(2);
-  const floatDur = (DURATIONS.float / Math.max(0.2, speed)).toFixed(2);
-  const driftDur = (DURATIONS.drift / Math.max(0.2, speed)).toFixed(2);
-  const waveDur = (DURATIONS.wave / Math.max(0.2, speed)).toFixed(2);
+  const breathDur = (DURATIONS.breath * h / Math.max(0.2, speed)).toFixed(2);
+  const swayDur = (DURATIONS.sway * h / Math.max(0.2, speed)).toFixed(2);
+  const twistDur = (DURATIONS.twist * h / Math.max(0.2, speed)).toFixed(2);
+  const floatDur = (DURATIONS.float * h / Math.max(0.2, speed)).toFixed(2);
+  const driftDur = (DURATIONS.drift * h / Math.max(0.2, speed)).toFixed(2);
+  const waveDur = (DURATIONS.wave * h / Math.max(0.2, speed)).toFixed(2);
   const jitterDur = DURATIONS.jitter.toFixed(3);
-  const glowDur = (DURATIONS.glow / Math.max(0.2, speed)).toFixed(2);
-  const hueDur = (DURATIONS.hue / Math.max(0.2, speed)).toFixed(2);
-  const focusDur = (DURATIONS.focus / Math.max(0.2, speed)).toFixed(2);
-  const shadowDur = (DURATIONS.shadow / Math.max(0.2, speed)).toFixed(2);
+  const glowDur = (DURATIONS.glow * h / Math.max(0.2, speed)).toFixed(2);
+  const hueDur = (DURATIONS.hue * h / Math.max(0.2, speed)).toFixed(2);
+  const focusDur = (DURATIONS.focus * h / Math.max(0.2, speed)).toFixed(2);
+  const shadowDur = (DURATIONS.shadow * h / Math.max(0.2, speed)).toFixed(2);
   // NEW v3 durations
   const heartbeatDur = (DURATIONS.heartbeat / Math.max(0.2, speed)).toFixed(2);
   const vortexDur = (DURATIONS.vortex / Math.max(0.2, speed)).toFixed(2);

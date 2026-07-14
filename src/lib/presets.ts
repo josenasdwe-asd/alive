@@ -946,6 +946,77 @@ export const PRESETS: PresetMeta[] = [
     },
     effects: { grain: true, lightleak: true },
   },
+
+  // ============ AWWWARDS PRESET ============
+  // El preset definitivo: nubes pasan, viento sopla, todo respira en loop orgánico
+  {
+    id: "vivo",
+    name: "Vivo",
+    emoji: "🌿",
+    tagline: "Vida orgánica en loop — nubes, viento, respiración",
+    description:
+      "El preset definitivo. Las capas lejanas (cielo/nubes) derivan horizontalmente como viento real. " +
+      "Las capas medias respiran y se balancean como vegetación. El sujeto flota suavemente. " +
+      "Todo usa duraciones primas para que NUNCA se sincronice. El efecto es sutil pero hipnótico — " +
+      "la imagen se siente viva, respirando, como un jardín con brisa.",
+    category: "calm",
+    buildLayer: (depth, i) => ({
+      ...DEFAULT_LAYER_ANIM,
+      // Parallax suave — suficiente para sentir profundidad sin desarmar
+      parallaxStrength: 4 + depth * 14,
+      mouseVelocityInfluence: 0.25,
+      inertia: 0.2,
+
+      // === CAPAS LEJANAS (depth < 0.3) — CIELO Y NUBES ===
+      // Derivan horizontalmente como viento real, lentamente
+      driftX: depth < 0.3,
+      driftAmp: 0.8 + (0.3 - depth) * 2, // más lejos = más deriva
+      // Flotan muy sutilmente
+      floatY: depth < 0.3,
+      floatAmp: 0.3,
+
+      // === CAPAS MEDIAS (0.3 < depth < 0.7) — VEGETACIÓN, MONTAÑAS ===
+      // Respiran como seres vivos
+      breathing: depth >= 0.3,
+      breathingAmp: 0.4 + depth * 0.3,
+      // Se balancean como con brisa
+      sway: depth >= 0.3,
+      swayAmp: 0.3 + depth * 0.2,
+      // Onda sutil — como hojas moviéndose
+      wave: depth >= 0.4 && depth < 0.8,
+      waveAmp: 0.3,
+
+      // === CAPAS CERCANAS (depth > 0.7) — SUJETO, PRIMER PLANO ===
+      // Flotan suavemente como suspendidos en el aire
+      floatY: depth >= 0.7,
+      floatAmp: 0.5,
+      // Respiración más profunda
+      breathingAmp: depth >= 0.7 ? 0.6 : 0.4 + depth * 0.3,
+
+      // Glow sutil en todas las capas — luz que pulsa
+      glow: true,
+      glowAmp: 0.2 + depth * 0.15,
+
+      // Phase offset prime para desincronizar
+      phaseOffset: primePhase(i),
+      // Velocidad orgánica — no demasiado rápida
+      durationMultiplier: 0.85 + depth * 0.3,
+    }),
+    base: {
+      intensity: 0.85,  // sutil pero perceptible
+      speed: 0.8,       // lento y orgánico
+      parallaxEnabled: true,
+      liquidEnabled: false,  // sin distorsión líquida — limpio
+      particlesEnabled: true,
+      shimmerEnabled: true,
+      chromaticAberration: 0.4,  // mínimo
+      vignette: 0.2,   // sutil
+      renderMode: "css",
+      mouseSmoothing: 0.04,  // suave
+    },
+    // Atmósfera: polvo sutil flotando + light leak cálido
+    effects: { dust: true, lightleak: true },
+  },
 ];
 
 export const PRESET_MAP: Record<PresetId, PresetMeta> = PRESETS.reduce(

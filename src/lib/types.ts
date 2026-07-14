@@ -141,7 +141,8 @@ export type PresetId =
   | "prism"
   | "ghost"
   | "origami"
-  | "neon";
+  | "neon"
+  | "vivo";
 
 export interface SpringPhysics {
   stiffness: number; // 1..200

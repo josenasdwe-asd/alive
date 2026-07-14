@@ -14,7 +14,6 @@ import { ShimmerOverlay } from "./ShimmerOverlay";
 import { EffectOverlays } from "./EffectOverlays";
 import { ParticleCanvas } from "./ParticleCanvas";
 import { ColorGrading } from "./ColorGrading";
-import { FlowFieldRenderer } from "./FlowFieldRenderer";
 import { AtmosphericAnimation } from "./AtmosphericAnimation";
 import { DepthFog } from "./DepthFog";
 import { BloomACES } from "./BloomACES";
@@ -90,8 +89,7 @@ export function AliveStage({
   const showMotionBlur = config.motionBlurEnabled && !config.reducedMotion && !isLowQuality && qualitySettings.motionBlurEnabled;
   const showDepthFog = config.depthFogEnabled && !config.reducedMotion && !isLowQuality && qualitySettings.depthFogEnabled;
   const showBloom = config.bloomEnabled && !isLowQuality && qualitySettings.bloomEnabled;
-  // v3 VANGUARDIA: Flow field is always available (not gated by quality — it's a user-drawn feature)
-  const showFlowField = !isLowQuality && ((window as any).__aliveFlowField != null);
+  // v3 VANGUARDIA: Flow field is handled by FlowFieldOverlay (direct CSS vars on layers)
   const showParticles = config.particlesEnabled && !config.reducedMotion && !isLowQuality;
   const showLiquid = config.liquidEnabled && !isLowQuality && qualitySettings.liquidEnabled;
 

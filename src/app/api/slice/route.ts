@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import fs from "fs/promises";
 import { sliceImageByDepth } from "@/lib/depth-slice";
 
 export const runtime = "nodejs";
@@ -45,6 +46,24 @@ export async function POST(req: NextRequest) {
 
     const originalPath = path.join(process.cwd(), "public", safeOriginal);
     const depthPath = path.join(process.cwd(), "public", safeDepth);
+
+    // v3 FIX: verify files exist before processing — prevents ENOENT crashes
+    try {
+      await fs.access(originalPath);
+    } catch {
+      return NextResponse.json(
+        { error: "La imagen original ya no existe. Sube la imagen nuevamente." },
+        { status: 404 }
+      );
+    }
+    try {
+      await fs.access(depthPath);
+    } catch {
+      return NextResponse.json(
+        { error: "El mapa de profundidad no existe. Genera las capas nuevamente." },
+        { status: 404 }
+      );
+    }
 
     const layers = await sliceImageByDepth(originalPath, depthPath, {
       k,

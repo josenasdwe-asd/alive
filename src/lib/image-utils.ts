@@ -97,8 +97,39 @@ export function safeResolvePath(url: string): string {
   return resolved;
 }
 
+/**
+ * Check if a file exists at the given path.
+ */
+export async function fileExists(filepath: string): Promise<boolean> {
+  try {
+    await fs.access(filepath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Resolve a URL and verify the file exists.
+ * Returns the resolved path if it exists, or null if not found.
+ */
+export async function safeResolveAndVerify(url: string): Promise<string | null> {
+  try {
+    const resolved = safeResolvePath(url);
+    const exists = await fileExists(resolved);
+    return exists ? resolved : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function readImageAsDataUrl(url: string): Promise<string> {
   const filepath = safeResolvePath(url);
+  // Verify file exists before reading — prevents ENOENT crashes
+  const exists = await fileExists(filepath);
+  if (!exists) {
+    throw new Error(`Image file not found: ${url}. The file may have been removed. Please upload the image again.`);
+  }
   const buf = await fs.readFile(filepath);
   const ext = path.extname(filepath).toLowerCase();
   const mime =

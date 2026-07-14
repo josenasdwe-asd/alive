@@ -301,6 +301,10 @@ function SortableLayerRow(props: RowProps) {
               <LayersIcon className="h-3.5 w-3.5" />
             </div>
           )}
+          {/* live indicator — pulsing dot when layer is visible */}
+          {layer.transform.visible && (
+            <span className="absolute bottom-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.8)]" />
+          )}
         </div>
 
         <div className="min-w-0 flex-1">

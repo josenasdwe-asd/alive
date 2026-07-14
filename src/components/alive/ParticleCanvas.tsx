@@ -179,10 +179,20 @@ function updateParticle(
 
 function drawParticle(ctx: CanvasRenderingContext2D, part: Particle) {
   ctx.save();
+
+  // === LIFE CYCLE: birth fade-in (0..0.15) + death fade-out (0.85..1) ===
+  const lifeRatio = 1 - part.life; // 0 at birth, 1 at death
+  let lifeAlpha = 1;
+  if (lifeRatio < 0.15) {
+    lifeAlpha = lifeRatio / 0.15; // fade in over first 15%
+  } else if (lifeRatio > 0.85) {
+    lifeAlpha = (1 - lifeRatio) / 0.15; // fade out over last 15%
+  }
+  const finalAlpha = part.alpha * lifeAlpha;
   switch (part.type) {
     case "smoke": {
       const grad = ctx.createRadialGradient(part.x, part.y, 0, part.x, part.y, part.size);
-      grad.addColorStop(0, `rgba(180,180,180,${part.alpha})`);
+      grad.addColorStop(0, `rgba(180,180,180,${finalAlpha})`);
       grad.addColorStop(1, "rgba(180,180,180,0)");
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -193,8 +203,8 @@ function drawParticle(ctx: CanvasRenderingContext2D, part: Particle) {
     case "fire": {
       ctx.globalCompositeOperation = "screen";
       const grad = ctx.createRadialGradient(part.x, part.y, 0, part.x, part.y, part.size);
-      grad.addColorStop(0, `hsla(${part.hue}, 100%, 70%, ${part.alpha})`);
-      grad.addColorStop(0.5, `hsla(${part.hue - 10}, 100%, 50%, ${part.alpha * 0.6})`);
+      grad.addColorStop(0, `hsla(${part.hue}, 100%, 70%, ${finalAlpha})`);
+      grad.addColorStop(0.5, `hsla(${part.hue - 10}, 100%, 50%, ${finalAlpha * 0.6})`);
       grad.addColorStop(1, `hsla(${part.hue - 20}, 100%, 30%, 0)`);
       ctx.fillStyle = grad;
       ctx.beginPath();

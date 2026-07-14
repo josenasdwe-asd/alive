@@ -16,6 +16,7 @@ import { HeroPanel } from "./HeroPanel";
 import { Pipeline25DPanel } from "./Pipeline25DPanel";
 import { ScenePanel } from "./ScenePanel";
 import { CinematicPanel } from "./CinematicPanel";
+import { MiniTimeline } from "./MiniTimeline";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import {
   Loader2,
@@ -158,6 +159,9 @@ export function Studio() {
               )}
             </div>
           )}
+
+          {/* Mini-timeline */}
+          {isReady && <MiniTimeline />}
 
           {/* Mobile: panels below stage */}
           <div className="space-y-3 lg:hidden">

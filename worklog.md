@@ -3319,3 +3319,39 @@ Stage Summary:
 - 7 layers render correctly, audio panel visible in Animate tab
 - No critical errors, lint clean
 - All pushed to https://github.com/josenasdwe-asd/alive.git (commit f98edc2)
+
+---
+Task ID: VANGUARDIA-FINAL
+Agent: Z.ai Code (main)
+Task: Implement 3 vanguardia features — flow field, video export, mesh prep
+
+Work Log:
+1. **Flow Field Motion** (Motionleap killer feature):
+   - FlowFieldOverlay: user draws arrows on image → directional pixel flow
+   - FlowFieldRenderer: WebGL2 fragment shader applies flow vectors
+   - Gaussian falloff from arrow center (radius 0.15)
+   - Oscillating motion (sin-based) along arrow direction
+   - Up to 16 concurrent arrows, adjustable intensity (0-100%)
+   - Draw/erase modes, clear button
+   - 'Flow' button in toolbar toggles drawing mode
+   - Flow data stored in window.__aliveFlowField, read by shader each frame
+
+2. **Video Export (WebM + GIF)**:
+   - ExportVideoPanel with format selector (WebM/GIF)
+   - Adjustable duration (2-15s) and FPS (15-60)
+   - Progress bar during recording
+   - WebM: canvas.captureStream → MediaRecorder (VP9/VP8, 8Mbps)
+   - GIF: frame-by-frame capture + encoding fallback
+   - DOM fallback for CSS mode (SVG foreignObject → canvas)
+   - Added to Export tab alongside ProjectPanel
+
+3. **Mesh warping preparation**:
+   - FlowFieldRenderer uses WebGL2 with uniform arrays for arrows
+   - Architecture ready for depth-based mesh warping extension
+
+Stage Summary:
+- Flow field: draw arrows → water flows, clouds drift, hair blows (Motionleap parity)
+- Video export: WebM + GIF with adjustable duration/fps
+- 7 layers render, Flow button in toolbar, video export in Export tab
+- No errors, lint clean
+- Pushed to git (commit 4aee26a)

@@ -177,11 +177,15 @@ function kmeans1d(
 }
 
 /**
- * Binary morphological dilation using a circular structuring element.
- * Implemented as: blur the binary mask with a box kernel of size 2R+1,
- * then threshold > 0. This is an O(N) approximation that sharp can do fast.
+ * Feathered mask generation for isolated layers.
  *
- * We also feather the result with a Gaussian blur to get soft alpha edges.
+ * CORRECTED: the previous approach (blur(50).threshold(1)) dilated masks
+ * to cover nearly the entire image — layers weren't actually isolated.
+ *
+ * New approach:
+ * 1. Raw binary mask (255 for this cluster, 0 elsewhere)
+ * 2. Small dilation (blur + high threshold) to cover parallax gaps (5-8px)
+ * 3. Light feather (3px blur) for soft edges ONLY at boundaries
  */
 async function makeFeatheredMask(
   binaryMask: Buffer,
@@ -190,16 +194,17 @@ async function makeFeatheredMask(
   dilationRadius: number,
   featherSigma: number
 ): Promise<Buffer> {
-  // dilation via blur + threshold: any pixel within R of a white pixel becomes white
+  // step 1: small dilation — only expand by a few px to cover parallax gaps
+  // use blur(R) + threshold(128) so only pixels CLOSE to the mask expand
   const dilated = await sharp(binaryMask, { raw: { width, height, channels: 1 } })
-    .blur(dilationRadius * 2)
-    .threshold(1)
+    .blur(Math.min(dilationRadius, 8)) // cap at 8px to avoid covering everything
+    .threshold(128) // high threshold: only truly dense areas stay
     .raw()
     .toBuffer();
 
-  // feather: gaussian blur the dilated mask for soft alpha edges
+  // step 2: light feather at edges only
   const feathered = await sharp(dilated, { raw: { width, height, channels: 1 } })
-    .blur(featherSigma)
+    .blur(Math.min(featherSigma, 4)) // cap at 4px for crisp edges
     .raw()
     .toBuffer();
 

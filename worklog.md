@@ -3282,3 +3282,43 @@ Stage Summary:
 - Priorización en 4 fases (impacto inmediato → wow factor → pulido)
 - Cada técnica tiene su base matemática/algorítmica especificada
 - Foco en el problema principal del usuario: capas semánticas reales (no bandas de profundidad)
+
+---
+Task ID: PRECISION-AUDIT
+Agent: Z.ai Code — Honest Self-Audit
+Task: Auditoría honesta de qué necesita ajustes precisos
+
+## AUDITORÍA HONESTA — 12 PROBLEMAS REALES
+
+Después de implementar 20+ features, el problema ya no es cantidad sino precisión. Estos son los problemas reales que veo en el código:
+
+### PROBLEMAS DE ANIMACIÓN (valores mal calibrados)
+1. **Parallax demasiado agresivo**: baseParallax=20px + depthFactor(0.3-1.7) = hasta 34px. Para imágenes pequeñas esto es excesivo.
+2. **Squash & Stretch apenas perceptible**: 0.03 × depth = máximo 0.03 de deformación. Demasiado sutil para notarse.
+3. **Follow-through con springs demasiado lentos en capas lejanas**: stiffness=30, mass=1.1 → la capa lejana se queda atrás demasiado tiempo, se siente "rota".
+4. **Entrance reveal demasiado lento con 7 capas**: delay máximo = 0.6 × 6 = 3.6s para la última capa. El usuario espera demasiado.
+5. **DOF blur demasiado agresivo**: dist × aperture × 20 = hasta 20px de blur. Las capas lejanas se ven borrosas en exceso.
+
+### PROBLEMAS VISUALES
+6. **Bordes de capas con seams visibles**: dilation=18px + feather=6px puede no ser suficiente cuando las capas se mueven 20+px.
+7. **Depth fog se ve como bandas horizontales**: 3 gradientes discretos en vez de niebla volumétrica suave.
+8. **Relighting canvas pixelado**: 128×128 escalado a 1024+ se ve blocky.
+9. **Color grading overlays demasiado sutiles o demasiado fuertes**: las opacidades son fijas, no se adaptan a la imagen.
+
+### PROBLEMAS DE UX
+10. **Mini-timeline es decorativa**: el playhead se mueve pero no controla la animación real. Scrubbing no hace nada.
+11. **Demasiados paneles en el tab "Animar"**: PresetPicker + ControlPanel + Pipeline25DPanel + CinematicPanel = scroll infinito. Abrumador.
+12. **Comparison slider no se alinea**: el overlay del original no coincide exactamente con las capas animadas debajo.
+
+### PLAN DE PULIDO FINO (priorizado por impacto)
+
+**Fix 1**: Calibrar parallax (baseParallax 20→12, depthFactor 0.3-1.7→0.2-1.2)
+**Fix 2**: Aumentar squash (0.03→0.06, 0.02→0.04)
+**Fix 3**: Springs más rápidos (stiffness min 30→50, mass max 1.1→0.7)
+**Fix 4**: Entrance más rápido (0.12→0.08 por capa, max 2.4s)
+**Fix 5**: DOF más sutil (×20→×12, max 12px)
+**Fix 6**: Bordes más suaves (dilation 18→25, feather 6→10)
+**Fix 7**: Depth fog suave (gradient continuo en vez de 3 bandas)
+**Fix 8**: Relighting a 256×256 (menos pixelado)
+**Fix 9**: Simplificar tab "Animar" (collapsible sections)
+**Fix 10**: Mini-timeline funcional (controlar animation-delay)

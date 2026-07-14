@@ -220,8 +220,8 @@ export async function sliceImageByDepth(
   options: SliceOptions = {}
 ): Promise<SlicedLayer[]> {
   const k = Math.max(2, Math.min(12, options.k ?? 6));
-  const dilationRadius = options.dilationRadius ?? 18;
-  const featherSigma = options.featherSigma ?? 6;
+  const dilationRadius = options.dilationRadius ?? 25; // CALIBRATED: was 18, now 25 (covers parallax gaps better)
+  const featherSigma = options.featherSigma ?? 10;     // CALIBRATED: was 6, now 10 (softer edges, less visible seams)
   const mode = options.mode ?? "anchor-base"; // default: base + isolated bands
 
   // Load both images at the same size (use original's dimensions)

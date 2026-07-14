@@ -31,6 +31,7 @@ import {
   Code2,
   Maximize2,
   Mountain,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -243,8 +244,18 @@ function RightPanelTabs({
         <>
           <PresetPicker />
           <ControlPanel />
-          <Pipeline25DPanel />
-          <CinematicPanel />
+          {/* Collapsible advanced sections */}
+          <details className="group">
+            <summary className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground">
+              <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+              Pipeline 2.5D + Cinemático
+              <span className="ml-auto text-[10px] text-muted-foreground/60">avanzado</span>
+            </summary>
+            <div className="mt-2 space-y-3">
+              <Pipeline25DPanel />
+              <CinematicPanel />
+            </div>
+          </details>
         </>
       )}
       {tab === "scene" && <ScenePanel />}

@@ -9,8 +9,9 @@ import { cn } from "@/lib/utils";
  * Mini-timeline visual with scrubbing.
  *
  * Shows a 30s horizontal bar with loop markers for each animation cycle.
- * User can scrub to preview the animation at any point.
- * The playhead auto-advances when playing.
+ * The playhead auto-advances when playing, showing where the animation
+ * is in its cycle. Loop markers indicate when each animation type
+ * (breathing, sway, float, etc.) completes a full cycle.
  */
 export function MiniTimeline() {
   const { animation: config } = useAliveStore();

@@ -90,9 +90,10 @@ export function DynamicRelighting({
       const ly = Math.cos(lightEl) * Math.sin(lightAz);
       const lz = Math.sin(lightEl);
 
-      // draw depth map to a temp canvas at low res for sampling
-      const sampleW = 128;
-      const sampleH = Math.round((H / W) * 128);
+      // draw depth map to a temp canvas at higher res for sampling
+      // CALIBRATED: was 128, now 256 (less pixelated when upscaled)
+      const sampleW = 256;
+      const sampleH = Math.round((H / W) * 256);
       const tempCanvas = document.createElement("canvas");
       tempCanvas.width = sampleW;
       tempCanvas.height = sampleH;

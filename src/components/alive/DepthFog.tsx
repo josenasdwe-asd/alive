@@ -12,12 +12,14 @@ interface DepthFogProps {
 }
 
 /**
- * Depth-aware volumetric fog.
- * Each layer gets a white overlay proportional to its depth (farther = foggier).
- * Mathematically: fogOpacity = (1 - depth) * density * 0.5
+ * Depth-aware volumetric fog — smooth continuous gradient.
  *
- * This creates atmospheric perspective — distant layers fade into haze,
- * giving true depth perception (not just parallax).
+ * Instead of discrete bands, uses a single vertical gradient that goes from
+ * opaque (top = far) to transparent (bottom = near), with screen blend.
+ * This creates atmospheric perspective — distant elements fade into haze.
+ *
+ * Mathematically: fogOpacity(y) = density * (1 - y/H) * 0.5
+ * where y=0 is top (farthest) and y=H is bottom (nearest).
  */
 export function DepthFog({
   enabled,
@@ -25,35 +27,34 @@ export function DepthFog({
   color = "rgba(180, 200, 220, 1)",
   layers,
 }: DepthFogProps) {
-  const fogBands = useMemo(() => {
-    if (!enabled || layers.length === 0) return [];
-    // create a few fog gradient bands at different depths
-    return [
-      { depth: 0.1, opacity: density * 0.4 },
-      { depth: 0.3, opacity: density * 0.25 },
-      { depth: 0.5, opacity: density * 0.12 },
-    ];
-  }, [enabled, density, layers]);
+  const fogStyle = useMemo(() => {
+    if (!enabled || layers.length === 0) return null;
 
-  if (!enabled) return null;
+    // find the depth distribution to position fog correctly
+    const minDepth = Math.min(...layers.map((l) => l.depth));
+    const fogStart = minDepth * 40; // % from top where fog starts
+    const fogEnd = 50 + density * 30; // % from top where fog ends
+
+    // continuous gradient: opaque at top → transparent at bottom
+    const colorBase = color.replace(/[\d.]+\)$/, "");
+    return {
+      background: `linear-gradient(180deg,
+        ${colorBase}${density * 0.45}) 0%,
+        ${colorBase}${density * 0.3}) ${fogStart}%,
+        ${colorBase}${density * 0.15}) ${fogEnd}%,
+        transparent 100%)`,
+      mixBlendMode: "screen" as const,
+      opacity: 0.9,
+    };
+  }, [enabled, density, color, layers]);
+
+  if (!enabled || !fogStyle) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {fogBands.map((band, i) => {
-        // each band is a horizontal gradient: more opaque at top (far), transparent at bottom (near)
-        const yStart = (1 - band.depth) * 60; // % from top
-        return (
-          <div
-            key={i}
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(180deg, ${color.replace("1)", `${band.opacity})`)} 0%, transparent ${yStart + 20}%, transparent 100%)`,
-              mixBlendMode: "screen",
-              opacity: 0.8,
-            }}
-          />
-        );
-      })}
-    </div>
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      style={fogStyle}
+    />
   );
 }

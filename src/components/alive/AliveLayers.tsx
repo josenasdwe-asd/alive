@@ -189,11 +189,10 @@ function LayerPlane({
   const t = layer.transform;
 
   // === FOLLOW-THROUGH (Principle 5): per-layer spring with depth-based stiffness ===
-  // Near layers = stiffer (react fast, settle quick). Far layers = softer (lag behind, drift).
-  // This creates the "overlapping action" where layers don't move in sync.
-  const springStiffness = 30 + layer.depth * 80; // 30..110
-  const springDamping = 15 + layer.depth * 15;   // 15..30
-  const springMass = 0.3 + (1 - layer.depth) * 0.8; // far = heavier (more lag)
+  // CALIBRATED: near layers react fast, far layers lag slightly (not too much)
+  const springStiffness = 60 + layer.depth * 60;  // 60..120 (was 30..110)
+  const springDamping = 18 + layer.depth * 14;     // 18..32 (was 15..30)
+  const springMass = 0.3 + (1 - layer.depth) * 0.4; // 0.3..0.7 (was 0.3..1.1 — too heavy)
   const smx = useSpring(mx, { stiffness: springStiffness, damping: springDamping, mass: springMass });
   const smy = useSpring(my, { stiffness: springStiffness, damping: springDamping, mass: springMass });
   const smvx = useSpring(mvx, { stiffness: 60 + layer.depth * 60, damping: 25 });
@@ -203,7 +202,8 @@ function LayerPlane({
     config.layers[layer.id] ??
     ({ layerId: layer.id, ...DEFAULT_LAYER_ANIM } as LayerAnimationConfig);
 
-  const depthFactor = 0.3 + layer.depth * 1.4;
+  // CALIBRATED: less aggressive depth factor (was 0.3 + 1.4 = 1.7 max, now 0.2 + 1.0 = 1.2 max)
+  const depthFactor = 0.2 + layer.depth * 1.0;
   const intensity = config.intensity;
   const pxToMove =
     (config.parallaxEnabled ? layerAnim.parallaxStrength : 0) *
@@ -240,9 +240,9 @@ function LayerPlane({
   );
 
   // === SQUASH & STRETCH (Principle 1): at parallax extremes, layers deform elastically ===
-  // scaleX stretches when mouse is at edges, scaleY compresses (area preserved)
-  const squashX = useTransform(smx, (v) => 1 + Math.abs(v) * 0.03 * layer.depth * intensity);
-  const squashY = useTransform(smx, (v) => 1 - Math.abs(v) * 0.02 * layer.depth * intensity);
+  // CALIBRATED: doubled from 0.03/0.02 to 0.06/0.04 for perceptible elastic feel
+  const squashX = useTransform(smx, (v) => 1 + Math.abs(v) * 0.06 * layer.depth * intensity);
+  const squashY = useTransform(smx, (v) => 1 - Math.abs(v) * 0.04 * layer.depth * intensity);
 
   // === BUG FIX #1: respect visibility (after all hooks) ===
   if (!t.visible) return null;
@@ -326,7 +326,7 @@ function LayerPlane({
       ? (config.layers[config.focusLayerId] ? layer.depth : config.focusDepth)
       : config.focusDepth;
     const dist = Math.abs(layer.depth - focusDepth);
-    dofBlur = dist * config.aperture * 20; // max 20px blur at aperture=1
+    dofBlur = dist * config.aperture * 12; // CALIBRATED: was 20, now 12 (max 12px — more natural)
   }
 
   const layerBlur = t.blur + layerAnim.blur + dofBlur;
@@ -339,8 +339,9 @@ function LayerPlane({
   const zIndex = t.zOverride ?? 10 + index + Math.round(layer.depth * 100);
 
   // entrance reveal: back layers first, front layers last, expo.out
+  // CALIBRATED: faster stagger (0.08 vs 0.12) and max 4 layers (was 6) = max 0.32s (was 0.72s)
   const entranceDelay = config.entranceEnabled
-    ? layer.depth * 0.12 * Math.min(total, 6)
+    ? layer.depth * 0.08 * Math.min(total, 4)
     : 0;
 
   return (

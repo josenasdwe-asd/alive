@@ -7,7 +7,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type {
   AnimationConfig,
   ImageLayer,
@@ -19,7 +19,16 @@ import {
   buildLayerMotionConfig,
   computeLayerTransform,
   safeTranslationBound,
+  depthSpringParams,
+  springStep,
+  predictMouse,
+  inertiaDecay,
+  fmBreath,
+  amEnvelope,
+  snoise2D,
+  motionBlurFromVelocity,
   type LayerMotionConfig,
+  type SpringState,
 } from "@/lib/motion-engine";
 
 interface AliveLayersProps {
@@ -186,56 +195,82 @@ function LayerPlane({
     config.layers[layer.id] ??
     ({ layerId: layer.id, ...DEFAULT_LAYER_ANIM } as LayerAnimationConfig);
 
-  // === BUILD MATHEMATICAL MOTION CONFIG (once per layer) ===
-  const motionConfig: LayerMotionConfig = buildLayerMotionConfig(
-    index,
-    total,
-    layer.depth,
-    {
-      breathAmp: layerAnim.breathing
-        ? 0.012 + layerAnim.breathingAmp * 0.01 * config.intensity
-        : 0,
-      swayAmp: layerAnim.sway
-        ? layerAnim.swayAmp * 0.5 * config.intensity
-        : 0,
-      floatAmp: layerAnim.floatY
-        ? layerAnim.floatAmp * 5 * config.intensity
-        : 0,
-      driftAmp: layerAnim.driftX
-        ? layerAnim.driftAmp * 4 * config.intensity
-        : 0,
-      parallaxStrength: config.parallaxEnabled
-        ? layerAnim.parallaxStrength
-        : 0,
-    }
+  // === BUILD MATHEMATICAL MOTION CONFIG (memoized — was recreated every render) ===
+  // PERF FIX: useMemo prevents RAF teardown/recreate on every parent re-render.
+  const motionConfig: LayerMotionConfig = useMemo(
+    () =>
+      buildLayerMotionConfig(index, total, layer.depth, {
+        breathAmp: layerAnim.breathing
+          ? 0.012 + layerAnim.breathingAmp * 0.01 * config.intensity
+          : 0,
+        swayAmp: layerAnim.sway
+          ? layerAnim.swayAmp * 0.5 * config.intensity
+          : 0,
+        floatAmp: layerAnim.floatY
+          ? layerAnim.floatAmp * 5 * config.intensity
+          : 0,
+        driftAmp: layerAnim.driftX
+          ? layerAnim.driftAmp * 4 * config.intensity
+          : 0,
+        parallaxStrength: config.parallaxEnabled
+          ? layerAnim.parallaxStrength
+          : 0,
+      }),
+    [index, total, layer.depth, config.intensity, config.parallaxEnabled,
+     layerAnim.breathing, layerAnim.breathingAmp, layerAnim.sway, layerAnim.swayAmp,
+     layerAnim.floatY, layerAnim.floatAmp, layerAnim.driftX, layerAnim.driftAmp,
+     layerAnim.parallaxStrength]
   );
 
-  // === SPRING SMOOTHING for parallax (depth-based stiffness) ===
-  const springStiffness = 60 + layer.depth * 60;
-  const springDamping = 18 + layer.depth * 14;
-  const springMass = 0.3 + (1 - layer.depth) * 0.4;
-  const smx = useSpring(mx, { stiffness: springStiffness, damping: springDamping, mass: springMass });
-  const smy = useSpring(my, { stiffness: springStiffness, damping: springDamping, mass: springMass });
+  // === v3 POWER-UP: PHANTOM SPRING PHYSICS ===
+  // Real Hooke's law per layer for true TIME-PARALLAX.
+  // Far layers are 6× heavier → settle 6× slower than near layers.
+  const springParams = useMemo(() => depthSpringParams(layer.depth), [layer.depth]);
+
+  // Spring state refs (avoid re-creating springs on every render)
+  const springX = useRef<SpringState>({ x: 0, v: 0 });
+  const springY = useRef<SpringState>({ x: 0, v: 0 });
+
+  // v3 POWER-UP: Inertia field state (wires previously-dead config fields)
+  const inertiaX = useRef({ pos: 0, vel: 0 });
+  const inertiaY = useRef({ pos: 0, vel: 0 });
 
   // === OVERSCALE (non-deforming: uniform scale) ===
-  // Computed to guarantee NO edge gaps. Base 1.12 + depth + intensity.
   const depthScale = config.scaleWithDepth ? 1 + layer.depth * 0.15 : 1;
   const overscale = (1.12 + layer.depth * 0.06 + config.intensity * 0.04) * depthScale;
   const userScale = t.scale * overscale;
 
-  // === SAFE BOUNDS (computed from overscale) ===
-  // These guarantee translation can NEVER reveal edges.
-  const containerRef2 = useRef<HTMLDivElement>(null);
-  const safeBoundX = safeTranslationBound(overscale, 800); // conservative default
-  const safeBoundY = safeTranslationBound(overscale, 500);
+  // === SAFE BOUNDS (measured from real container size) ===
+  // PERF FIX: was hardcoded 800×500. Now uses ResizeObserver.
+  const containerSizeRef = useRef({ w: 800, h: 500 });
+  const layerWrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = layerWrapperRef.current;
+    if (!el) return;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        containerSizeRef.current = { w: rect.width, h: rect.height };
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // === RAF-DRIVEN MATHEMATICAL MOTION ===
-  // Instead of CSS @property keyframes, we compute transforms in JS via RAF.
-  // This gives EXACT control over the math and guarantees non-deforming motion.
   const txMV = useMotionValue(0);
   const tyMV = useMotionValue(0);
   const scaleMV = useMotionValue(userScale);
-  const rotateMV = useMotionValue(0);
+  const rotateMV = useMotionValue(t.rotation);
+  const blurMV = useMotionValue(0);
+
+  // Refs for delta-time computation and velocity tracking
+  const lastNowRef = useRef(performance.now());
+  const lastTxRef = useRef(0);
+  const lastTyRef = useRef(0);
 
   useEffect(() => {
     if (config.reducedMotion) {
@@ -243,42 +278,109 @@ function LayerPlane({
       tyMV.set(0);
       scaleMV.set(userScale);
       rotateMV.set(t.rotation);
+      blurMV.set(0);
       return;
     }
 
     let raf = 0;
     const start = performance.now();
+    lastNowRef.current = start;
 
     const tick = () => {
-      const elapsed = (performance.now() - start) / 1000;
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - lastNowRef.current) / 1000); // cap at 50ms (tab throttle)
+      lastNowRef.current = now;
+      const elapsed = (now - start) / 1000;
       const speed = config.speed * layerAnim.durationMultiplier;
 
-      // Get current parallax (from springs)
-      const px = smx.get();
-      const py = smy.get();
+      // === v3: PHANTOM SPRING PHYSICS ===
+      // Real Hooke's law integration per layer (replaces framer useSpring)
+      const targetX = mx.get();
+      const targetY = my.get();
+      springX.current = springStep(springX.current, targetX, springParams.k, springParams.c, springParams.m, dt);
+      springY.current = springStep(springY.current, targetY, springParams.k, springParams.c, springParams.m, dt);
 
-      // Compute exact mathematical transform
+      // === v3: MOTION PREDICTION + INERTIA ===
+      // Predict mouse 1 frame ahead, then apply inertia field.
+      // Wires the previously-DEAD `inertia` and `mouseVelocityInfluence` config fields.
+      const predictedX = predictMouse(springX.current.x, mvx.get() * 0.01, 0.016);
+      const predictedY = predictMouse(springY.current.x, mvy.get() * 0.01, 0.016);
+
+      inertiaX.current = inertiaDecay(
+        inertiaX.current.pos, inertiaX.current.vel,
+        predictedX, layerAnim.mouseVelocityInfluence, layerAnim.inertia, dt
+      );
+      inertiaY.current = inertiaDecay(
+        inertiaY.current.pos, inertiaY.current.vel,
+        predictedY, layerAnim.mouseVelocityInfluence, layerAnim.inertia, dt
+      );
+
+      // Measure real container size for safe bounds
+      const { w: cw, h: ch } = containerSizeRef.current;
+      const safeX = safeTranslationBound(overscale, cw);
+      const safeY = safeTranslationBound(overscale, ch);
+
+      // Compute exact mathematical transform using PREDICTED + INERTIA position
       const result = computeLayerTransform(
         elapsed * speed,
         motionConfig,
-        px,
-        py,
-        safeBoundX,
-        safeBoundY,
-        800
+        inertiaX.current.pos,
+        inertiaY.current.pos,
+        safeX,
+        safeY,
+        cw
       );
 
-      // Apply user transform ON TOP of mathematical motion (composable, non-deforming)
-      txMV.set(result.translateX + t.x);
-      tyMV.set(result.translateY + t.y);
-      scaleMV.set(result.scale * userScale); // UNIFORM scale only
-      rotateMV.set(result.rotate + t.rotation);
+      // === v3: FM BREATHING + AM ENVELOPE ===
+      // Override the simple sinusoidal breath with FM synthesis + AM envelope.
+      // Produces breathing with HRV-like variability and natural rest periods.
+      let finalScale = result.scale;
+      if (layerAnim.breathing) {
+        const h = motionConfig.harmonicRatio;
+        const carrierFreq = motionConfig.breathFreq * h;
+        const modFreq = carrierFreq * 0.23; // slow HRV drift
+        const modIndex = 0.6; // ±60% frequency variation
+        const breathAmp = 0.012 + layerAnim.breathingAmp * 0.01 * config.intensity;
+        const envelope = amEnvelope(elapsed + motionConfig.phase * 100, 4, 8, 4, 8);
+        const fmBreathDelta = fmBreath(elapsed * speed, carrierFreq, modFreq, modIndex, breathAmp) * envelope;
+        finalScale = 1 + fmBreathDelta;
+      }
+
+      // === v3: 2D SIMPLEX DRIFT (spatially-correlated) ===
+      // Replace 1D value noise with 2D simplex for correlated drift between layers.
+      let finalTx = result.translateX;
+      if (layerAnim.driftX) {
+        const driftT = elapsed * speed * motionConfig.driftFreq * motionConfig.harmonicRatio;
+        const driftVal = snoise2D(driftT, layer.depth * 3.0) * motionConfig.driftAmp * 4 * config.intensity;
+        finalTx = Math.max(-safeX, Math.min(safeX, finalTx + driftVal));
+      }
+
+      // === v3: VELOCITY-BASED MOTION BLUR ===
+      const vx = (finalTx - lastTxRef.current) / Math.max(0.001, dt);
+      const vy = (result.translateY - lastTyRef.current) / Math.max(0.001, dt);
+      lastTxRef.current = finalTx;
+      lastTyRef.current = result.translateY;
+      const velocity = Math.hypot(vx, vy);
+      const motionBlur = motionBlurFromVelocity(velocity);
+
+      // === PERF: Guard MotionValue.set with epsilon (avoid redundant dirty updates) ===
+      const eps = 0.01;
+      if (Math.abs(txMV.get() - (finalTx + t.x)) > eps) txMV.set(finalTx + t.x);
+      if (Math.abs(tyMV.get() - (result.translateY + t.y)) > eps) tyMV.set(result.translateY + t.y);
+      if (Math.abs(scaleMV.get() - (finalScale * userScale)) > eps) scaleMV.set(finalScale * userScale);
+      if (Math.abs(rotateMV.get() - (result.rotate + t.rotation)) > eps) rotateMV.set(result.rotate + t.rotation);
+      if (Math.abs(blurMV.get() - motionBlur) > eps) blurMV.set(motionBlur);
 
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [config.reducedMotion, config.speed, config.intensity, motionConfig, smx, smy, safeBoundX, safeBoundY, userScale, t.x, t.y, t.rotation, txMV, tyMV, scaleMV, rotateMV, layerAnim.durationMultiplier]);
+    // PERF: reduced deps — use refs for values that change frequently
+  }, [config.reducedMotion, config.speed, config.intensity, motionConfig, springParams,
+      mx, my, mvx, mvy, overscale, userScale, t.x, t.y, t.rotation,
+      layerAnim.breathing, layerAnim.breathingAmp, layerAnim.driftX,
+      layerAnim.inertia, layerAnim.mouseVelocityInfluence, layerAnim.durationMultiplier,
+      txMV, tyMV, scaleMV, rotateMV, blurMV]);
 
   // Scroll-driven parallax (separate from organic motion)
   const fallbackScroll = useMotionValue(0);
@@ -342,15 +444,16 @@ function LayerPlane({
           willChange: "transform",
         }}
       >
-        {/* USER TRANSFORM WRAPPER (moveable target) */}
+        {/* USER TRANSFORM WRAPPER (moveable target) — ref for size measurement */}
         <div
+          ref={layerWrapperRef}
           data-layer-id={layer.id}
           className={`alive-layer-wrapper absolute inset-0 ${selected ? "selected" : ""}`}
           style={{
             filter: useLiquid
-              ? `blur(${layerBlur}px) url(#${liquidFilterId})`
-              : layerBlur > 0
-                ? `blur(${layerBlur}px)`
+              ? `blur(${layerBlur + blurMV.get()}px) url(#${liquidFilterId})`
+              : (layerBlur + blurMV.get()) > 0
+                ? `blur(${layerBlur + blurMV.get()}px)`
                 : undefined,
           }}
         >

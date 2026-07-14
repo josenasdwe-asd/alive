@@ -254,13 +254,15 @@ export async function sliceWithSlic(
       maskFull[i] = Math.max(maskBinary[i], maskUpscaled[i]);
     }
 
-    // composite: original RGB × mask alpha
+    // RENDER FIX: Premultiply alpha to eliminate colored fringes at layer edges
     const rgba = Buffer.alloc(W * H * 4);
     for (let i = 0; i < W * H; i++) {
-      rgba[i * 4] = originalRaw[i * 3];
-      rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
-      rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
-      rgba[i * 4 + 3] = maskFull[i];
+      const alpha = maskFull[i];
+      const premult = alpha / 255;
+      rgba[i * 4] = Math.round(originalRaw[i * 3] * premult);
+      rgba[i * 4 + 1] = Math.round(originalRaw[i * 3 + 1] * premult);
+      rgba[i * 4 + 2] = Math.round(originalRaw[i * 3 + 2] * premult);
+      rgba[i * 4 + 3] = alpha;
     }
 
     const png = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })

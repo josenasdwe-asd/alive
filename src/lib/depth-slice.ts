@@ -328,12 +328,18 @@ export async function sliceImageByDepth(
 
       const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
 
+      // RENDER FIX: Premultiply alpha to eliminate colored fringes at layer edges.
+      // Without premultiplication, semi-transparent edge pixels show full-saturation
+      // foreground color → colored halos when composited over background layers.
+      // With premult: rgba = rgb * (alpha/255), so edges fade to correct blended color.
       const rgba = Buffer.alloc(W * H * 4);
       for (let i = 0; i < W * H; i++) {
-        rgba[i * 4] = originalRaw[i * 3];
-        rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
-        rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
-        rgba[i * 4 + 3] = featheredMask[i];
+        const alpha = featheredMask[i];
+        const premult = alpha / 255;
+        rgba[i * 4] = Math.round(originalRaw[i * 3] * premult);
+        rgba[i * 4 + 1] = Math.round(originalRaw[i * 3 + 1] * premult);
+        rgba[i * 4 + 2] = Math.round(originalRaw[i * 3 + 2] * premult);
+        rgba[i * 4 + 3] = alpha;
       }
 
       const pngBuffer = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })
@@ -392,12 +398,15 @@ export async function sliceImageByDepth(
 
     const featheredMask = await makeFeatheredMask(maskBuf, W, H, dilationRadius, featherSigma);
 
+    // RENDER FIX: Premultiply alpha (same as anchor-base mode)
     const rgba = Buffer.alloc(W * H * 4);
     for (let i = 0; i < W * H; i++) {
-      rgba[i * 4] = originalRaw[i * 3];
-      rgba[i * 4 + 1] = originalRaw[i * 3 + 1];
-      rgba[i * 4 + 2] = originalRaw[i * 3 + 2];
-      rgba[i * 4 + 3] = featheredMask[i];
+      const alpha = featheredMask[i];
+      const premult = alpha / 255;
+      rgba[i * 4] = Math.round(originalRaw[i * 3] * premult);
+      rgba[i * 4 + 1] = Math.round(originalRaw[i * 3 + 1] * premult);
+      rgba[i * 4 + 2] = Math.round(originalRaw[i * 3 + 2] * premult);
+      rgba[i * 4 + 3] = alpha;
     }
 
     const pngBuffer = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })

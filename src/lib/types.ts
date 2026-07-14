@@ -230,6 +230,15 @@ export interface AnimationConfig {
   atmoTimelapse: boolean;
   /** seasonal hue rotation */
   atmoSeasonal: boolean;
+
+  // === Phase 2: pro cinematic ===
+  /** depth fog volumétrico */
+  depthFogEnabled: boolean;
+  depthFogDensity: number;
+  /** bloom + ACES tone mapping */
+  bloomEnabled: boolean;
+  bloomIntensity: number;
+  toneMapStrength: number;
 }
 
 /** .2p5d export format (Disguise-compatible container) */

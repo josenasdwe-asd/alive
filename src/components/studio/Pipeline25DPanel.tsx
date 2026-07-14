@@ -1,6 +1,6 @@
 "use client";
 
-import { Aperture, Focus, Crosshair, Layers, Camera } from "lucide-react";
+import { Aperture, Focus, Crosshair, Layers, Camera, CloudFog, Sun } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -144,6 +144,84 @@ export function Pipeline25DPanel() {
             onCheckedChange={(v) => updateAnimation({ scaleWithDepth: v })}
           />
         </div>
+
+        {/* Depth fog */}
+        <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-2.5">
+          <div className="flex items-center gap-1.5">
+            <CloudFog className="h-3.5 w-3.5 text-muted-foreground" />
+            <Label className="text-xs">Depth fog volumétrico</Label>
+          </div>
+          <Switch
+            checked={config.depthFogEnabled}
+            onCheckedChange={(v) => updateAnimation({ depthFogEnabled: v })}
+          />
+        </div>
+        {config.depthFogEnabled && (
+          <div className="space-y-1">
+            <Label className="flex items-center justify-between text-[10px] text-muted-foreground">
+              <span>Densidad niebla</span>
+              <span className="font-mono text-foreground/80">
+                {config.depthFogDensity.toFixed(2)}
+              </span>
+            </Label>
+            <Slider
+              value={[config.depthFogDensity]}
+              min={0}
+              max={1}
+              step={0.05}
+              onValueChange={(v) => updateAnimation({ depthFogDensity: v[0] })}
+              className="py-0.5"
+            />
+          </div>
+        )}
+
+        {/* Bloom + ACES */}
+        <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-2.5">
+          <div className="flex items-center gap-1.5">
+            <Sun className="h-3.5 w-3.5 text-muted-foreground" />
+            <Label className="text-xs">Bloom + ACES</Label>
+          </div>
+          <Switch
+            checked={config.bloomEnabled}
+            onCheckedChange={(v) => updateAnimation({ bloomEnabled: v })}
+          />
+        </div>
+        {config.bloomEnabled && (
+          <div className="space-y-2">
+            <div className="space-y-1">
+              <Label className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>Bloom</span>
+                <span className="font-mono text-foreground/80">
+                  {config.bloomIntensity.toFixed(2)}
+                </span>
+              </Label>
+              <Slider
+                value={[config.bloomIntensity]}
+                min={0}
+                max={1}
+                step={0.05}
+                onValueChange={(v) => updateAnimation({ bloomIntensity: v[0] })}
+                className="py-0.5"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>Tone map</span>
+                <span className="font-mono text-foreground/80">
+                  {config.toneMapStrength.toFixed(2)}
+                </span>
+              </Label>
+              <Slider
+                value={[config.toneMapStrength]}
+                min={0}
+                max={1}
+                step={0.05}
+                onValueChange={(v) => updateAnimation({ toneMapStrength: v[0] })}
+                className="py-0.5"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

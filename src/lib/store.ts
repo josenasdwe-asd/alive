@@ -97,6 +97,11 @@ const emptyAnim: AnimationConfig = {
   atmoFogDrift: false,
   atmoTimelapse: false,
   atmoSeasonal: false,
+  depthFogEnabled: false,
+  depthFogDensity: 0.4,
+  bloomEnabled: false,
+  bloomIntensity: 0.5,
+  toneMapStrength: 0.6,
 };
 
 const initialState: ProjectState = {

@@ -168,13 +168,52 @@ export function AnalysisPanel() {
       setProgress(100);
       setStage("ready");
       setPipelineStep("animate");
-      toast.success(`¡${data.layers.length} capas generadas matemáticamente!`);
+      toast.success(`¡${data.layers.length} capas generadas!`);
       const preset = useAliveStore.getState().analysis?.recommendedPreset;
       if (preset) applyPreset(preset as any);
     } catch (err: any) {
       setStage("error");
       setStatus("error", err?.message);
       toast.error(err?.message ?? "Error en el slicing");
+    }
+  }
+
+  async function runSlic() {
+    setStage("decomposing");
+    setStrategy("depth-slice");
+    setProgress(70);
+    try {
+      if (!depthMapUrl) {
+        setProgress(75);
+        await generateBaseAssets();
+      }
+      const depthUrl = useAliveStore.getState().depthMapUrl;
+      if (!depthUrl) throw new Error("No depth map available");
+
+      setProgress(85);
+      const res = await fetch("/api/slic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          originalUrl,
+          depthUrl,
+          k: kLayers,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "SLIC failed");
+
+      setSlicedLayers(data.layers);
+      setProgress(100);
+      setStage("ready");
+      setPipelineStep("animate");
+      toast.success(`¡${data.layers.length} capas semánticas (SLIC)!`);
+      const preset = useAliveStore.getState().analysis?.recommendedPreset;
+      if (preset) applyPreset(preset as any);
+    } catch (err: any) {
+      setStage("error");
+      setStatus("error", err?.message);
+      toast.error(err?.message ?? "Error en SLIC");
     }
   }
 
@@ -366,6 +405,15 @@ export function AnalysisPanel() {
                 title="PRO Mode"
                 badge="🎯 Producción · 15s"
                 desc="Depth map IA + K-means con conciencia semántica. Separación limpia para rigging y sprites. Bordes refinados."
+              />
+
+              <StrategyCard
+                active={false}
+                onClick={runSlic}
+                icon={<LayersIcon className="h-4 w-4" />}
+                title="SLIC Semántico"
+                badge="🧬 Superpixels · 5s"
+                desc="Segmentación por color+posición+profundidad. Capas semánticas reales: solo nubes, solo montañas, solo suelo."
               />
             </div>
           </div>

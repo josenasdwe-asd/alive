@@ -14,6 +14,8 @@ import { EffectOverlays } from "./EffectOverlays";
 import { ParticleCanvas } from "./ParticleCanvas";
 import { ColorGrading } from "./ColorGrading";
 import { AtmosphericAnimation } from "./AtmosphericAnimation";
+import { DepthFog } from "./DepthFog";
+import { BloomACES } from "./BloomACES";
 
 interface AliveStageProps {
   layers: ImageLayer[];
@@ -171,6 +173,18 @@ export function AliveStage({
       <EffectOverlays effects={config.effects} speed={config.speed} />
 
       <ColorGrading grade={config.colorGrade} intensity={1} />
+
+      {/* Depth fog volumétrico + Bloom/ACES */}
+      <DepthFog
+        enabled={config.depthFogEnabled && !config.reducedMotion}
+        density={config.depthFogDensity}
+        layers={layers}
+      />
+      <BloomACES
+        enabled={config.bloomEnabled}
+        intensity={config.bloomIntensity}
+        toneMap={config.toneMapStrength}
+      />
 
       {/* Atmospheric animations (light cycle, fog, timelapse, seasonal) */}
       <AtmosphericAnimation type="light-cycle" enabled={config.atmoLightCycle && !config.reducedMotion} speed={config.speed} intensity={config.intensity} />

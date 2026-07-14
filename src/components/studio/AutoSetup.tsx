@@ -1,6 +1,6 @@
 "use client";
 
-import { Wand2, Sparkles } from "lucide-react";
+import { Wand2, Sparkles, Brain } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { PRESET_MAP } from "@/lib/presets";
 import { SCENE_MAP } from "@/lib/scene-compositions";
@@ -9,12 +9,13 @@ import { toast } from "sonner";
 import type { PresetId, SceneCompositionId } from "@/lib/types";
 
 /**
- * Auto-setup inteligente — one click "Dar vida" that configures:
+ * Auto-setup inteligente v3 — now applies the FULL AI-recommended config bundle:
  * 1. The recommended preset from VLM analysis
- * 2. The best scene composition based on layer count
- * 3. Optimal intensity, speed, and effects
+ * 2. The full recommendedConfig (renderMode, colorGrade, effects, DOF, relighting, etc.)
+ * 3. Per-layer animation suggestions based on content (trees sway, water waves, etc.)
+ * 4. Optimal intensity, speed
  *
- * This is the "make it look amazing in one click" button.
+ * This is the "make it look amazing in one click" button — now truly intelligent.
  */
 export function AutoSetup() {
   const {
@@ -23,6 +24,8 @@ export function AutoSetup() {
     animation,
     applyPreset,
     applySceneComp,
+    applyIntelligentConfig,
+    applyLayerAnimSuggestions,
     updateAnimation,
   } = useAliveStore();
 
@@ -33,56 +36,66 @@ export function AutoSetup() {
     const presetId = (analysis.recommendedPreset as PresetId) ?? "dream";
     applyPreset(presetId);
 
-    // 2. Pick best scene composition based on layer count and roles
-    const hasForeground = layers.some((l) => l.role === "foreground");
-    const hasBackground = layers.some((l) => l.role === "background");
-    const layerCount = layers.length;
-
-    let sceneId: SceneCompositionId = "free";
-    if (layerCount >= 5 && hasBackground) {
-      sceneId = "horizon";
-    } else if (layers.some((l) => l.role === "subject")) {
-      sceneId = "subject-focus";
-    } else if (layerCount <= 4) {
-      sceneId = "anchor-midground";
+    // 2. Apply the FULL AI-recommended config bundle (v3 INTELLIGENCE)
+    if (analysis.recommendedConfig) {
+      applyIntelligentConfig(analysis.recommendedConfig);
+    } else {
+      // Fallback: legacy scene composition detection
+      const hasBackground = layers.some((l) => l.role === "background");
+      const layerCount = layers.length;
+      let sceneId: SceneCompositionId = "free";
+      if (layerCount >= 5 && hasBackground) {
+        sceneId = "horizon";
+      } else if (layers.some((l) => l.role === "subject")) {
+        sceneId = "subject-focus";
+      } else if (layerCount <= 4) {
+        sceneId = "anchor-midground";
+      }
+      applySceneComp(sceneId);
     }
-    applySceneComp(sceneId);
 
-    // 3. Only adjust intensity/speed if user hasn't manually changed them
-    // (check if they're still at default values)
-    const userAdjustedIntensity = animation.intensity !== 1;
-    const userAdjustedSpeed = animation.speed !== 1;
-
-    const isCinematic = presetId === "cinematic3d" || presetId === "cosmic";
-    const isDreamy = presetId === "dream" || presetId === "ethereal" || presetId === "aurora";
-
-    const patch: Partial<typeof animation> = {};
-    if (!userAdjustedIntensity) {
-      patch.intensity = isCinematic ? 1.3 : isDreamy ? 0.9 : 1.0;
+    // 3. Apply per-layer animation suggestions (v3 INTELLIGENCE)
+    // Map analysis.layers[i].suggestedAnimations to store layers by index
+    if (analysis.layers.some((l: any) => l.suggestedAnimations?.length)) {
+      const suggestions = layers.map((storeLayer, i) => ({
+        layerId: storeLayer.id,
+        animations: (analysis.layers[i]?.suggestedAnimations as string[]) ?? [],
+      }));
+      applyLayerAnimSuggestions(suggestions);
     }
-    if (!userAdjustedSpeed) {
-      patch.speed = isCinematic ? 0.85 : isDreamy ? 0.8 : 1.0;
-    }
-    // always enable entrance + parallax (these are almost always wanted)
-    patch.entranceEnabled = true;
-    patch.parallaxEnabled = true;
-    updateAnimation(patch);
+
+    // 4. Ensure entrance + parallax enabled
+    updateAnimation({ entranceEnabled: true, parallaxEnabled: true });
 
     const presetName = PRESET_MAP[presetId]?.name ?? presetId;
-    const sceneName = SCENE_MAP[sceneId]?.name ?? sceneId;
-    toast.success(`✨ Configurado: ${presetName} + ${sceneName}`, {
-      description: "La imagen está viva. Mueve el mouse para sentir el parallax.",
-    });
+    const hasIntelligentConfig = !!analysis.recommendedConfig;
+    toast.success(
+      hasIntelligentConfig
+        ? `🧠 Configuración inteligente: ${presetName}`
+        : `✨ Configurado: ${presetName}`,
+      {
+        description: hasIntelligentConfig
+          ? "IA aplicó preset + color grade + effects + DOF + animaciones por capa. Mueve el mouse para sentirlo."
+          : "La imagen está viva. Mueve el mouse para sentir el parallax.",
+      }
+    );
   };
+
+  const hasIntelligentConfig = !!analysis.recommendedConfig;
 
   return (
     <Button
       onClick={handleAutoSetup}
       className="w-full gap-2"
       size="sm"
+      variant={hasIntelligentConfig ? "default" : "secondary"}
     >
-      <Wand2 className="h-3.5 w-3.5" />
-      Dar vida
+      {hasIntelligentConfig ? (
+        <Brain className="h-3.5 w-3.5" />
+      ) : (
+        <Wand2 className="h-3.5 w-3.5" />
+      )}
+      {hasIntelligentConfig ? "Dar vida (IA)" : "Dar vida"}
       <Sparkles className="h-3 w-3 opacity-60" />
     </Button>
   );

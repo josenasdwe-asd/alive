@@ -18,6 +18,8 @@ import { ScenePanel } from "./ScenePanel";
 import { CinematicPanel } from "./CinematicPanel";
 import { MiniTimeline } from "./MiniTimeline";
 import { ComparisonSlider } from "./ComparisonSlider";
+import { NaturalLanguageAnimate } from "./NaturalLanguageAnimate";
+import { QualityScore } from "./QualityScore";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { useUndoRedo } from "@/hooks/use-undo-redo";
 import {
@@ -282,11 +284,15 @@ function RightPanelTabs({
 
       {tab === "animate" && (
         <>
+          {/* v3 INTELLIGENCE: Natural language animation input — most prominent */}
+          <NaturalLanguageAnimate />
           <PresetPicker />
           <ControlPanel />
           {/* GAP-H fix: Pipeline 2.5D + Cinematic now always visible (was collapsed in <details>) */}
           <Pipeline25DPanel />
           <CinematicPanel />
+          {/* v3 INTELLIGENCE: Quality scoring + suggestions */}
+          <QualityScore />
         </>
       )}
       {tab === "scene" && <ScenePanel />}
@@ -362,7 +368,7 @@ function PreviewLoading({
 
 /**
  * P0 fix: prominent AutoSetup toolbar button — the primary "one-click animate" CTA.
- * Wraps the existing AutoSetup logic in a toolbar-friendly styled button.
+ * v3 INTELLIGENCE: now applies full AI-recommended config + per-layer animation suggestions.
  */
 function AutoSetupToolbar() {
   const analysis = useAliveStore((s) => s.analysis);
@@ -370,6 +376,8 @@ function AutoSetupToolbar() {
   const animation = useAliveStore((s) => s.animation);
   const applyPreset = useAliveStore((s) => s.applyPreset);
   const applySceneComp = useAliveStore((s) => s.applySceneComp);
+  const applyIntelligentConfig = useAliveStore((s) => s.applyIntelligentConfig);
+  const applyLayerAnimSuggestions = useAliveStore((s) => s.applyLayerAnimSuggestions);
   const updateAnimation = useAliveStore((s) => s.updateAnimation);
 
   if (!analysis || layers.length === 0) return null;
@@ -378,49 +386,75 @@ function AutoSetupToolbar() {
     const presetId = (analysis.recommendedPreset as PresetId) ?? "dream";
     applyPreset(presetId);
 
-    const hasForeground = layers.some((l) => l.role === "foreground");
-    const hasBackground = layers.some((l) => l.role === "background");
-    const layerCount = layers.length;
+    // v3 INTELLIGENCE: apply full AI config bundle
+    if (analysis.recommendedConfig) {
+      applyIntelligentConfig(analysis.recommendedConfig);
+    } else {
+      // Fallback: legacy scene composition
+      const hasBackground = layers.some((l) => l.role === "background");
+      const layerCount = layers.length;
+      let sceneId: SceneCompositionId = "free";
+      if (layerCount >= 5 && hasBackground) {
+        sceneId = "horizon";
+      } else if (layers.some((l) => l.role === "subject")) {
+        sceneId = "subject-focus";
+      } else if (layerCount <= 4) {
+        sceneId = "anchor-midground";
+      }
+      applySceneComp(sceneId);
 
-    let sceneId: SceneCompositionId = "free";
-    if (layerCount >= 5 && hasBackground) {
-      sceneId = "horizon";
-    } else if (layers.some((l) => l.role === "subject")) {
-      sceneId = "subject-focus";
-    } else if (layerCount <= 4) {
-      sceneId = "anchor-midground";
+      const isCinematic = presetId === "cinematic3d" || presetId === "cosmic";
+      const isDreamy = presetId === "dream" || presetId === "ethereal" || presetId === "aurora";
+      const patch: Partial<typeof animation> = {};
+      if (animation.intensity === 1) {
+        patch.intensity = isCinematic ? 1.3 : isDreamy ? 0.9 : 1.0;
+      }
+      if (animation.speed === 1) {
+        patch.speed = isCinematic ? 0.85 : isDreamy ? 0.8 : 1.0;
+      }
+      updateAnimation(patch);
     }
-    applySceneComp(sceneId);
 
-    const isCinematic = presetId === "cinematic3d" || presetId === "cosmic";
-    const isDreamy = presetId === "dream" || presetId === "ethereal" || presetId === "aurora";
+    // v3 INTELLIGENCE: per-layer animation suggestions
+    if (analysis.layers.some((l: any) => l.suggestedAnimations?.length)) {
+      const suggestions = layers.map((storeLayer, i) => ({
+        layerId: storeLayer.id,
+        animations: (analysis.layers[i]?.suggestedAnimations as string[]) ?? [],
+      }));
+      applyLayerAnimSuggestions(suggestions);
+    }
 
-    const patch: Partial<typeof animation> = {
-      entranceEnabled: true,
-      parallaxEnabled: true,
-    };
-    if (animation.intensity === 1) {
-      patch.intensity = isCinematic ? 1.3 : isDreamy ? 0.9 : 1.0;
-    }
-    if (animation.speed === 1) {
-      patch.speed = isCinematic ? 0.85 : isDreamy ? 0.8 : 1.0;
-    }
-    updateAnimation(patch);
+    updateAnimation({ entranceEnabled: true, parallaxEnabled: true });
 
     const presetName = PRESET_MAP[presetId]?.name ?? presetId;
-    const sceneName = SCENE_MAP[sceneId]?.name ?? sceneId;
-    toast.success(`✨ ${presetName} + ${sceneName}`, {
-      description: "La imagen está viva. Mueve el mouse para sentir el parallax.",
-    });
+    const hasIntelligentConfig = !!analysis.recommendedConfig;
+    toast.success(
+      hasIntelligentConfig
+        ? `🧠 IA: ${presetName}`
+        : `✨ ${presetName}`,
+      {
+        description: hasIntelligentConfig
+          ? "Configuración inteligente aplicada. Mueve el mouse para sentirlo."
+          : "La imagen está viva. Mueve el mouse para sentir el parallax.",
+      }
+    );
   };
+
+  const hasIntelligentConfig = !!analysis?.recommendedConfig;
 
   return (
     <button
       onClick={handleAutoSetup}
-      className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+      className={cn(
+        "flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition-colors",
+        hasIntelligentConfig
+          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+          : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20"
+      )}
+      title={hasIntelligentConfig ? "Configuración inteligente IA" : "Auto-setup básico"}
     >
       <Wand2 className="h-3 w-3" />
-      Dar vida
+      {hasIntelligentConfig ? "Dar vida (IA)" : "Dar vida"}
     </button>
   );
 }

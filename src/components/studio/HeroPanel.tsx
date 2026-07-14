@@ -1,6 +1,6 @@
 "use client";
 
-import { Film, Palette, Type, Maximize2, Sparkles, Wand2 } from "lucide-react";
+import { Film, Palette, Type, Maximize2, Sparkles, Wand2, Brain } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import type { ColorGrade } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { recommendColorGrade, explainColorGrade } from "@/lib/palette-intelligence";
 
 const GRADES: Array<{ id: ColorGrade; name: string; swatch: string }> = [
   { id: "none", name: "Ninguno", swatch: "linear-gradient(135deg, #555, #aaa)" },
@@ -32,6 +33,7 @@ export function HeroPanel() {
     textOverlay,
     setTextOverlay,
     setHeroMode,
+    analysis,
   } = useAliveStore();
 
   // safe defaults when textOverlay is undefined
@@ -126,7 +128,21 @@ export function HeroPanel() {
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">
             <Palette className="h-3.5 w-3.5" />
           </span>
-          <h3 className="text-sm font-medium tracking-tight">Color grading</h3>
+          <h3 className="flex-1 text-sm font-medium tracking-tight">Color grading</h3>
+          {/* v3 INTELLIGENCE: palette-driven auto color grade */}
+          {analysis?.palette && analysis.palette.length > 0 && (
+            <button
+              onClick={() => {
+                const grade = recommendColorGrade(analysis.palette);
+                updateAnimation({ colorGrade: grade });
+              }}
+              className="flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] text-primary transition-colors hover:bg-primary/20"
+              title={explainColorGrade(recommendColorGrade(analysis.palette), analysis.palette)}
+            >
+              <Brain className="h-2.5 w-2.5" />
+              Auto
+            </button>
+          )}
         </header>
         <div className="grid grid-cols-3 gap-1.5">
           {GRADES.map((g) => (

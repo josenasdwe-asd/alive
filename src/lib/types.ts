@@ -94,8 +94,26 @@ export interface SceneAnalysis {
     description: string;
     /** optional extraction prompt for image-edit to isolate this element */
     extractPrompt?: string;
+    /** v3: AI-suggested animations for this layer based on content (e.g. trees → sway) */
+    suggestedAnimations?: string[];
   }>;
   recommendedPreset: string;
+  /** v3: full intelligent config recommendation bundle from VLM */
+  recommendedConfig?: {
+    renderMode: "css" | "css3d" | "webgl" | "kenburns3d";
+    sceneComposition: string;
+    colorGrade: ColorGrade;
+    effects: Record<string, boolean>;
+    dofEnabled: boolean;
+    dofFocusDepth: number;
+    relightingEnabled: boolean;
+    relightingAzimuth: number;
+    relightingElevation: number;
+    intensity: number;
+    speed: number;
+    depthFogEnabled: boolean;
+    bloomEnabled: boolean;
+  };
 }
 
 export type PresetId =

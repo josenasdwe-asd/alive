@@ -49,6 +49,12 @@ interface AliveStore extends ProjectState {
   ) => void;
   /** v3: toggle an organic animation across ALL layers at once */
   toggleGlobalAnim: (field: string, enabled: boolean) => void;
+  /** v3 INTELLIGENCE: apply the full AI-recommended config bundle */
+  applyIntelligentConfig: (config: SceneAnalysis["recommendedConfig"]) => void;
+  /** v3 INTELLIGENCE: apply AI-suggested animations to each layer based on content */
+  applyLayerAnimSuggestions: (
+    suggestions: Array<{ layerId: string; animations: string[] }>
+  ) => void;
   toggleEffect: (effect: EffectType) => void;
   setReducedMotion: (v: boolean) => void;
   setStrategy: (s: DecompositionStrategy) => void;
@@ -307,6 +313,52 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
       }
       return { animation: { ...s.animation, layers } };
     }),
+
+  // v3 INTELLIGENCE: apply the full AI-recommended config bundle in one shot
+  applyIntelligentConfig: (config: import("./types").SceneAnalysis["recommendedConfig"]) => {
+    if (!config) return;
+    const s = get();
+    const patch: Partial<AnimationConfig> = {
+      renderMode: config.renderMode,
+      colorGrade: config.colorGrade,
+      intensity: config.intensity,
+      speed: config.speed,
+      dofEnabled: config.dofEnabled,
+      focusDepth: config.dofFocusDepth,
+      focusMode: "manual",
+      relightingEnabled: config.relightingEnabled,
+      relightingAzimuth: config.relightingAzimuth,
+      relightingElevation: config.relightingElevation,
+      depthFogEnabled: config.depthFogEnabled,
+      bloomEnabled: config.bloomEnabled,
+      sceneComposition: config.sceneComposition as any,
+    };
+    // merge effects
+    const newEffects = { ...s.animation.effects };
+    for (const [k, v] of Object.entries(config.effects)) {
+      if (k in newEffects) (newEffects as any)[k] = v;
+    }
+    patch.effects = newEffects;
+    set({ animation: { ...s.animation, ...patch } });
+  },
+
+  // v3 INTELLIGENCE: apply AI-suggested animations to each layer based on content
+  applyLayerAnimSuggestions: (
+    suggestions: Array<{ layerId: string; animations: string[] }>
+  ) => {
+    const s = get();
+    const newLayers = { ...s.animation.layers };
+    for (const { layerId, animations } of suggestions) {
+      if (!newLayers[layerId]) continue;
+      const base = { ...newLayers[layerId] };
+      // turn on each suggested animation
+      for (const anim of animations) {
+        if (anim in base) (base as any)[anim] = true;
+      }
+      newLayers[layerId] = base;
+    }
+    set({ animation: { ...s.animation, layers: newLayers } });
+  },
 
   toggleEffect: (effect) =>
     set((s) => ({

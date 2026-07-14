@@ -77,7 +77,8 @@ export function AnalysisPanel() {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         const res = await fetch(url, opts);
-        if (res.status === 502 || res.status === 504 || res.status === 429) {
+        // Only retry on gateway errors and rate limiting — NOT on 4xx client errors
+        if (res.status === 502 || res.status === 503 || res.status === 504 || res.status === 429) {
           throw new Error(`Gateway ${res.status} — reintentando…`);
         }
         const data = await res.json();
@@ -85,7 +86,9 @@ export function AnalysisPanel() {
         return data;
       } catch (err: any) {
         lastErr = err;
-        if (attempt < maxRetries) {
+        // Don't retry on 4xx (except 429) — these are permanent failures
+        const isRetryable = err?.message?.includes("Gateway") || err?.message?.includes("502") || err?.message?.includes("503") || err?.message?.includes("504") || err?.message?.includes("429") || err?.name === "TypeError"; // network errors
+        if (attempt < maxRetries && isRetryable) {
           const delay = (attempt + 1) * 3000 + Math.random() * 2000;
           setProgress((p) => Math.max(p, 15 + attempt * 10));
           await new Promise((r) => setTimeout(r, delay));

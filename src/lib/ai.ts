@@ -4,10 +4,10 @@ import fs from "fs/promises";
 import path from "path";
 import type { SceneAnalysis } from "./types";
 
-let _zai: Awaited<ReturnType<typeof ZAI.create>> | null = null;
+let _zaiPromise: Promise<Awaited<ReturnType<typeof ZAI.create>>> | null = null;
 async function getZai() {
-  if (!_zai) _zai = await ZAI.create();
-  return _zai;
+  if (!_zaiPromise) _zaiPromise = ZAI.create();
+  return _zaiPromise;
 }
 
 /** Read a local image file as base64 data URL */

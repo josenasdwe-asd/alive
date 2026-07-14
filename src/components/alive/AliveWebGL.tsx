@@ -193,8 +193,6 @@ export function AliveWebGL({
     const imageTex = makeTex();
     const depthTex = makeTex();
 
-    let imgLoaded = false;
-    let depthLoaded = false;
 
     const loadTex = (
       url: string,
@@ -211,8 +209,6 @@ export function AliveWebGL({
       img.onerror = () => console.warn("texture load failed", url);
       img.src = url;
     };
-    loadTex(imageUrl, imageTex, () => (imgLoaded = true));
-    loadTex(depthUrl, depthTex, () => (depthLoaded = true));
 
     // mouse tracking (smoothed)
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };

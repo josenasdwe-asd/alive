@@ -7,7 +7,6 @@ import {
   MousePointer2,
   Droplets,
   Cpu,
-  Code2,
   ArrowRight,
   Wind,
   Flame,

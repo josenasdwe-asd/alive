@@ -206,8 +206,6 @@ export function AliveStage({
       <MotionBlur
         enabled={config.motionBlurEnabled && !config.reducedMotion}
         strength={config.motionBlurStrength}
-        velocityX={0}
-        velocityY={0}
       />
 
       {/* Atmospheric animations (light cycle, fog, timelapse, seasonal) */}

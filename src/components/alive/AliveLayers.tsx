@@ -364,7 +364,7 @@ function LayerPlane({
         mixBlendMode: BLEND_CSS[t.blendMode],
         opacity: config.entranceEnabled ? undefined : t.opacity * layerAnim.opacity,
         isolation: t.blendMode !== "normal" ? "isolate" : undefined,
-        willChange: "transform, filter",
+        willChange: config.entranceEnabled ? "transform, filter" : "transform",
         pointerEvents: editorMode ? "auto" : "none",
         cursor: editorMode ? (selected ? "move" : "pointer") : "default",
       }}

@@ -6,61 +6,61 @@ interface MotionBlurProps {
   enabled: boolean;
   /** blur strength 0..1 */
   strength: number;
-  /** mouse velocity X (from parent) */
-  velocityX: number;
-  /** mouse velocity Y */
-  velocityY: number;
 }
 
 /**
  * Directional motion blur overlay.
- *
- * When the parallax is strong (high mouse velocity), applies a blur
- * in the direction of movement. This simulates camera shutter blur
- * and makes fast parallax feel more natural (less jarring).
- *
- * Implementation: CSS filter with directional blur approximation
- * using multiple offset shadows. For true directional blur we'd need
- * WebGL, but this CSS approximation is performant and looks good.
+ * Tracks mouse velocity internally. When the mouse moves fast,
+ * applies backdrop blur to simulate shutter blur.
  */
-export function MotionBlur({
-  enabled,
-  strength,
-  velocityX,
-  velocityY,
-}: MotionBlurProps) {
+export function MotionBlur({ enabled, strength }: MotionBlurProps) {
   const layerRef = useRef<HTMLDivElement>(null);
-  const velRef = useRef({ vx: velocityX, vy: velocityY });
+  const velRef = useRef({ vx: 0, vy: 0, tx: 0, ty: 0 });
+  const lastPosRef = useRef({ x: 0, y: 0, t: 0 });
 
   useEffect(() => {
-    velRef.current = { vx: velocityX, vy: velocityY };
-  });
+    if (!enabled) return;
 
-  useEffect(() => {
-    if (!enabled || !layerRef.current) return;
-    const el = layerRef.current;
+    const onMove = (e: PointerEvent) => {
+      const now = performance.now();
+      const dt = Math.max(1, now - lastPosRef.current.t);
+      velRef.current.tx = ((e.clientX - lastPosRef.current.x) / dt) * 16;
+      velRef.current.ty = ((e.clientY - lastPosRef.current.y) / dt) * 16;
+      lastPosRef.current = { x: e.clientX, y: e.clientY, t: now };
+    };
+    const onLeave = () => {
+      velRef.current.tx = 0;
+      velRef.current.ty = 0;
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerleave", onLeave);
+
     let raf = 0;
-
     const tick = () => {
+      velRef.current.vx += (velRef.current.tx - velRef.current.vx) * 0.15;
+      velRef.current.vy += (velRef.current.ty - velRef.current.vy) * 0.15;
       const { vx, vy } = velRef.current;
       const speed = Math.sqrt(vx * vx + vy * vy);
-      // only blur when moving fast
       const blurAmount = Math.min(8, speed * strength * 0.5);
-
-      if (blurAmount > 0.5) {
-        const angle = Math.atan2(vy, vx);
-        // approximate directional blur with radial blur
-        el.style.backdropFilter = `blur(${blurAmount.toFixed(1)}px)`;
-        el.style.opacity = "1";
-      } else {
-        el.style.opacity = "0";
+      const el = layerRef.current;
+      if (el) {
+        if (blurAmount > 0.5) {
+          el.style.backdropFilter = `blur(${blurAmount.toFixed(1)}px)`;
+          el.style.opacity = "1";
+        } else {
+          el.style.opacity = "0";
+        }
       }
-
       raf = requestAnimationFrame(tick);
     };
-    tick();
+    raf = requestAnimationFrame(tick);
 
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerleave", onLeave);
+    };
   }, [enabled, strength]);
 
   if (!enabled) return null;
@@ -69,8 +69,9 @@ export function MotionBlur({
     <div
       ref={layerRef}
       aria-hidden
-      className="pointer-events-none absolute inset-0 transition-opacity duration-150"
+      className="pointer-events-none absolute inset-0"
       style={{ zIndex: 13, opacity: 0 }}
     />
   );
 }
+

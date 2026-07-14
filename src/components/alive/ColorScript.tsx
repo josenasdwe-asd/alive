@@ -62,23 +62,34 @@ export function ColorScript({ enabled, act, speed }: ColorScriptProps) {
     const el = layerRef.current;
     let raf = 0;
     let start = performance.now();
+    let lastAct = -1;
 
     const tick = () => {
       const t = ((performance.now() - start) / 1000) * speed;
-      // auto-cycle: 12s per act = 60s total
       const currentAct = act >= 0 ? act : Math.floor((t / 12) % 5);
       const phaseInAct = act >= 0 ? 0 : (t % 12) / 12;
 
-      // cross-fade between acts: last 2s of each act blends into next
+      // cross-fade: last 17% of each act blends into next
       const nextAct = (currentAct + 1) % 5;
       const blendFactor = phaseInAct > 0.83 ? (phaseInAct - 0.83) / 0.17 : 0;
 
       const a = ACTS[currentAct];
       const b = ACTS[nextAct];
 
-      el.style.background = a.overlay;
-      el.style.mixBlendMode = a.blend;
-      el.style.opacity = String(1 - blendFactor * 0.5);
+      // only write styles when act changes or during cross-fade
+      if (currentAct !== lastAct || blendFactor > 0) {
+        if (blendFactor > 0) {
+          // cross-fade: show both overlays
+          el.style.background = `${a.overlay}, ${b.overlay}`;
+          el.style.mixBlendMode = a.blend;
+          el.style.opacity = String(1);
+        } else {
+          el.style.background = a.overlay;
+          el.style.mixBlendMode = a.blend;
+          el.style.opacity = "1";
+        }
+        lastAct = currentAct;
+      }
 
       raf = requestAnimationFrame(tick);
     };

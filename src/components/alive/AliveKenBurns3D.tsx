@@ -240,8 +240,6 @@ export function AliveKenBurns3D({
     const imageTex = makeTex();
     const depthTex = makeTex();
 
-    let imgLoaded = false;
-    let depthLoaded = false;
 
     const loadTex = (url: string, tex: WebGLTexture, done: () => void) => {
       const img = new Image();
@@ -254,8 +252,6 @@ export function AliveKenBurns3D({
       img.onerror = () => console.warn("tex load failed", url);
       img.src = url;
     };
-    loadTex(imageUrl, imageTex, () => (imgLoaded = true));
-    loadTex(depthUrl, depthTex, () => (depthLoaded = true));
 
     // mouse for subtle parallax tilt
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 };

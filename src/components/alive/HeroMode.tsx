@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useId } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useAliveStore } from "@/lib/store";
 import { AliveLayers } from "./AliveLayers";
@@ -17,7 +17,6 @@ import { DynamicRelighting } from "./DynamicRelighting";
 import { ColorScript } from "./ColorScript";
 import { TextOverlayView } from "./TextOverlay";
 import { Particles } from "./Particles";
-import { useId } from "react";
 
 interface HeroModeProps {
   onExit: () => void;
@@ -69,7 +68,7 @@ export function HeroMode({ onExit }: HeroModeProps) {
   const canWebGL = config.renderMode === "webgl" && !!depthMapUrl;
   const canKenBurns3D = config.renderMode === "kenburns3d" && !!depthMapUrl;
   // in hero mode, prefer KenBurns3D whenever a depth map is available
-  const useKenBurnsInHero = !!depthMapUrl;
+  const useKenBurnsInHero = config.renderMode === "kenburns3d" && !!depthMapUrl;
   const hasCanvasParticles =
     config.effects.smoke || config.effects.fire || config.effects.embers;
 

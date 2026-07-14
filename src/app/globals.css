@@ -225,125 +225,74 @@
 }
 
 /* ===== Custom property types for stacked transform animations ===== */
-@property --breath {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-@property --sway {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-@property --twist {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-@property --float-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --drift-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --wave-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --jitter-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --jitter-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --glow {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-@property --hue {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-@property --focus {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --shadow-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --shadow-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
+/* Pattern: animated var goes 0→1 (or -1→1), amplitude is a SEPARATE var */
+@property --breath { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --sway { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --twist { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --float-y { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --drift-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --wave-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --jitter-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --jitter-y { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --glow { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --hue { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --focus { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --shadow-x { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --shadow-y { syntax: "<number>"; inherits: false; initial-value: 0; }
 
-/* ===== "Alive" animation keyframes — organic, prime-duration ===== */
+/* ===== "Alive" animation keyframes — all animate 0→1 or -1→1 (amplitude via CSS vars) ===== */
 @keyframes alive-breath {
   0%, 100% { --breath: 0; }
   50% { --breath: 1; }
 }
 @keyframes alive-sway {
-  0%, 100% { --sway: -0.4deg; }
-  50% { --sway: 0.4deg; }
+  0%, 100% { --sway: -1; }
+  50% { --sway: 1; }
 }
 @keyframes alive-twist {
-  0%, 100% { --twist: -1.2deg; }
-  25% { --twist: 0.8deg; }
-  50% { --twist: 1.2deg; }
-  75% { --twist: -0.8deg; }
+  0%, 100% { --twist: -1; }
+  25% { --twist: 0.7; }
+  50% { --twist: 1; }
+  75% { --twist: -0.7; }
 }
 @keyframes alive-float-y {
-  0%, 100% { --float-y: -6px; }
-  50% { --float-y: 6px; }
+  0%, 100% { --float-y: -1; }
+  50% { --float-y: 1; }
 }
 @keyframes alive-drift-x {
-  0%, 100% { --drift-x: -4px; }
-  50% { --drift-x: 4px; }
+  0%, 100% { --drift-x: -1; }
+  50% { --drift-x: 1; }
 }
 @keyframes alive-wave {
-  0% { --wave-x: -8px; }
-  25% { --wave-x: 4px; }
-  50% { --wave-x: 8px; }
-  75% { --wave-x: -4px; }
-  100% { --wave-x: -8px; }
+  0% { --wave-x: -1; }
+  25% { --wave-x: 0.5; }
+  50% { --wave-x: 1; }
+  75% { --wave-x: -0.5; }
+  100% { --wave-x: -1; }
 }
 @keyframes alive-jitter {
-  0%   { --jitter-x: -1px; --jitter-y:  0px; }
-  20%  { --jitter-x:  1px; --jitter-y: -1px; }
-  40%  { --jitter-x:  0px; --jitter-y:  1px; }
-  60%  { --jitter-x: -1px; --jitter-y: -1px; }
-  80%  { --jitter-x:  1px; --jitter-y:  1px; }
-  100% { --jitter-x: -1px; --jitter-y:  0px; }
+  0%   { --jitter-x: -1; --jitter-y:  0; }
+  20%  { --jitter-x:  1; --jitter-y: -1; }
+  40%  { --jitter-x:  0; --jitter-y:  1; }
+  60%  { --jitter-x: -1; --jitter-y: -1; }
+  80%  { --jitter-x:  1; --jitter-y:  1; }
+  100% { --jitter-x: -1; --jitter-y:  0; }
 }
 @keyframes alive-glow {
   0%, 100% { --glow: 0; }
   50% { --glow: 1; }
 }
 @keyframes alive-hue {
-  0% { --hue: 0deg; }
-  100% { --hue: 360deg; }
+  0% { --hue: 0; }
+  100% { --hue: 1; }
 }
 @keyframes alive-focus {
-  0%, 100% { --focus: 0px; }
-  50% { --focus: 3px; }
+  0%, 100% { --focus: 0; }
+  50% { --focus: 1; }
 }
 @keyframes alive-shadow {
-  0%, 100% { --shadow-x: 4px; --shadow-y: 4px; }
-  50% { --shadow-x: -4px; --shadow-y: -4px; }
+  0%, 100% { --shadow-x: 1; --shadow-y: 1; }
+  50% { --shadow-x: -1; --shadow-y: -1; }
 }
 
 @keyframes shimmer-sweep {
@@ -385,20 +334,20 @@
  * The inner .alive-layer only handles organic animation + filter effects.
  */
 .alive-layer {
-  /* organic transform — separate from user transform (which is on the parent) */
+  /* organic transform — animated vars (0..1) × amplitude vars (set by JS) */
   transform: translate3d(
-      calc(var(--drift-x, 0px) + var(--wave-x, 0px) + var(--jitter-x, 0px)),
-      calc(var(--float-y, 0px) + var(--jitter-y, 0px)),
+      calc(var(--drift-x, 0) * var(--drift-x-amp, 0px) + var(--wave-x, 0) * var(--wave-x-amp, 0px) + var(--jitter-x, 0) * var(--jitter-x-amp, 0px)),
+      calc(var(--float-y, 0) * var(--float-y-amp, 0px) + var(--jitter-y, 0) * var(--jitter-y-amp, 0px)),
       0
     )
     scale(calc(1 + var(--breath, 0) * var(--breath-amp, 0.02)))
-    rotate(calc(var(--sway, 0deg) + var(--twist, 0deg)));
+    rotate(calc(var(--sway, 0) * var(--sway-amp, 0deg) + var(--twist, 0) * var(--twist-amp, 0deg)));
   transform-origin: center;
   filter:
-    blur(calc(var(--focus, 0px) + var(--layer-blur, 0px)))
-    brightness(calc(1 + var(--glow, 0) * 0.25))
-    drop-shadow(var(--shadow-x, 0px) var(--shadow-y, 0px) 12px rgba(0,0,0,0.35))
-    hue-rotate(var(--hue, 0deg));
+    blur(calc(var(--focus, 0) * var(--focus-amp, 0px) + var(--layer-blur, 0px)))
+    brightness(calc(1 + var(--glow, 0) * var(--glow-amp, 0) * 0.25))
+    drop-shadow(calc(var(--shadow-x, 0) * var(--shadow-amp, 4px)) calc(var(--shadow-y, 0) * var(--shadow-amp, 4px)) 12px rgba(0,0,0,0.35))
+    hue-rotate(calc(var(--hue, 0) * var(--hue-amp, 360deg)));
   will-change: transform, filter;
 }
 

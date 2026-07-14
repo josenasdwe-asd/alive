@@ -309,7 +309,8 @@ export function AliveKenBurns3D({
 
       // view matrix: camera at Z = 1.5, looking at origin
       // scroll dolly moves camera forward
-      const camZ = 1.5 - scrollVal * 1.0 * p.intensity;
+      // BUG FIX: intensity is already applied in the shader dolly — don't double-apply
+      const camZ = 1.5 - scrollVal * 1.0;
       const tiltX = p.reducedMotion ? 0 : mouse.y * 0.05;
       const tiltY = p.reducedMotion ? 0 : mouse.x * 0.05;
       const view = lookAt(

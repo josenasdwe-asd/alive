@@ -312,7 +312,7 @@ export function ParticleCanvas({
       ctx.clearRect(0, 0, W, H);
 
       spawnAccum += dt;
-      const spawnRate = 120 * p.intensity * p.speed;
+      const spawnRate = Math.max(0.01, 120 * p.intensity * p.speed); // clamp to prevent infinite loop
       while (spawnAccum > 1 / spawnRate) {
         spawnAccum -= 1 / spawnRate;
         spawnParticle(particlesRef.current, p.systems, sp, W, H);

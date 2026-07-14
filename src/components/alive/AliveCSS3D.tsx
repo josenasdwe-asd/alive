@@ -118,6 +118,7 @@ export function AliveCSS3D({
           layer={layer}
           index={i}
           total={sorted.length}
+          allLayers={sorted}
           zRange={zRange}
           config={config}
           liquidFilterId={liquidFilterId}
@@ -134,6 +135,7 @@ interface CSS3DLayerProps {
   layer: ImageLayer;
   index: number;
   total: number;
+  allLayers: ImageLayer[];
   zRange: number;
   config: AnimationConfig;
   liquidFilterId?: string;
@@ -146,6 +148,7 @@ function CSS3DLayer({
   layer,
   index,
   total,
+  allLayers,
   zRange,
   config,
   liquidFilterId,
@@ -207,9 +210,12 @@ function CSS3DLayer({
   // === DOF (same calibration as AliveLayers) ===
   let dofBlur = 0;
   if (config.dofEnabled && !config.reducedMotion) {
-    const focusDepth = config.focusMode === "object" && config.focusLayerId
-      ? (config.layers[config.focusLayerId] ? layer.depth : config.focusDepth)
-      : config.focusDepth;
+    // BUG FIX: same as AliveLayers — find focused layer's actual depth
+    let focusDepth = config.focusDepth;
+    if (config.focusMode === "object" && config.focusLayerId) {
+      const focusedLayer = allLayers.find((l) => l.id === config.focusLayerId);
+      if (focusedLayer) focusDepth = focusedLayer.depth;
+    }
     const dist = Math.abs(layer.depth - focusDepth);
     dofBlur = dist * config.aperture * 12;
   }

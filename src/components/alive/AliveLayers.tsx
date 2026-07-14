@@ -139,6 +139,7 @@ export function AliveLayers({
           layer={layer}
           index={i}
           total={sorted.length}
+          allLayers={sorted}
           mx={mx}
           my={my}
           mvx={mvx}
@@ -159,6 +160,7 @@ interface LayerPlaneProps {
   layer: ImageLayer;
   index: number;
   total: number;
+  allLayers: ImageLayer[];
   mx: MotionValue<number>;
   my: MotionValue<number>;
   mvx: MotionValue<number>;
@@ -175,6 +177,7 @@ function LayerPlane({
   layer,
   index,
   total,
+  allLayers,
   mx,
   my,
   mvx,
@@ -274,43 +277,44 @@ function LayerPlane({
     }
     if (layerAnim.sway) {
       animations.push(`alive-sway ${swayDur}s ease-in-out infinite`);
-      ampVars["--sway"] = `${layerAnim.swayAmp * intensity * 0.5}deg`;
+      ampVars["--sway-amp"] = `${layerAnim.swayAmp * intensity * 0.5}deg`;
     }
     if (layerAnim.twist) {
       animations.push(`alive-twist ${twistDur}s ease-in-out infinite`);
-      ampVars["--twist"] = `${layerAnim.twistAmp * intensity}deg`;
+      ampVars["--twist-amp"] = `${layerAnim.twistAmp * intensity}deg`;
     }
     if (layerAnim.floatY) {
       animations.push(`alive-float-y ${floatDur}s ease-in-out infinite`);
-      ampVars["--float-y"] = `${layerAnim.floatAmp * 6 * intensity}px`;
+      ampVars["--float-y-amp"] = `${layerAnim.floatAmp * 6 * intensity}px`;
     }
     if (layerAnim.driftX) {
       animations.push(`alive-drift-x ${driftDur}s ease-in-out infinite`);
-      ampVars["--drift-x"] = `${layerAnim.driftAmp * 4 * intensity}px`;
+      ampVars["--drift-x-amp"] = `${layerAnim.driftAmp * 4 * intensity}px`;
     }
     if (layerAnim.wave) {
       animations.push(`alive-wave ${waveDur}s ease-in-out infinite`);
-      ampVars["--wave-x"] = `${layerAnim.waveAmp * 8 * intensity}px`;
+      ampVars["--wave-x-amp"] = `${layerAnim.waveAmp * 8 * intensity}px`;
     }
     if (layerAnim.jitter) {
       animations.push(`alive-jitter ${jitterDur}s steps(1) infinite`);
-      ampVars["--jitter-x"] = `${layerAnim.jitterAmp * 1.5 * intensity}px`;
-      ampVars["--jitter-y"] = `${layerAnim.jitterAmp * 1.5 * intensity}px`;
+      ampVars["--jitter-x-amp"] = `${layerAnim.jitterAmp * 1.5 * intensity}px`;
+      ampVars["--jitter-y-amp"] = `${layerAnim.jitterAmp * 1.5 * intensity}px`;
     }
     if (layerAnim.glow) {
       animations.push(`alive-glow ${glowDur}s ease-in-out infinite`);
-      ampVars["--glow"] = layerAnim.glowAmp * intensity;
+      ampVars["--glow-amp"] = layerAnim.glowAmp * intensity;
     }
     if (layerAnim.hueDrift) {
       animations.push(`alive-hue ${hueDur}s linear infinite`);
-      ampVars["--hue"] = `${layerAnim.hueDriftAmp * intensity}deg`;
+      ampVars["--hue-amp"] = `${layerAnim.hueDriftAmp * intensity}deg`;
     }
     if (layerAnim.focusPull) {
       animations.push(`alive-focus ${focusDur}s ease-in-out infinite`);
-      ampVars["--focus"] = `${layerAnim.focusAmp * intensity}px`;
+      ampVars["--focus-amp"] = `${layerAnim.focusAmp * intensity}px`;
     }
     if (layerAnim.shadowDrift) {
       animations.push(`alive-shadow ${shadowDur}s ease-in-out infinite`);
+      ampVars["--shadow-amp"] = `${4 * intensity}px`;
     }
   }
 
@@ -322,9 +326,13 @@ function LayerPlane({
   // This emulates a real lens: layers far from focal plane get more blur
   let dofBlur = 0;
   if (config.dofEnabled && !config.reducedMotion) {
-    const focusDepth = config.focusMode === "object" && config.focusLayerId
-      ? (config.layers[config.focusLayerId] ? layer.depth : config.focusDepth)
-      : config.focusDepth;
+    // BUG FIX: was returning layer.depth (current layer) instead of focused layer's depth
+    // Now correctly finds the focused layer's depth from allLayers
+    let focusDepth = config.focusDepth;
+    if (config.focusMode === "object" && config.focusLayerId) {
+      const focusedLayer = allLayers.find((l) => l.id === config.focusLayerId);
+      if (focusedLayer) focusDepth = focusedLayer.depth;
+    }
     const dist = Math.abs(layer.depth - focusDepth);
     dofBlur = dist * config.aperture * 12; // CALIBRATED: was 20, now 12 (max 12px — more natural)
   }

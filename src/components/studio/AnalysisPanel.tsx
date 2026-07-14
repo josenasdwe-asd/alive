@@ -222,6 +222,94 @@ export function AnalysisPanel() {
     }
   }
 
+  /**
+   * v3 VANGUARDIA: AI Semantic Segmentation + Inpainting.
+   * Uses VLM-extracted element prompts to:
+   * 1. Inpaint background (reconstruct behind subject)
+   * 2. Extract each element as a separate transparent layer
+   * 3. Fall back to depth slice if extraction fails
+   */
+  async function runAISegment() {
+    setStage("decomposing");
+    setStrategy("ai-extract");
+    setProgress(70);
+    try {
+      if (!analysis) throw new Error("No analysis");
+
+      setProgress(75);
+      // Call /api/segment which does inpainting + extraction
+      const res = await fetchWithRetry("/api/segment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: originalUrl,
+          subject: analysis.subject,
+          layers: analysis.layers,
+        }),
+      });
+
+      setProgress(90);
+
+      // Set background + depth
+      if (res.background) setBackground(res.background.url);
+      if (res.depth) setDepthMap(res.depth.url);
+
+      // Build layer list from extracted elements
+      const extracted = res.extracted || [];
+
+      if (extracted.length > 0) {
+        // Convert extracted elements to sliced layers format
+        const slicedLayers = extracted.map((ext: any, i: number) => ({
+          url: ext.url,
+          name: ext.layerName,
+          depth: ext.depth,
+        }));
+
+        // Add the inpainted background as the base layer
+        slicedLayers.unshift({
+          url: res.background.url,
+          name: "Fondo reconstruido",
+          depth: 0,
+        });
+
+        setSlicedLayers(slicedLayers);
+        setProgress(100);
+        setStage("ready");
+        setPipelineStep("animate");
+        toast.success(`🧠 ${extracted.length} elementos extraídos + fondo inpaintado!`);
+
+        // Apply recommended preset + intelligent config
+        const preset = analysis.recommendedPreset;
+        if (preset) applyPreset(preset as any);
+
+        // Apply per-layer animation suggestions
+        if (analysis.layers.some((l: any) => l.suggestedAnimations?.length)) {
+          const layers = useAliveStore.getState().layers;
+          const suggestions = layers.map((storeLayer: any, i: number) => ({
+            layerId: storeLayer.id,
+            animations: (analysis.layers[i]?.suggestedAnimations as string[]) ?? [],
+          }));
+          useAliveStore.getState().applyLayerAnimSuggestions(suggestions);
+        }
+
+        // Apply intelligent config if available
+        if (analysis.recommendedConfig) {
+          // Force CSS render mode (most reliable for animation)
+          const config = { ...analysis.recommendedConfig, renderMode: "css" as const };
+          useAliveStore.getState().applyIntelligentConfig(config);
+        }
+      } else {
+        // No extractions succeeded — fall back to depth slice
+        toast.info("Extracción IA no disponible, usando depth slice…");
+        await runDepthSlice();
+      }
+    } catch (err: any) {
+      setStage("error");
+      setStatus("error", err?.message);
+      toast.error(err?.message ?? "Error en segmentación IA");
+    }
+  }
+
   async function runAiExtract() {
     setStage("decomposing");
     setStrategy("ai-extract");
@@ -426,6 +514,17 @@ export function AnalysisPanel() {
                 title="SLIC Semántico"
                 badge="🧬 Superpixels · 5s"
                 desc="Segmentación por color+posición+profundidad. Capas semánticas reales: solo nubes, solo montañas, solo suelo."
+              />
+
+              {/* v3 VANGUARDIA: AI Segmentation + Inpainting */}
+              <StrategyCard
+                active={false}
+                onClick={runAISegment}
+                disabled={stage === "decomposing"}
+                icon={<Sparkles className="h-4 w-4" />}
+                title="AI Segment + Inpaint"
+                badge="🧠 Segmentación IA · 30s"
+                desc="Inpainta el fondo (reconstruye lo oculto) + extrae cada elemento (cielo, nubes, sujeto) como capa independiente. Nivel Awwwards."
               />
             </div>
           </div>

@@ -154,12 +154,12 @@ export function AliveStage({
       {hasCanvasParticles && !config.reducedMotion && (
         <ParticleCanvas
           systems={{
-            smoke: config.effects.smoke,
-            fire: config.effects.fire,
-            embers: config.effects.embers,
-            dust: config.effects.dust,
-            snow: config.effects.snow,
-            rain: config.effects.rain,
+            smoke: config.effects?.smoke ?? false,
+            fire: config.effects?.fire ?? false,
+            embers: config.effects?.embers ?? false,
+            dust: config.effects?.dust ?? false,
+            snow: config.effects?.snow ?? false,
+            rain: config.effects?.rain ?? false,
           }}
           intensity={config.intensity}
           speed={config.speed}
@@ -173,7 +173,7 @@ export function AliveStage({
         intensity={config.intensity}
       />
 
-      <EffectOverlays effects={config.effects} speed={config.speed} />
+      <EffectOverlays effects={config.effects ?? {}} speed={config.speed} />
 
       <ColorGrading grade={config.colorGrade} intensity={1} />
 

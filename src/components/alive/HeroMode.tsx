@@ -70,7 +70,7 @@ export function HeroMode({ onExit }: HeroModeProps) {
   // in hero mode, prefer KenBurns3D whenever a depth map is available
   const useKenBurnsInHero = config.renderMode === "kenburns3d" && !!depthMapUrl;
   const hasCanvasParticles =
-    config.effects.smoke || config.effects.fire || config.effects.embers;
+    (config.effects?.smoke || config.effects?.fire || config.effects?.embers);
 
   // pass scroll progress to AliveLayers via a prop — we need a modified version
   // that accepts scrollY. For now, HeroMode wraps AliveLayers and applies
@@ -141,12 +141,12 @@ export function HeroMode({ onExit }: HeroModeProps) {
         {hasCanvasParticles && !config.reducedMotion && (
           <ParticleCanvas
             systems={{
-              smoke: config.effects.smoke,
-              fire: config.effects.fire,
-              embers: config.effects.embers,
-              dust: config.effects.dust,
-              snow: config.effects.snow,
-              rain: config.effects.rain,
+              smoke: config.effects?.smoke,
+              fire: config.effects?.fire,
+              embers: config.effects?.embers,
+              dust: config.effects?.dust,
+              snow: config.effects?.snow,
+              rain: config.effects?.rain,
             }}
             intensity={config.intensity}
             speed={config.speed}

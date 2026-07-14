@@ -28,7 +28,7 @@ const EFFECT_META: Array<{
 ];
 
 export function EffectsPanel() {
-  const effects = useAliveStore((s) => s.animation.effects);
+  const effects = useAliveStore((s) => s.animation.effects) ?? {};
   const toggleEffect = useAliveStore((s) => s.toggleEffect);
 
   return (

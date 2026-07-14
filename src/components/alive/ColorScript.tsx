@@ -94,7 +94,7 @@ export function ColorScript({ enabled, act, speed }: ColorScriptProps) {
       ref={layerRef}
       aria-hidden
       className="pointer-events-none absolute inset-0"
-      style={{ zIndex: 45 }}
+      style={{ zIndex: 14 }}
     />
   );
 }

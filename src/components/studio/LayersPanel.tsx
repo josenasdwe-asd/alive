@@ -91,6 +91,7 @@ export function LayersPanel() {
 
   const [extracting, setExtracting] = useState(false);
   const [extractInput, setExtractInput] = useState("");
+  const [showExtract, setShowExtract] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -138,6 +139,7 @@ export function LayersPanel() {
       };
       addLayer(newLayer);
       setExtractInput("");
+      setShowExtract(false);
       toast.success(`Capa "${newLayer.name}" añadida`);
     } catch (err: any) {
       toast.error(err?.message ?? "Error extrayendo capa");
@@ -160,7 +162,7 @@ export function LayersPanel() {
             variant="ghost"
             className="h-7 w-7 p-0 text-muted-foreground"
             title="Añadir capa (extraer elemento con IA)"
-            onClick={() => setExtractInput(" ")}
+            onClick={() => setShowExtract(true)}
           >
             <Plus className="h-3.5 w-3.5" />
           </Button>
@@ -168,16 +170,16 @@ export function LayersPanel() {
       </header>
 
       {/* Extract element input */}
-      {extractInput !== "" && (
+      {showExtract && (
         <div className="mb-2 flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] p-1.5">
           <Wand2 className="h-3 w-3 flex-shrink-0 text-primary" />
           <input
             autoFocus
-            value={extractInput.trim() === " " ? "" : extractInput}
+            value={extractInput}
             onChange={(e) => setExtractInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleExtract();
-              if (e.key === "Escape") setExtractInput("");
+              if (e.key === "Escape") { setShowExtract(false); setExtractInput(""); }
             }}
             placeholder="ej: el perro, las flores…"
             className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"

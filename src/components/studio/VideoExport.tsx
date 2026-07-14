@@ -28,11 +28,21 @@ export function VideoExport({ duration = 5, fps = 30 }: VideoExportProps) {
   const cancelRef = useRef(false);
 
   const handleRecord = async () => {
-    // find the stage canvas or the stage container
-    const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+    // find the MAIN stage canvas (not relighting/particle canvases)
+    // the main canvas is the largest one inside the stage container
     const stageDiv = document.querySelector(
       "[class*='aspect-[16/10]']"
     ) as HTMLElement;
+    const allCanvases = (stageDiv || document).querySelectorAll("canvas");
+    let canvas: HTMLCanvasElement | null = null;
+    let maxArea = 0;
+    allCanvases.forEach((c) => {
+      const area = c.width * c.height;
+      if (area > maxArea) {
+        maxArea = area;
+        canvas = c as HTMLCanvasElement;
+      }
+    });
 
     if (!canvas && !stageDiv) {
       toast.error("No se encontró el stage para grabar");

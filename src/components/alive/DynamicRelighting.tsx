@@ -162,7 +162,7 @@ export function DynamicRelighting({
     <canvas
       ref={canvasRef}
       className="pointer-events-none absolute inset-0 h-full w-full"
-      style={{ mixBlendMode: "soft-light", zIndex: 50 }}
+      style={{ mixBlendMode: "soft-light", zIndex: 15 }}
       aria-hidden
     />
   );

@@ -358,7 +358,7 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
   applySceneComp: (sceneId) => {
     const layers = get().layers;
     const anim = get().animation;
-    const baseParallax = 20; // base parallax strength
+    const baseParallax = 35; // CORRECTED: was 20 (too subtle to notice)
     const overrides = applySceneComposition(layers, sceneId, baseParallax);
 
     const newLayers = { ...anim.layers };

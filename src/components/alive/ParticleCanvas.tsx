@@ -345,7 +345,7 @@ export function ParticleCanvas({
     <canvas
       ref={canvasRef}
       className="pointer-events-none absolute inset-0 h-full w-full"
-      style={{ zIndex: 100 }}
+      style={{ zIndex: 20 }}
       aria-hidden
     />
   );

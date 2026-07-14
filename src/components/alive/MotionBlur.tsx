@@ -70,7 +70,7 @@ export function MotionBlur({
       ref={layerRef}
       aria-hidden
       className="pointer-events-none absolute inset-0 transition-opacity duration-150"
-      style={{ zIndex: 35, opacity: 0 }}
+      style={{ zIndex: 13, opacity: 0 }}
     />
   );
 }

@@ -3,7 +3,7 @@ import ZAI from "z-ai-web-dev-sdk";
 import fs from "fs/promises";
 import path from "path";
 import type { SceneAnalysis } from "./types";
-import { getZai as getZaiBase, withRetry, enqueue, getCached, setCached, hashKey, generateWithCache } from "./ai-resilient";
+import { getZai as getZaiBase, withRetry, enqueue, getCached, setCached, hashKey } from "./ai-resilient";
 
 // Re-export getZai for backwards compatibility
 export async function getZai() {
@@ -64,7 +64,8 @@ Rules:
 - recommendedPreset routing: landscapes→cinematic3d/aurora/zen, portraits→ethereal/float/ghost, night/dark→noir/cosmic/neon, ocean/water→underwater/lava, dreamy→dream/ghost, urban→techno/neon/vintage, vintage/analog→vintage/paper, abstract→prism/glass/origami, fire/warm→lava, paper/illustration→paper/boil.
 - recommendedConfig: choose renderMode webgl if depth parallax is key, css3d for 3D tilt scenes, css for organic. sceneComposition: horizon for landscapes, subject-focus for portraits, tunnel for perspective scenes. colorGrade: teal-orange for warm/action, bleach-bypass for dramatic, portra for skin tones, blade-runner for neon, noir-film for dark/monochrome. dofFocusDepth = subject layer's depth. relightingAzimuth/Elevation match the apparent light direction in the image. intensity/speed: calm scenes 0.7-0.9 slow, dramatic 1.2-1.4 fast.`;
 
-  // v3 FIX: use queued + retried execution to handle 429 errors
+  // v3 FIX: minimal retry (1 attempt, 1s delay) — VLM is often 429,
+  // retrying 3× with 2s/4s/8s causes 14s waits. Better to fail fast to fallback.
   const response = await enqueue(() => withRetry(() =>
     zai.chat.completions.createVision({
       messages: [
@@ -77,7 +78,7 @@ Rules:
         },
       ],
       thinking: { type: "disabled" },
-    })
+    }), 1, 1500  // maxRetries=1, baseDelay=1.5s (max 3s total wait)
   ));
 
   const content = response.choices[0]?.message?.content ?? "";
@@ -206,54 +207,74 @@ function parseAnalysis(content: string): SceneAnalysis {
  * Generate the inpainted background plate (subject removed) via image-edit.
  * This is the key asset for parallax — when the original shifts, this fills the gap.
  *
- * v3 FIX: now uses cached + queued + retried execution to handle 429 errors.
+ * v3 FIX: NO retry on image-edit APIs. They consistently 429 and retrying causes
+ * 30s waits. Fail fast → caller uses deterministic fallback immediately.
  */
 export async function generateBackgroundPlate(
   dataUrl: string,
   subject: string
 ): Promise<Buffer> {
   const cacheKey = `bg:${hashKey(dataUrl.substring(0, 100), subject)}`;
-  return generateWithCache(cacheKey, async () => {
-    const zai = await getZai();
-    const prompt = `Remove the ${subject} from this image completely. Inpaint the background naturally and seamlessly where the ${subject} used to be, so the scene looks like the ${subject} was never there. Keep every other element — sky, ground, background objects, lighting, colors — identical to the original. Photorealistic seamless inpainting, no artifacts, no text, no blur. The result must be the same scene with the ${subject} gone.`;
+  const cached = getCached<Buffer>(cacheKey);
+  if (cached) {
+    console.log("[ai] bg cache hit");
+    return cached;
+  }
 
-    const response = await zai.images.generations.edit({
+  const zai = await getZai();
+  const prompt = `Remove the ${subject} from this image completely. Inpaint the background naturally and seamlessly where the ${subject} used to be, so the scene looks like the ${subject} was never there. Keep every other element — sky, ground, background objects, lighting, colors — identical to the original. Photorealistic seamless inpainting, no artifacts, no text, no blur. The result must be the same scene with the ${subject} gone.`;
+
+  // NO retry — image-edit APIs 429 consistently. Fail fast, use fallback.
+  const response = await enqueue(() =>
+    zai.images.generations.edit({
       prompt,
       images: [{ url: dataUrl }],
       size: "1024x1024",
-    });
+    })
+  );
 
-    const b64 = response.data?.[0]?.base64;
-    if (!b64) throw new Error("No image returned from background generation");
-    return Buffer.from(b64, "base64");
-  });
+  const b64 = response.data?.[0]?.base64;
+  if (!b64) throw new Error("No image returned from background generation");
+  const buf = Buffer.from(b64, "base64");
+  setCached(cacheKey, buf);
+  return buf;
 }
 
 /**
  * Generate a grayscale depth map (white=near, black=far) via image-edit.
  * Used for WebGL displacement-mode parallax and for masking the subject in CSS mode.
  *
- * v3 FIX: now uses cached + queued + retried execution to handle 429 errors.
+ * v3 FIX: NO retry on image-edit APIs. They consistently 429 and retrying causes
+ * 30s waits. Fail fast → caller uses deterministic fallback immediately.
  */
 export async function generateDepthMap(
   dataUrl: string,
   subject: string
 ): Promise<Buffer> {
   const cacheKey = `depth:${hashKey(dataUrl.substring(0, 100), subject)}`;
-  return generateWithCache(cacheKey, async () => {
-    const zai = await getZai();
-    const prompt = `Convert this image into a clean grayscale depth map. White (#ffffff) represents pixels closest to the camera, black (#000000) represents the farthest background. The ${subject} must be the brightest area (closest). Smooth gradients between depth regions, no harsh noise, no text, no labels. Pure grayscale depth visualization, like a 3D depth pass from a CGI render.`;
+  const cached = getCached<Buffer>(cacheKey);
+  if (cached) {
+    console.log("[ai] depth cache hit");
+    return cached;
+  }
 
-    const response = await zai.images.generations.edit({
+  const zai = await getZai();
+  const prompt = `Convert this image into a clean grayscale depth map. White (#ffffff) represents pixels closest to the camera, black (#000000) represents the farthest background. The ${subject} must be the brightest area (closest). Smooth gradients between depth regions, no harsh noise, no text, no labels. Pure grayscale depth visualization, like a 3D depth pass from a CGI render.`;
+
+  // NO retry — image-edit APIs 429 consistently. Fail fast, use fallback.
+  const response = await enqueue(() =>
+    zai.images.generations.edit({
       prompt,
       images: [{ url: dataUrl }],
       size: "1024x1024",
-    });
+    })
+  );
 
-    const b64 = response.data?.[0]?.base64;
-    if (!b64) throw new Error("No image returned from depth generation");
-    return Buffer.from(b64, "base64");
-  });
+  const b64 = response.data?.[0]?.base64;
+  if (!b64) throw new Error("No image returned from depth generation");
+  const buf = Buffer.from(b64, "base64");
+  setCached(cacheKey, buf);
+  return buf;
 }
 
 /**

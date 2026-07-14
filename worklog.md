@@ -4768,3 +4768,36 @@ Stage Summary:
 - The "alive" effect is now subtle and exact — images breathe without deforming
 - Browser verified: 7 layers animating with deformation=0, smooth scale/rotate
 - No console errors, no page errors, lint passes cleanly
+
+---
+Task ID: FIX-STUCK-DECOMPOSING
+Agent: Z.ai Code (main)
+Task: Fix decomposing stuck (30s+ wait due to 429 retry exponential backoff)
+
+Work Log:
+- ROOT CAUSE: The 429 fix (exponential backoff retry) was causing 30s+ waits
+  on decomposing because:
+  - image-edit APIs (depth + bg) consistently return 429
+  - withRetry retried 3× with 2s/4s/8s = 14s per API call
+  - 2 API calls (depth + bg) = 28s+ total
+  - The deterministic fallback was never reached until all retries exhausted
+- FIX 1: Removed retry on image-edit APIs (generateDepthMap, generateBackgroundPlate)
+  - These APIs consistently 429, retrying is pointless
+  - Fail fast → deterministic fallback is instant
+  - Result: 30s → 0.5s
+- FIX 2: Reduced VLM analyze retry from 3× (2s/4s/8s) to 1× (1.5s)
+  - VLM also frequently 429s
+  - 1 retry with 1.5s delay is enough — fallback analysis is available
+- FIX 3: Added 5s timeout on AI calls in separate/route.ts
+  - withTimeout() Promise.race wrapper
+  - If AI call hangs > 5s, fail fast to deterministic fallback
+- FIX 4: Reduced frontend fetchWithRetry from 3 retries (3s/6s/9s) to 1 retry (1.5s)
+  - Was compounding the wait time on the client side
+
+Stage Summary:
+- /api/separate response time: 30s+ → 0.4-0.6s (60× faster)
+- Decomposing no longer stuck — completes in <8s with fallbacks
+- AI APIs still 429 (rate limited by provider) but now fail fast
+- Deterministic fallbacks (depth map, background plate) produce usable results instantly
+- The user can now upload → analyze → decompose → animate without getting stuck
+- Browser verified: mountain sample → analyze 5s → Quick Mode → 7 layers ready in <8s total

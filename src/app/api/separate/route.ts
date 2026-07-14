@@ -54,12 +54,21 @@ export async function POST(req: NextRequest) {
     const origH = originalMeta.height ?? 1024;
 
     // Phase 1: try AI for bg + depth, fallback to deterministic on 429
+    // v3 FIX: 5s timeout on each AI call — if it 429s, fail fast to fallback
+    // instead of waiting 30s with retries. The deterministic fallback is instant.
     const out: Record<string, { url: string; filename: string } | null> = {};
+
+    const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
+      Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+          setTimeout(() => reject(new Error(`timeout ${ms}ms`)), ms)
+        ),
+      ]);
 
     // depth map — resize AI output to match original aspect ratio
     try {
-      const buf = await generateDepthMap(dataUrl, subject);
-      // resize to exact original dimensions (fit: fill to avoid letterboxing)
+      const buf = await withTimeout(generateDepthMap(dataUrl, subject), 5000);
       const resizedDepth = await sharp(buf)
         .resize(origW, origH, { fit: "fill" })
         .png()
@@ -67,13 +76,13 @@ export async function POST(req: NextRequest) {
       const r = await saveGeneratedImage(resizedDepth, "depth");
       out.depth = { url: r.url, filename: r.filename };
     } catch (e: any) {
-      console.warn("[separate] AI depth failed, using deterministic fallback", e?.message);
+      console.warn("[separate] AI depth failed, using deterministic fallback:", e?.message?.substring(0, 60));
       out.depth = await generateDeterministicDepth(originalPath);
     }
 
     // background plate — resize AI output to match original aspect ratio
     try {
-      const buf = await generateBackgroundPlate(dataUrl, subject);
+      const buf = await withTimeout(generateBackgroundPlate(dataUrl, subject), 5000);
       const resizedBg = await sharp(buf)
         .resize(origW, origH, { fit: "fill" })
         .png()
@@ -81,7 +90,7 @@ export async function POST(req: NextRequest) {
       const r = await saveGeneratedImage(resizedBg, "bg");
       out.background = { url: r.url, filename: r.filename };
     } catch (e: any) {
-      console.warn("[separate] AI bg failed, using deterministic fallback", e?.message);
+      console.warn("[separate] AI bg failed, using deterministic fallback:", e?.message?.substring(0, 60));
       out.background = await generateDeterministicBackground(originalPath);
     }
 

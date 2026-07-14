@@ -145,7 +145,7 @@ export function Studio() {
                 onClick={() => undoRedo.undo()}
                 disabled={!undoRedo.canUndo}
                 className="rounded-md border border-white/5 p-1 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
-                title="Deshacer (Ctrl+Z)"
+                aria-label="Deshacer" title="Deshacer (Ctrl+Z)"
               >
                 <Undo2 className="h-3 w-3" />
               </button>
@@ -153,7 +153,7 @@ export function Studio() {
                 onClick={() => undoRedo.redo()}
                 disabled={!undoRedo.canRedo}
                 className="rounded-md border border-white/5 p-1 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
-                title="Rehacer (Ctrl+Shift+Z)"
+                aria-label="Rehacer" title="Rehacer (Ctrl+Shift+Z)"
               >
                 <Redo2 className="h-3 w-3" />
               </button>
@@ -230,7 +230,7 @@ function RightPanelTabs({
   return (
     <div className="space-y-3">
       {/* Tab selector */}
-      <div className="flex items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] p-1">
+      <div className="scroll-thin flex items-center gap-1 overflow-x-auto rounded-lg border border-white/5 bg-white/[0.02] p-1">
         <TabButton
           active={tab === "animate"}
           onClick={() => setTab("animate")}
@@ -303,6 +303,8 @@ function TabButton({
   return (
     <button
       onClick={onClick}
+      role="tab"
+      aria-selected={active}
       className={cn(
         "flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
         active

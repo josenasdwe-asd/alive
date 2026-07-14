@@ -23,7 +23,7 @@ export function ControlPanel() {
   const updateAnimation = useAliveStore((s) => s.updateAnimation);
 
   return (
-    <section className="glass rounded-xl p-4">
+    <section className="glass rounded-xl p-3">
       <header className="mb-3 flex items-center gap-2">
         <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">
           <SlidersHorizontal className="h-4 w-4" />

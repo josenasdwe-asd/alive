@@ -125,6 +125,18 @@
     @apply bg-background text-foreground;
     font-feature-settings: "ss01", "cv01", "cv11";
   }
+  /* focus-visible for keyboard accessibility */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  [role="switch"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid oklch(0.7 0.15 165);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 /* ===== Custom scrollbar ===== */

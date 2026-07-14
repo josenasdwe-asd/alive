@@ -16,7 +16,7 @@ export function Pipeline25DPanel() {
 
   return (
     <section className="glass rounded-xl p-3">
-      <header className="mb-2.5 flex items-center gap-2">
+      <header className="mb-3 flex items-center gap-2">
         <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">
           <Camera className="h-3.5 w-3.5" />
         </span>

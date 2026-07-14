@@ -67,7 +67,7 @@ export function ExportPanel() {
   const presetName = PRESET_MAP[animation.preset]?.name ?? "";
 
   return (
-    <section className="glass rounded-xl p-4">
+    <section className="glass rounded-xl p-3">
       <header className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/15 text-primary">

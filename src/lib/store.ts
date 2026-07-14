@@ -140,6 +140,7 @@ export const useAliveStore = create<AliveStore>((set, get) => ({
       width,
       height,
       status: "uploaded",
+      pipelineStep: "upload",
       layers: [],
       analysis: undefined,
       depthMapUrl: undefined,

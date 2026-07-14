@@ -77,27 +77,21 @@ export function sanitizeFilename(label: string): string {
 }
 
 /**
- * Resolve a URL path safely within the public/uploads directory.
- * Throws if the path escapes the uploads directory.
+ * Resolve a URL path safely within the public directory.
+ * URL format: /uploads/xxx.jpg → cwd/public/uploads/xxx.jpg
+ * Throws if the path escapes the public directory.
  */
 export function safeResolvePath(url: string): string {
-  const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
   const PUBLIC_DIR = path.join(process.cwd(), "public");
 
-  // Only allow paths starting with /uploads/
-  if (!url.startsWith("/uploads/")) {
-    // also allow direct /uploads paths for depth maps etc
-    const normalized = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
-    const resolved = path.resolve(PUBLIC_DIR, normalized);
-    if (!resolved.startsWith(PUBLIC_DIR + path.sep)) {
-      throw new Error("Invalid path: escapes public directory");
-    }
-    return resolved;
-  }
-
-  const normalized = path.normalize(url).replace(/^(\.\.(\/|\\|$))+/, "");
-  const resolved = path.resolve(PUBLIC_DIR, normalized);
-  if (!resolved.startsWith(PUBLIC_DIR + path.sep)) {
+  // strip leading slashes so path.join works correctly
+  const cleanUrl = url.replace(/^\/+/, "");
+  // normalize and remove any ../ attempts
+  const normalized = path.normalize(cleanUrl).replace(/^(\.\.(\/|\\|$))+/, "");
+  // join with public dir (path.join, NOT resolve — resolve treats absolutes differently)
+  const resolved = path.join(PUBLIC_DIR, normalized);
+  // verify containment
+  if (!resolved.startsWith(PUBLIC_DIR + path.sep) && resolved !== PUBLIC_DIR) {
     throw new Error("Invalid path: escapes public directory");
   }
   return resolved;

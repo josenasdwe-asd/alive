@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
 
 /**
  * Mini-timeline visual with scrubbing.

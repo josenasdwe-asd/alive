@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { GitCompare } from "lucide-react";
+import { GitCompare, X } from "lucide-react";
 import { useAliveStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
  * - Right side: animated image (with all effects)
  *
  * The user drags the handle to reveal/hide the animation effect.
+ * Click X or the Comparar button again to close.
  */
 export function ComparisonSlider() {
   const originalUrl = useAliveStore((s) => s.originalUrl);
@@ -21,13 +22,6 @@ export function ComparisonSlider() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   if (!originalUrl) return null;
-
-  const handleMove = (e: React.PointerEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    setPosition(Math.max(0, Math.min(100, x)));
-  };
 
   const handleDown = (e: React.PointerEvent) => {
     const onMove = (ev: PointerEvent) => {
@@ -63,10 +57,9 @@ export function ComparisonSlider() {
       {enabled && (
         <div
           ref={containerRef}
-          className="pointer-events-auto absolute inset-0 z-[60]"
-          onPointerDown={handleDown}
+          className="pointer-events-none absolute inset-0 z-[60]"
         >
-          {/* Original image on the left */}
+          {/* Original image on the left — pointer-events-none so it doesn't block clicks */}
           <div
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
@@ -82,10 +75,11 @@ export function ComparisonSlider() {
             </div>
           </div>
 
-          {/* Divider handle */}
+          {/* Divider handle — ONLY this has pointer-events-auto */}
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
+            className="pointer-events-auto absolute top-0 bottom-0 w-0.5 cursor-ew-resize bg-white shadow-lg"
             style={{ left: `${position}%` }}
+            onPointerDown={handleDown}
           >
             <div className="absolute top-1/2 left-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-xl">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -101,6 +95,15 @@ export function ComparisonSlider() {
           >
             Animado
           </div>
+
+          {/* Close button — pointer-events-auto, top-right */}
+          <button
+            onClick={() => setEnabled(false)}
+            className="pointer-events-auto absolute right-2 top-8 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur hover:bg-black/80"
+            aria-label="Cerrar comparación"
+          >
+            <X className="h-3 w-3" />
+          </button>
         </div>
       )}
     </>

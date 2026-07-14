@@ -69,8 +69,6 @@ export function useUndoRedo() {
   };
 
   const applyState = (state: HistoryState) => {
-    const s = store.getState();
-    // use setLayers + updateAnimation to restore
     useAliveStore.setState({
       layers: state.layers as any,
       animation: state.animation as any,

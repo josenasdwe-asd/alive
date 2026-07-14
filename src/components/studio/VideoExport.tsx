@@ -44,12 +44,19 @@ export function VideoExport({ duration = 5, fps = 30 }: VideoExportProps) {
     cancelRef.current = false;
 
     try {
-      // if we have a real canvas (WebGL mode), use MediaRecorder
-      if (canvas && canvas.getContext("webgl2")) {
+      // check if we have a canvas (WebGL or 2D context — captureStream works on any canvas)
+      // Note: can't call getContext("webgl2") again if already obtained — just check canvas exists
+      if (canvas && canvas.width > 1 && canvas.height > 1) {
         const stream = canvas.captureStream(fps);
-        const recorder = new MediaRecorder(stream, {
-          mimeType: "video/webm;codecs=vp9",
-        });
+        // try vp9, fallback to vp8, fallback to default
+        let mimeType = "video/webm;codecs=vp9";
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = "video/webm;codecs=vp8";
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = "video/webm";
+          }
+        }
+        const recorder = new MediaRecorder(stream, { mimeType });
         const chunks: Blob[] = [];
 
         recorder.ondataavailable = (e) => {

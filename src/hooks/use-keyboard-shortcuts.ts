@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAliveStore } from "@/lib/store";
 
 /**
@@ -14,14 +14,21 @@ export function useKeyboardShortcuts(
   editorMode: boolean,
   setEditorMode: (v: boolean) => void
 ) {
-  const {
-    layers,
-    selectedLayerId,
-    selectLayer,
-    duplicateLayer,
-    removeLayer,
-    reorderLayers,
-  } = useAliveStore();
+  const layers = useAliveStore((s) => s.layers);
+  const selectedLayerId = useAliveStore((s) => s.selectedLayerId);
+  const selectLayer = useAliveStore((s) => s.selectLayer);
+  const duplicateLayer = useAliveStore((s) => s.duplicateLayer);
+  const removeLayer = useAliveStore((s) => s.removeLayer);
+  const reorderLayers = useAliveStore((s) => s.reorderLayers);
+
+  // use refs to avoid re-subscribing on every render
+  const layersRef = useRef(layers);
+  const selectedRef = useRef(selectedLayerId);
+
+  useEffect(() => {
+    layersRef.current = layers;
+    selectedRef.current = selectedLayerId;
+  });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -35,9 +42,9 @@ export function useKeyboardShortcuts(
         return;
 
       // Cmd/Ctrl+D = duplicate
-      if ((e.metaKey || e.ctrlKey) && e.key === "d" && selectedLayerId) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "d" && selectedRef.current) {
         e.preventDefault();
-        duplicateLayer(selectedLayerId);
+        duplicateLayer(selectedRef.current);
         return;
       }
 
@@ -49,16 +56,16 @@ export function useKeyboardShortcuts(
       }
 
       // Delete/Backspace = remove layer
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedLayerId) {
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedRef.current) {
         e.preventDefault();
-        removeLayer(selectedLayerId);
+        removeLayer(selectedRef.current);
         return;
       }
 
       // 1-9 = select layer N
       const numKey = parseInt(e.key);
       if (!isNaN(numKey) && numKey >= 1 && numKey <= 9) {
-        const layer = layers[numKey - 1];
+        const layer = layersRef.current[numKey - 1];
         if (layer) {
           e.preventDefault();
           selectLayer(layer.id);
@@ -67,31 +74,22 @@ export function useKeyboardShortcuts(
       }
 
       // [ = move layer back, ] = move layer front
-      if (e.key === "[" && selectedLayerId) {
+      if (e.key === "[" && selectedRef.current) {
         e.preventDefault();
-        const idx = layers.findIndex((l) => l.id === selectedLayerId);
-        if (idx > 0) reorderLayers(selectedLayerId, layers[idx - 1].id);
+        const idx = layersRef.current.findIndex((l) => l.id === selectedRef.current);
+        if (idx > 0) reorderLayers(selectedRef.current!, layersRef.current[idx - 1].id);
         return;
       }
-      if (e.key === "]" && selectedLayerId) {
+      if (e.key === "]" && selectedRef.current) {
         e.preventDefault();
-        const idx = layers.findIndex((l) => l.id === selectedLayerId);
-        if (idx < layers.length - 1)
-          reorderLayers(selectedLayerId, layers[idx + 1].id);
+        const idx = layersRef.current.findIndex((l) => l.id === selectedRef.current);
+        if (idx < layersRef.current.length - 1)
+          reorderLayers(selectedRef.current!, layersRef.current[idx + 1].id);
         return;
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [
-    layers,
-    selectedLayerId,
-    editorMode,
-    setEditorMode,
-    selectLayer,
-    duplicateLayer,
-    removeLayer,
-    reorderLayers,
-  ]);
+  }, [editorMode, setEditorMode]); // refs handle the rest
 }
